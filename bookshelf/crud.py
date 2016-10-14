@@ -19,6 +19,8 @@ from flask import Blueprint, current_app, redirect, render_template, request, \
 
 crud = Blueprint('crud', __name__)
 
+def samplerate(file):
+    pass
 
 def upload_image_file(file):
     """

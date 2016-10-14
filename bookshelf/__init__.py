@@ -93,11 +93,9 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         ds = get_client()
         key = ds.key('Audio', int(id))
         results = ds.get(key)
-        # print(from_datastore(results))
         audio_data = from_datastore(results)
 
         audio_url = audio_data.get('audioUrl')
-        print _speech(audio_url)
         return _speech(audio_url)
 
     # Add a logout handler.
@@ -220,13 +218,7 @@ def _speech(speech_file):
     # speech_content = base64.b64encode(req)
 
     service = _get_speech_service()
-    print("-- speech_file")
-    print(speech_file)
-    print(speech_file.replace('https://storage.googleapis.com','gs://'))
-    print("-- bucket")
-    print(bucket)
-    print
-    print
+    speech_uri = speech_file.replace('https://storage.googleapis.com','gs://')
 
     service_request = service.speech().syncrecognize(
         body={
@@ -243,15 +235,11 @@ def _speech(speech_file):
             #     }
 
             'audio': {
-                'uri': 'gs://flasker-143706/audio-2016-10-14-082802.wav'
+                'uri': speech_uri
                 }
             })
     # [END construct_request]
     # [START send_request]
     response = service_request.execute()
-    print("-- service_request")
-    print service_request
-    print("-- response")
-    print(json.dumps(response))
     return json.dumps(response)
     # [END send_request]
