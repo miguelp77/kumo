@@ -1,0 +1,16 @@
+.square {
+    width: 275px;
+    padding-bottom: 25px;
+    padding-left: 10px;
+    margin-right: 2%;
+    background: #b0ddc9;
+    background-size: cover;
+    border: 1px solid #6bbe9a;
+}
+
+a h4{
+  color: #fff;
+}
+p {
+  color: #444;
+}

@@ -89,7 +89,7 @@ MONGO_URI = 'mongodb://user:password@host:27017/database'
 # larger or more varied file types if desired.
 CLOUD_STORAGE_BUCKET = 'flasker-143706'
 MAX_CONTENT_LENGTH = 8 * 1024 * 1024
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif','txt','wav'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif','txt','wav','flac'])
 
 # OAuth2 configuration.
 # This can be generated from the Google Developers Console at
@@ -104,4 +104,4 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif','txt','wav'])
 # that the current URI is allowed.
 GOOGLE_OAUTH2_CLIENT_ID = \
     '583400284929-usn5ts7aemtkkpunmsje4mqh6f1hlsi4.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET = 'zp-bkqet2r7icVcELor_2IFg'
+GOOGLE_OAUTH2_CLIENT_SECRET = 'vu2IjducOIKmWF5Osrzl4Noq'

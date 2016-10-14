@@ -46,19 +46,27 @@ def from_datastore(entity):
     return entity
 
 
-def list(limit=10, cursor=None):
+# def list(limit=10, cursor=None):
+#     ds = get_client()
+#     query = ds.query(kind='Book', order=['title'])
+#     it = query.fetch(limit=limit, start_cursor=cursor)
+#     entities, more_results, cursor = it.next_page()
+#     entities = builtin_list(map(from_datastore, entities))
+#     return entities, cursor.decode('utf-8') if len(entities) == limit else None
+
+def list(limit=10, kind='Book', cursor=None):
     ds = get_client()
-    query = ds.query(kind='Book', order=['title'])
+    query = ds.query(kind=kind, order=['title'])
     it = query.fetch(limit=limit, start_cursor=cursor)
     entities, more_results, cursor = it.next_page()
     entities = builtin_list(map(from_datastore, entities))
     return entities, cursor.decode('utf-8') if len(entities) == limit else None
 
 
-def list_by_user(user_id, limit=10, cursor=None):
+def list_by_user(user_id, kind='Book', limit=10, cursor=None):
     ds = get_client()
     query = ds.query(
-        kind='Book',
+        kind=kind,
         filters=[
             ('createdById', '=', user_id)
         ]
@@ -73,15 +81,23 @@ def read(id):
     ds = get_client()
     key = ds.key('Book', int(id))
     results = ds.get(key)
+    print(from_datastore(results))
+    return from_datastore(results)
+
+def read_audio(id):
+    ds = get_client()
+    key = ds.key('Audio', int(id))
+    results = ds.get(key)
+    print(from_datastore(results))
     return from_datastore(results)
 
 
-def update(data, id=None):
+def update(data, kind='Book', id=None):
     ds = get_client()
     if id:
-        key = ds.key('Book', int(id))
+        key = ds.key(kind, int(id))
     else:
-        key = ds.key('Book')
+        key = ds.key(kind)
 
     entity = datastore.Entity(
         key=key,
@@ -95,7 +111,7 @@ def update(data, id=None):
 create = update
 
 
-def delete(id):
+def delete(id, kind='Book'):
     ds = get_client()
-    key = ds.key('Book', int(id))
+    key = ds.key(kind, int(id))
     ds.delete(key)

@@ -18,31 +18,61 @@
 
 {% block content %}
 
-<h3>Books</h3>
+<h3>Datos</h3>
 <a href="/books/add" class="btn btn-success btn-sm">
   <i class="glyphicon glyphicon-plus"></i>
   Add book
 </a>
+{% if session.profile %}
+<a href="/books/add_audio" class="btn btn-success btn-sm">
+  <i class="glyphicon glyphicon-plus"></i>
+  Add audio
+</a>
+{% endif %}
 
 {% for book in books %}
 <div class="media">
   <a href="/books/{{book.id}}">
     <div class="media-left">
       {% if book.imageUrl %}
-        <img src="{{book.imageUrl}}">
+        <img src="{{book.imageUrl}}" width="128px">
       {% else %}
-        <img src="http://placekitten.com/g/128/192">
+        <img src="http://placekitten.com/g/128/192" width="128px">
       {% endif %}
     </div>
     <div class="media-body">
       <h4>{{book.title}}</h4>
       <p>{{book.author}}</p>
+      <p>{{book.kind}}</p>
     </div>
   </a>
 </div>
 {% else %}
-<p>No books found</p>
+<p></p>
 {% endfor %}
+
+<div class="container">
+  <div class="row">
+  {% for audio in audios %}
+    <div class="col col-xs-3 col-md-3">
+      <div class="media square">
+        <a href="/books/audio/{{audio.id}}">
+          <div class="media-body">
+            <h4>{{audio.title}}</h4>
+            <p>author: {{audio.author}}</p>
+            <a href="/api_tasks/{{audio.id}}" class="btn btn-success btn-sm">
+              <i class="glyphicon glyphicon-expand"></i>
+              Proccess it
+            </a>
+          </div>
+        </a>
+      </div>
+    </div>
+  {% else %}
+  <p>No audios found</p>
+  {% endfor %}
+  </div>
+</div>
 
 {% if next_page_token %}
 <nav>
