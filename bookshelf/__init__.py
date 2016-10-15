@@ -13,6 +13,8 @@ from google.cloud import datastore
 from google.cloud import storage as cloud_storage
 # from google.cloud import cloudstorage as gcs
 #from google.appengine.ext import ndb
+# from googleapiclient import discovery
+# from apiclient.discovery import build
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
@@ -83,7 +85,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     # Initalize the OAuth2 helper.
     oauth2.init_app(
         app,
-        scopes=['email', 'profile','https://speech.googleapis.com/$discovery/rest?version=v1beta1'],
+        scopes=['email', 'profile'],
         authorize_callback=_request_user_info)
 
 
@@ -218,7 +220,7 @@ def _speech(speech_file):
     # speech_content = base64.b64encode(req)
 
     service = _get_speech_service()
-    speech_uri = speech_file.replace('https://storage.googleapis.com','gs://')
+    speech_uri = speech_file.replace('https://storage.googleapis.com/','gs://')
 
     service_request = service.speech().syncrecognize(
         body={
