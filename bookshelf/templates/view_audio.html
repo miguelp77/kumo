@@ -47,6 +47,11 @@
     <h5 class="book-author">By {{audio.author|default('Unknown', True)}}</h5>
     <p class="book-description">{{audio.description}}</p>
     <small class="book-added-by">Added by {{audio.createdBy|default('Anonymous', True)}}</small>
+    {% if audio.text %}
+    <hr>
+    <p>{{audio.text}}</a>
+    {% endif %}
+
     {% if audio.audioUrl %}
     <hr>
     <a href="{{audio.audioUrl}}" class="btn btn-primary btn-sm">

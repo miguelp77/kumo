@@ -98,7 +98,27 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         audio_data = from_datastore(results)
 
         audio_url = audio_data.get('audioUrl')
-        return _speech(audio_url)
+        text_from_audio = _speech(audio_url)
+        #audio_data = text_from_audio
+        jason = json.loads(text_from_audio)
+        results.__setitem__("text",unicode(jason['results'][0]['alternatives'][0]['transcript']))
+        results.__setitem__("confidence",unicode(jason['results'][0]['alternatives'][0]['confidence']))
+        results.update()
+        current_app.logger.info(
+            "audio_data: %s" % results)
+        # ds = get_client()
+        # if id:
+        #     key = ds.key(kind, int(id))
+        # else:
+        #     key = ds.key(kind)
+        #
+        # entity = datastore.Entity(
+        #     key=key,
+        #     exclude_from_indexes=['description'])
+        #
+        # entity.update(data)
+        ds.put(results)
+        return text_from_audio
 
     # Add a logout handler.
     @app.route('/logout')
@@ -202,22 +222,9 @@ def _speech(speech_file):
         speech_file: the name of the audio file.
     """
     # [START construct_request]
-    # # with open(speech_file, 'rb') as speech:
-    # client = _get_storage_client()
-    # bucket = client.get_bucket(current_app.config['CLOUD_STORAGE_BUCKET'])
-    # blob = bucket.blob(speech_file)
-    #
-    # # with bucket.open(speech_file, 'r') as speech:
-    # # with speech_file as speech:
-    #     # Base64 encode the binary audio file for inclusion in the JSON
-    #     # request.
-    #     # speech_content = base64.b64encode(speech.read())
-    # # speech_content = base64.b64encode(speech_file)
     storage_service = _get_storage_service()
     bucket = current_app.config['CLOUD_STORAGE_BUCKET']
     req = storage_service.objects().get(bucket=bucket, object=speech_file)
-
-    # speech_content = base64.b64encode(req)
 
     service = _get_speech_service()
     speech_uri = speech_file.replace('https://storage.googleapis.com/','gs://')
@@ -232,10 +239,6 @@ def _speech(speech_file):
                 # See https://goo.gl/A9KJ1A for a list of supported languages.
                 'languageCode': 'es-ES',  # a BCP-47 language tag en-US
             },
-            # 'audio': {
-            #     'content': speech_content.decode('UTF-8')
-            #     }
-
             'audio': {
                 'uri': speech_uri
                 }
@@ -244,4 +247,5 @@ def _speech(speech_file):
     # [START send_request]
     response = service_request.execute()
     return json.dumps(response)
+    # return response
     # [END send_request]

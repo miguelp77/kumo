@@ -18,13 +18,16 @@
   <head>
     <title>Devoteam -  Google Cloud Platform</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
   </head>
   <body>
-    <div class="navbar navbar-default">
+    <!--  NAVBAR -->
+    <!-- <div class="navbar navbar-default">
       <div class="container">
         <div class="navbar-header">
           <div class="navbar-brand">DevoDemo</div>
@@ -49,10 +52,46 @@
         {% endif %}
         </p>
       </div>
-    </div>
+    </div> -->
+    <!--  END NAVBAR-->
+    <nav>
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo">DevoDemo</a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li><a class="tab" href="/books">Books</a></li>
+          <li><a class="tab" href="/books/mine">My Books</a></li>
+          {% if session.profile %}
+            <li><a class="tab" href="/books/audios">Audios</a></li>
+          {% endif %}
+          <li>
+            {% if session.profile %}
+            {% if session.profile.image %}
+            <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
+            {% endif %}
+            {% endif %}
+          </li>
+          <li>
+            {% if session.profile %}
+              <a class="tab" href="/logout">
+                {{session.profile.displayName}}
+              </a>
+            {% else %}
+              <a class="tab" href="/oauth2authorize">Login</a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </nav>
     <div class="container">
       {% block content %}{% endblock %}
     </div>
     {{user}}
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+    <script>
+      $(document).ready(function(){
+        $('ul.tabs').tabs('select_tab', 'tab_id');
+      });
+    </script>
   </body>
 </html>
