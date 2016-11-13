@@ -1,13 +1,3 @@
-/*.square {
-    width: 275px;
-    padding-bottom: 25px;
-    padding-left: 10px;
-    margin-right: 2%;
-    background: #b0ddc9;
-    background-size: cover;
-    border: 1px solid #6bbe9a;
-}*/
-
 a h4{
   color: #fff;
 }
@@ -17,4 +7,24 @@ p {
 
 .img_profile{
   margin-top: 20px;
+}
+.condensed{
+  font-stretch: condensed;
+}
+.collapsible-header{
+  color:rgba(0,0,0,0.87);
+}
+.collection .collection-item.active{
+  background-color: #fff;
+  color:rgba(0,0,0,0.87);
+  border: rgba(125, 125, 228, 0.49) 1px solid;
+}
+.collapsible-header, .collapsible-body{
+  border-bottom:0;
+}
+
+.dz-default.dz-message {
+  border: 2px dashed #4a4a4a;
+  padding: 10px;
+  height: 220px;
 }

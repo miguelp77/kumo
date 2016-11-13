@@ -1,0 +1,56 @@
+{#
+# Miguel Paniagua.
+#
+#}
+
+{% extends "base.html" %}
+
+{% block content %}
+<h3>{{action}} audio</h3>
+
+<form method="POST" enctype="multipart/form-data">
+
+  <div class="form-group">
+    <label for="title">Title</label>
+    <input type="text" name="title" id="title" value="{{audio.title}}" class="form-control"/>
+  </div>
+
+  <div class="form-group">
+    <label for="author">Author</label>
+    <input type="text" name="author" id="author" value="{{audio.author}}" class="form-control"/>
+  </div>
+
+  <div class="form-group">
+    <label for="publishedDate">Date Published</label>
+    <input type="text" name="publishedDate" id="publishedDate" value="{{audio.publishedDate}}" class="form-control"/>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea name="description" id="description" class="form-control">{{audio.description}}</textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="image">Audio File</label>
+    <input type="file" name="audiofile" id="audiofile" class="form-control"/>
+  </div>
+
+  <div class="form-group hidden">
+    <label for="imageUrl">Audio File URL</label>
+    <input type="text" name="audioUrl" id="audioUrl" value="{{audio.imageUrl}}" class="form-control"/>
+  </div>
+
+  <div class="form-group hidden">
+    <label for="createdBy">Created by</label>
+    <input type="text" name="createdBy" id="createdBy" value="{{audio.createdBy}}" class="form-control"/>
+  </div>
+
+  <div class="form-group hidden">
+    <label for="createdById">Created by ID</label>
+    <input type="text" name="createdById" id="createdById" value="{{audio.createdById}}" class="form-control"/>
+  </div>
+
+  <button type="submit" class="btn btn-success">Save</button>
+</form>
+
+{% endblock %}

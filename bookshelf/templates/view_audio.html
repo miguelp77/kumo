@@ -1,65 +1,125 @@
 {#
-# Copyright 2015 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Miguel Paniagua in Devoteam Spain
 #}
 
 {% extends "base.html" %}
 
 {% block content %}
 
-<h3>Book</h3>
+<h3>{{audio.title}}</h3>
+{% if audio.polarity %}
+  {% if (audio.polarity)|float <= -0.75 %}
+    <div class="chip tooltipped red darken-4" data-position="top" data-tooltip="Polarity from -1.0 (very negative) to 1.0 (very positive)">
+      Polarity: {{audio.polarity|float}}
+    </div>
+    <div class="chip tooltipped light-blue darken-3" data-position="left" data-tooltip="Magnitude is the strenght of sentiment, from 0 to infinity">
+      Magnitude: {{audio.magnitude|float}}
+    </div>
+  {% elif (audio.polarity)|float < 0.25 %}
+    <div class="chip tooltipped yellow lighten-1" data-position="top" data-tooltip="Polarity between -1.0 to 1.0">
+      Polarity: {{audio.polarity|float}}
+    </div>
+    <div class="chip tooltipped light-blue darken-3" data-position="left" data-tooltip="Magnitude is the strenght of sentiment, from 0 to infinity">
+      {{audio.magnitude|float}}
+    </div>
+  {% endif %}
+  {% if (audio.polarity)|float > 0.25 %}
+    <div class="chip tooltipped green lighten-1" data-position="top" data-tooltip="Polarity from -1.0 (very negative) to 1.0 (very positive)">
+      Polarity: {{audio.polarity|float}}
+    </div>
+    <div class="chip tooltipped light-blue darken-3" data-position="left" data-tooltip="Magnitude is the strenght of sentiment, from 0 to infinity">
+      {{audio.magnitude|float}}
+    </div>
+  {% endif %}
+{% endif %}
 
-<div class="btn-group">
-  <a href="/books/{{audio.id}}/edit_audio" class="btn btn-primary btn-sm">
-    <i class="glyphicon glyphicon-edit"></i>
-    Edit audio
-  </a>
-  <a href="/books/{{audio.id}}/delete" class="btn btn-danger btn-sm">
-    <i class="glyphicon glyphicon-trash"></i>
-    Delete book
-  </a>
-</div>
 
-<div class="media">
-  <div class="media-left">
-    {% if audio.imageUrl %}
-      <img class="book-image" src="{{audio.imageUrl}}">
-    {% else %}
-      <img class="book-image" src="http://placekitten.com/g/128/192">
-    {% endif %}
-  </div>
-  <div class="media-body">
-    <h4 class="book-title">
-      {{audio.title}}
-      <small>{{audio.publishedDate}}</small>
-    </h4>
-    <h5 class="book-author">By {{audio.author|default('Unknown', True)}}</h5>
-    <p class="book-description">{{audio.description}}</p>
-    <small class="book-added-by">Added by {{audio.createdBy|default('Anonymous', True)}}</small>
-    {% if audio.text %}
-    <hr>
-    <p>{{audio.text}}</a>
-    {% endif %}
-
+<ul class="collection collapsible popout">
+    <li class="collection-item avatar">
+      <i class="material-icons circle">label_outline</i>
+      <span class="title">Title</span>
+      <p>{{audio.title}}<br>
+      </p>
+    </li>
+    <li class="collection-item avatar">
+      <i class="material-icons circle blue">language</i>
+      <span class="title">Description</span>
+      <p>{{audio.description}}
+      </p>
+    </li>
+    <li class="collection-item avatar">
+      <i class="material-icons circle green">recent_actors</i>
+      <span class="title">Details</span>
+      <p>Upload by: {{audio.createdBy|default('Anonymous', True)}}
+         on {{audio.publishedDate}}
+      </p>
+    </li>
     {% if audio.audioUrl %}
-    <hr>
-    <a href="{{audio.audioUrl}}" class="btn btn-primary btn-sm">
-      <i class="glyphicon glyphicon-cloud-download"></i> Download File
-    </a>
+    <li class="collection-item avatar">
+      {# <i class="material-icons circle red">system_update_alt</i> #}
+      <a href="{{audio.audioUrl}}"><i class="material-icons circle red">play_arrow</i></a>
+      <span class="title">File</span>
+      <p>
+        Push play to download/reproduce audio file
+      </p>
+    </li>
+    {% else %}
+    <li class="collection-item avatar">
+      <i class="material-icons circle grey">system_update_alt</i>
+      <span class="title">No file</span>
+      <p>
+        No audio file
+      </p>
+    </li>
     {% endif %}
 
-  </div>
-</div>
+    {% if audio.text %}
+    <li class="collection-item avatar">
+      <i class="material-icons circle blue">chat_bubble_outline</i>
+      <span class="badge" title="Confidence {{audio.confidence}}">{{audio.confidence}}</span>
+      <span class="title collapsible-header">Transcription</span>
+      <blockquote class="collapsible-body">{{audio.text}}
+      </blockquote>
+    </li>
+    <li class="collection-item avatar">
+      <i class="material-icons circle green">chat_bubble</i>
+      <span class="title collapsible-header">Translation to English</span>
+      <blockquote class="collapsible-body">{{audio.english}}
+      </blockquote>
+    </li>
+    {% else %}
+    <li class="collection-item avatar">
+      <i class="material-icons circle grey">play_arrow</i>
+      <span class="title">Transcription</span>
+    </li>
+    {% endif %}
 
+  </ul>
+
+  <div class="btn-group">
+    <div class="fixed-action-btn horizontal" style="bottom: 45px; right: 24px;">
+      <a class="tooltipped btn-floating btn-large green" data-position="bottom" data-tooltip="More options">
+        <i class="large material-icons">visibility</i>
+      </a>
+      <ul>
+        <li><a href="/books/{{audio.id}}/delete" class="tooltipped btn-floating red" data-position="top" data-tooltip="Delete"><i class="material-icons">delete</i></a></li>
+        <li><a href="/books/{{audio.id}}/edit_audio" class="tooltipped btn-floating" data-position="top" data-tooltip="Edit"><i class="material-icons">mode_edit</i></a></li>
+        {% if audio.audioUrl %}
+          <li><a href="/api_tasks/{{audio.id}}" class="tooltipped btn-floating" data-position="top" data-tooltip="Transcript"><i class="material-icons">message</i></a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+
+
+
+<script>
+  $(document).ready(function(){
+      $('.tooltipped').tooltip({delay: 50});
+      $('.collapsible').collapsible({
+        accordion : false // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+      });
+    });
+</script>
 {% endblock %}

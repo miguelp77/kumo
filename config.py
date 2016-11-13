@@ -21,7 +21,8 @@ You can create and manage projects at https://console.developers.google.com
 import os
 
 # The secret key is used by Flask to encrypt session cookies.
-SECRET_KEY = 'secret'
+# SECRET_KEY = 'secret'
+SECRET_KEY = 'secret3131312aaa'
 
 # There are three different ways to store the data in the application.
 # You can choose 'datastore', 'cloudsql', or 'mongodb'. Be sure to
@@ -32,7 +33,7 @@ DATA_BACKEND = 'datastore'
 
 # Google Cloud Project ID. This can be found on the 'Overview' page at
 # https://console.developers.google.com
-PROJECT_ID = 'flasker-143706'
+PROJECT_ID = 'devodemo-2016'
 
 # CloudSQL & SQLAlchemy configuration
 # Replace the following values the respective values of your Cloud SQL
@@ -72,7 +73,7 @@ PROJECT_ID = 'flasker-143706'
 # Mongo configuration
 # If using mongolab, the connection URI is available from the mongolab control
 # panel. If self-hosting on compute engine, replace the values below.
-MONGO_URI = 'mongodb://user:password@host:27017/database'
+# MONGO_URI = 'mongodb://user:password@host:27017/database'
 
 # Google Cloud Storage and upload settings.
 # Typically, you'll name your bucket the same as your project. To create a
@@ -87,7 +88,7 @@ MONGO_URI = 'mongodb://user:password@host:27017/database'
 #
 # You can adjust the max content length and allow extensions settings to allow
 # larger or more varied file types if desired.
-CLOUD_STORAGE_BUCKET = 'flasker-143706'
+CLOUD_STORAGE_BUCKET = 'devodemo-2016'
 MAX_CONTENT_LENGTH = 8 * 1024 * 1024
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif','txt','wav','flac'])
 
@@ -102,6 +103,11 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif','txt','wav','flac'])
 #
 # If you receive a invalid redirect URI error review you settings to ensure
 # that the current URI is allowed.
+# GOOGLE_OAUTH2_CLIENT_ID = \
+#     '583400284929-usn5ts7aemtkkpunmsje4mqh6f1hlsi4.apps.googleusercontent.com'
 GOOGLE_OAUTH2_CLIENT_ID = \
-    '583400284929-usn5ts7aemtkkpunmsje4mqh6f1hlsi4.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET = 'vu2IjducOIKmWF5Osrzl4Noq'
+    '930023369442-k2na31qmm4n9e1kqkdgifru4sc85c8sr.apps.googleusercontent.com'
+# GOOGLE_OAUTH2_CLIENT_SECRET = 'vu2IjducOIKmWF5Osrzl4Noq'
+GOOGLE_OAUTH2_CLIENT_SECRET = 'Lz2BV4GB69c9P-pqx26-N5d1'
+# API_KEY = 'AIzaSyAulFrHf86ze4ImeV4G5x6Lg4awxaAv4Sw'
+API_KEY = 'AIzaSyC3bb8ZhYon3W8BMMTWObh1tj0qQWzcjCg'

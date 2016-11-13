@@ -57,15 +57,15 @@
 <style media="screen">
 #droparea{
 width: 400px;
-min-height: 220px;
+min-height: 400px;
 margin: 30px auto 0;
 padding: 0 20px;
-border: 4px dashed rgba(82, 82, 82, 0.8);
+border: 4px dashed rgba(0, 82, 156, 0.8);
 }
 
 #previewsContainer {
 width: 300px;
-/*min-height: 280px;*/
+min-height: 280px;
 padding: 10px 20px;
 background: #FFF;
 margin: 0 auto 20px;
@@ -81,52 +81,48 @@ float: left;
 cursor: pointer;
 }*/
 
-canvas{ display: block; vertical-align: bottom; } /* ---- particles.js container ---- */
-#particles-js{ display:none; position:absolute; width: 100%; height: 100%;
-	background-color: #b61924; background-image: url("");
-	background-repeat: no-repeat; background-size: cover; background-position: 50% 50%; }
-
 </style>
-<div id="uploader">
 <h3>{{action}} audio</h3>
 
 {# <div id="selectImage">Select Image</div> #}
-{# <button id="selectFile" class="btn btn-success">File</button> #}
-
+<button id="selectFile" class="btn btn-success">File</button>
 <button id="fileSubmit" class="btn btn-success">Save</button>
-<div id="droparea">
+{# <div id="droparea">
 	<p></p>
 	<div id="previewsContainer">
 		<p>Drag your file here</p>
 	</div>
-</div>
-</div>
+</div> #}
 
-<div id="particles-js"></div>
+	<form action="/books/drop_audio'"
+	      class="dropzone"
+	      enctype="multipart/form-data"
+	      id="my-dropzone">
+				<div class="fallback">
+				    <input name="file" type="file" multiple />
+				  </div>
+
+	      </form>
+
 
 
 <script src="/static/js/dropzone.js"></script>
-<script src="/static/js/particles.js"></script>
-<script src="/static/js/particles_back.js"></script>
-
-<script type="text/javascript">
+{# <script type="text/javascript">
 $(function() {
 
 var myDropzone = new Dropzone("div#droparea", {
   url: "/books/drop_audio",
   method: "POST", // can be changed to "put" if necessary
-  maxFilesize: 8, // in MB
+  maxFilesize: 2, // in MB
   paramName: "file", // The name that will be used to transfer the file
-  uploadMultiple: false, // This option will also trigger additional events (like processingmultiple).
-  // headers: {
-  //   "My-Awesome-Header": "header value"
-  // },
-	// autoDiscover: false
+  uploadMultiple: true, // This option will also trigger additional events (like processingmultiple).
+  headers: {
+    "My-Awesome-Header": "header value"
+  },
   addRemoveLinks: true, // add an <a class="dz-remove">Remove file</a> element to the file preview that will remove the file, and it will change to Cancel upload
   previewsContainer: "#previewsContainer",
-  // clickable: "#selectFile",
-  clickable: true,
-  createImageThumbnails: false,
+  clickable: "#selectFile",
+  createImageThumbnails: true,
   maxThumbnailFilesize: 2, // in MB
   thumbnailWidth: 300,
   thumbnailHeight: 300,
@@ -170,10 +166,6 @@ myDropzone.options.previewTemplate = '\
   <div class="dz-error-message"><span data-dz-errormessage></span></div>\
   </div>';
 
-	myDropzone.on('sending', function(file, xhr, formData){
-	            formData.append('title', file.name);
-							console.log(file.name);
-	        });
 
 /*
  * Available Events
@@ -204,25 +196,9 @@ myDropzone.on("thumbnail", function(file) { console.log("thumbnail"); });
 myDropzone.on("error", function(file) { console.log("error"); });
 myDropzone.on("processing ", function(file) { console.log("processing "); });
 myDropzone.on("uploadprogress", function(file) { console.log("uploadprogress"); });
-// myDropzone.on("sending", function(file) { console.log("sending"); });
-myDropzone.on("success", function(file, responseText) {
-	console.log("success");
-	// location = '/books/audio/'+responseText;
-	$('#uploader').hide();
-	$('.container').css('margin',0);
-	$('#particles-js').show();
-	particlesJS.load('particles-js', '../static/particles.json', function() {
-	  console.log('callback - particles.js config loaded');
-	});
-
-	location = '/api_tasks/'+responseText;
-});
-myDropzone.on("complete", function(file, responseText) {
-	console.log("complete");
-	myDropzone.removeFile(file);
-	console.log(responseText);
-
-});
+myDropzone.on("sending", function(file) { console.log("sending"); });
+myDropzone.on("success", function(file) { console.log("success"); });
+myDropzone.on("complete", function(file) { console.log("complete"); });
 myDropzone.on("canceled", function(file) { console.log("canceled"); });
 myDropzone.on("maxfilesreached", function(file) { console.log("maxfilesreached"); });
 myDropzone.on("maxfilesexceeded", function(file) { console.log("maxfilesexceeded"); });
@@ -241,6 +217,6 @@ myDropzone.on("totaluploadprogress", function() { console.log("totaluploadprogre
 myDropzone.on("reset", function() { console.log("reset") });
 
 });
-</script>
+</script> #}
 
 {% endblock %}

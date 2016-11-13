@@ -8,3 +8,5 @@ Flask-PyMongo==0.4.1
 PyMongo==3.3.0
 six==1.10.0
 google-api-python-client==1.5.3
+google-cloud-translate
+wave
