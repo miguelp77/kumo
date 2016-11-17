@@ -15,31 +15,14 @@
 from bookshelf import get_model, oauth2, storage
 from flask import Blueprint, current_app, redirect, render_template, request, \
     session, url_for
+import datetime
+from werkzeug.utils import secure_filename
 
 
 crud = Blueprint('crud', __name__)
 
 def samplerate(file):
     pass
-
-def upload_image_file(file):
-    """
-    Upload the user-uploaded file to Google Cloud Storage and retrieve its
-    publicly-accessible URL.
-    """
-    if not file:
-        return None
-
-    public_url = storage.upload_file(
-        file.read(),
-        file.filename,
-        file.content_type
-    )
-
-    current_app.logger.info(
-        "Uploaded file %s as %s.", file.filename, public_url)
-
-    return public_url
 
 def upload_audio_file(file):
     """
@@ -66,11 +49,11 @@ def list():
     if token:
         token = token.encode('utf-8')
 
-    books, next_page_token = get_model().list(kind='Book',cursor=token)
+    audios, next_page_token = get_model().list(kind='Audio',cursor=token)
 
     return render_template(
-        "list.html",
-        books=books,
+        "home.html",
+        audios=audios,
         next_page_token=next_page_token)
 
 @crud.route("/audios")
@@ -117,28 +100,6 @@ def view_audio(id):
     audio = get_model().read_audio(id)
     return render_template("view_audio.html", audio=audio)
 
-@crud.route('/add', methods=['GET', 'POST'])
-def add():
-    if request.method == 'POST':
-        data = request.form.to_dict(flat=True)
-
-        # If an image was uploaded, update the data to point to the new image.
-        image_url = upload_image_file(request.files.get('image'))
-
-        if image_url:
-            data['imageUrl'] = image_url
-
-        # If the user is logged in, associate their profile with the new book.
-        if 'profile' in session:
-            data['createdBy'] = session['profile']['displayName']
-            data['createdById'] = session['profile']['id']
-
-        book = get_model().create(data, kind='Book')
-
-        return redirect(url_for('.view', id=book['id'], kind='Book'))
-
-    return render_template("form.html", action="Add", book={})
-
 @crud.route('/add_audio', methods=['GET', 'POST'])
 def add_audio():
     if request.method == 'POST':
@@ -146,10 +107,8 @@ def add_audio():
 
         # If an image was uploaded, update the data to point to the new image.
         audio_url = upload_audio_file(request.files.get('audiofile'))
-
         if audio_url:
             data['audioUrl'] = audio_url
-
         # If the user is logged in, associate their profile with the new book.
         if 'profile' in session:
             data['createdBy'] = session['profile']['displayName']
@@ -157,28 +116,59 @@ def add_audio():
 
         audio = get_model().create(data, kind='Audio')
 
-        return redirect(url_for('.view', id=audio['id'],kind='Audio'))
+        return redirect(url_for('.view_audio', id=audio['id'],kind='Audio'))
 
     return render_template("upload_file.html", action="Add", audio={})
 
+@crud.route('/test', methods=['GET', 'POST'])
+def test():
+    return "post"
 
-@crud.route('/<id>/edit', methods=['GET', 'POST'])
-def edit(id):
-    book = get_model().read(id)
-
+@crud.route('/drop_audio', methods=['GET', 'POST'])
+def upldfile():
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
+        # files = request.files.getlist('file[]')
+        files = request.files.getlist("file")
 
-        image_url = upload_image_file(request.files.get('image'))
+        # print('request.method : %s',  request.method)
+        # print('request.files : %s', request.files)
+        # print('request.args : %s', request.args)
+        # print('request.form : %s', request.form)
+        # print('request.values : %s', request.values)
+        # print('request.headers : %s', request.headers)
+        # print('request.data : %s', request.data)
+        for f in files:
+            print("***************")
+            print(f)
+            print("***************")
+            if f:
+                filename = secure_filename(f.filename)
+                audio_url = upload_audio_file(f)
+                if audio_url:
+                    data['audioUrl'] = audio_url
+                    # If the user is logged in, associate their profile with the new book.
+                    if 'profile' in session:
+                        data['author'] = session['profile']['displayName']
+                        data['createdBy'] = session['profile']['displayName']
+                        data['createdById'] = session['profile']['id']
+                    else:
+                        data['author'] = 'user-no-logged'
+                        data['createdBy'] = 'user-no-logged'
+                        data['createdById'] = 'user-no-logged'
 
-        if image_url:
-            data['imageUrl'] = image_url
+                    data['description'] = 'File uploaded and process automatically'
+                    date = datetime.datetime.utcnow().strftime("%Y-%m-%d at %H%M%S")
+                    data['publishedDate'] = date
 
-        book = get_model().update(data, id)
+                    audio = get_model().create(data, kind='Audio')
+                    id = audio['id']
 
-        return redirect(url_for('.view', id=book['id']))
+                    return str(id)
+                    # return redirect(url_for('.view_audio', id=audio['id'],kind='Audio'))
 
-    return render_template("form.html", action="Edit", book=book)
+
+    return render_template("upload_file.html", action="Add", audio={})
 
 @crud.route('/<id>/edit_audio', methods=['GET', 'POST'])
 def edit_audio(id):
@@ -201,8 +191,7 @@ def edit_audio(id):
 
     return render_template("upload_file.html", action="Edit", audio=audio)
 
-
 @crud.route('/<id>/delete')
 def delete(id):
-    get_model().delete(id, kind='Book')
+    get_model().delete(id, kind='Audio')
     return redirect(url_for('.list'))

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>devoSpeech</title>
+  <link rel="shortcut icon" type="image/ico" href="/static/images/favicon.ico"/>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="/static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="/static/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+  <div class="navbar-fixed">
+  <nav>
+    <div class="container">
+    <div class="nav-wrapper">
+      <a href="/" class="brand-logo">DevoDemo</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        {# <li><a class="tab" href="/books">Books</a></li> #}
+        {% if session.profile %}
+          <li><a class="tab" href="/books/mine">My Audios</a></li>
+          <li><a class="tab" href="/books/audios">Audios</a></li>
+        {% endif %}
+        <li>
+          {% if session.profile %}
+          {% if session.profile.image %}
+          <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
+          {% endif %}
+          {% endif %}
+        </li>
+        <li>
+          {% if session.profile %}
+            <a class="tab" href="/logout">
+              {{session.profile.displayName}}
+            </a>
+          {% else %}
+            <a class="tab" href="/oauth2authorize">Login</a>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  </div>
+  </nav>
+</div>
+
+<div class="container">
+  <div class="row">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+{{user}}
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+<script src="/static/js/init.js"></script>
+
+<script>
+  $(document).ready(function(){
+    $('ul.tabs').tabs('select_tab', 'tab_id');
+  });
+</script>
+</body>
+</html>
