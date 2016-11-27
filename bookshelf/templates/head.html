@@ -1,48 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
-  <title>devoSpeech</title>
+  <title>R2C</title>
+  <meta charset="utf-8">
   <link rel="shortcut icon" type="image/ico" href="/static/images/favicon.ico"/>
 
-  <!-- CSS  -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="/static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  <link href="/static/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" media="screen" title="no title">
+  <link href="http://fonts.googleapis.com/icon?family=Material+Icons|Orbitron|Russo+One" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+
+
+  <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
 </head>
 <body>
   <div class="navbar-fixed">
-  <nav>
-    <div class="container">
-    <div class="nav-wrapper">
-      <a href="/" class="brand-logo">DevoDemo</a>
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        {# <li><a class="tab" href="/books">Books</a></li> #}
-        {% if session.profile %}
-          <li><a class="tab" href="/books/mine">My Audios</a></li>
-          <li><a class="tab" href="/books/audios">Audios</a></li>
-        {% endif %}
-        <li>
+    <nav>
+      <div class="container">
+      <div class="nav-wrapper">
+        <a href="/" class="brand-logo russo">R2C</a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          {# <li><a class="tab" href="/books">Books</a></li> #}
           {% if session.profile %}
-          {% if session.profile.image %}
-          <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
+            <li><a class="tab" href="/books/mine">My Audios</a></li>
+            <li><a class="tab" href="/books/audios">Audios</a></li>
+            <li><a class="tab" href="/books/dashboard">Dashboard</a></li>
           {% endif %}
-          {% endif %}
-        </li>
-        <li>
-          {% if session.profile %}
-            <a class="tab" href="/logout">
-              {{session.profile.displayName}}
-            </a>
-          {% else %}
-            <a class="tab" href="/oauth2authorize">Login</a>
-          {% endif %}
-        </li>
-      </ul>
+          <li>
+            {% if session.profile %}
+            {% if session.profile.image %}
+            <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
+            {% endif %}
+            {% endif %}
+          </li>
+          <li>
+            {% if session.profile %}
+              <a class="tab" href="/logout">
+                {{session.profile.displayName}}
+              </a>
+            {% else %}
+              <a class="tab" href="/oauth2authorize">Login</a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-  </nav>
+    </nav>
 </div>
 
 <div class="container">

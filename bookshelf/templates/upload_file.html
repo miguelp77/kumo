@@ -18,16 +18,67 @@
 <div id="uploader">
 <h3>Upload audio</h3>
 
-<div id="droparea" class="amber lighten-4">
-	<p></p>
-	<div id="previewsContainer" class="amber lighten-4">
-		<p class="msg_drag">Drag your file here</p>
+<form id="my-awesome-dropzone" class="dropzone">
+
+	<div id="droparea" class="amber lighten-4">
+		<p></p>
+		<div id="previewsContainer" class="amber lighten-4">
+			<p class="msg_drag">Drag your file here</p>
+		</div>
 	</div>
-</div>
-<button id="fileSubmit" class="btn btn-success disabled">Start</button>
+	<input type="email" name="username" />
+	<select class="browser-default" name="frame_rate">
+		<option value="48000" disabled selected>Choose Sample Rate</option>
+		<option value="8000">8 KHz</option>
+		<option value="16000">16 KHz</option>
+		<option value="44000">44 KHz</option>
+		<option value="48000">48 KHz</option>
+	</select>
+	<div class="row">
+
+		{# <form id="my-awesome-dropzone" class="dropzone">
+		  <div class="dropzone-previews"></div> <!-- this is were the previews should be shown. -->
+
+		  <!-- Now setup your input fields -->
+		  <input type="password" name="password" />
+
+		</form> #}
+
+	<div class="col offset-s1 s3 offset-m1 m3">
+		<select class="browser-default" name="frame_rate">
+			<option value="48000" disabled selected>Choose Sample Rate</option>
+			<option value="8000">8 KHz</option>
+			<option value="16000">16 KHz</option>
+			<option value="44000">44 KHz</option>
+			<option value="48000">48 KHz</option>
+		</select>
+	</div>
+	<div class="col s3 m3">
+		<select class="browser-default" name="file_encoding">
+			<option value="LINEAR16" disabled selected>Choose File Encoding</option>
+			<option value="LINEAR16">WAV</option>
+			<option value="AMR">AMR</option>
+			<option value="FLAC">FLAC</option>
+		</select>
+	</div>
+	<div class="col s3 m3">
+		<select class="browser-default" name="language">
+			<option value="es-ES" disabled selected>Choose Language</option>
+			<option value="es-ES">Spanish</option>
+			<option value="fr-FR">French</option>
+		</select>
+	</div>
+	<div class="col s2 m2">
+		<button id="fileSubmit" class="btn btn-success disabled">Start</button>
+	</div>
+
 
 </div>
-<div class="row">
+</form>
+
+</div>
+
+<div id="infospeech" class="row">
       <div class="col s12 m4">
         <div class="card-panel orange darken-3">
           <span class="white-text"><h4>Synchronous Recognition</h4>Ssends audio data to the Speech API, performs recognition on that data, and returns results after all audio has been processed.
@@ -145,7 +196,9 @@ myDropzone.on("dragremove", function(event){ console.log(event.type); });
 myDropzone.on("addedfile", function(file) {
   console.log("addedfile");
   console.log(file);
-  $('#fileSubmit').click(function(){
+  $('#fileSubmit').click(function(e){
+		e.preventDefault();
+      e.stopPropagation();
       myDropzone.processQueue(); //processes the queue
   });
 });
@@ -160,6 +213,7 @@ myDropzone.on("success", function(file, responseText) {
 	console.log("success");
 	// location = '/books/audio/'+responseText;
 	$('#uploader').hide();
+	$('#infospeech').hide();
 	$('.container').css('margin',0);
 	$('#particles-js').show();
 	particlesJS.load('particles-js', '../static/particles.json', function() {

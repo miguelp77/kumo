@@ -52,7 +52,7 @@ def main(speech_file):
         speech_file: the name of the audio file.
     """
     # [START construct_request]
-    w = wave.open(speech_file,'r')
+    # w = wave.open(speech_file,'r')
     with open(speech_file, 'rb') as speech:
         # Base64 encode the binary audio file for inclusion in the JSON
         # request.
@@ -65,7 +65,8 @@ def main(speech_file):
                 # There are a bunch of config options you can specify. See
                 # https://goo.gl/KPZn97 for the full list.
                 'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
-                'sampleRate': w.getframerate(),  # 16 khz
+                # 'sampleRate': w.getframerate(),  # 16 khz
+                'sampleRate': 48000,  # 48 khz
                 # See https://goo.gl/A9KJ1A for a list of supported languages.
                 'languageCode': 'es-ES',  # a BCP-47 language tag
             },
@@ -77,7 +78,7 @@ def main(speech_file):
     # [START send_request]
     response = service_request.execute()
     print(json.dumps(response))
-    print w.getparams()
+    # print w.getparams()
     # [END send_request]
 
 # [START run_application]

@@ -8,10 +8,16 @@ import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler, setup_logging
 import httplib2
 from oauth2client.contrib.flask_util import UserOAuth2
-from google.cloud import datastore, translate
+# from google.cloud import datastore, storage
+from google.cloud import datastore
 from google.cloud import storage as cloud_storage
+# from google.cloud import cloudstorage as gcs
+#from google.appengine.ext import ndb
+# from googleapiclient import discovery
+# from apiclient.discovery import build
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
+
 
 oauth2 = UserOAuth2()
 
@@ -43,7 +49,7 @@ def _get_storage_client():
         project=current_app.config['PROJECT_ID'])
 
 
-def list(limit=10, kind='Audio', cursor=None):
+def list(limit=10, kind='Book', cursor=None):
     ds = get_client()
     query = ds.query(kind=kind, order=['title'])
     it = query.fetch(limit=limit, start_cursor=cursor)
@@ -95,43 +101,25 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         text_from_audio = _speech(audio_url)
         #audio_data = text_from_audio
         jason = json.loads(text_from_audio)
-        # El SPEECH API no devuelve siempre text_from_audio
-        # - El formato del archivo no es configurado.
-        if len(jason) > 0:
-            es_text =jason['results'][0]['alternatives'][0]['transcript']
-            # es_text = "Enhorabuena por vuestro gran servicio. Me gustaria conocer otros servicios"
-            en_text = _translate(es_text)
+        results.__setitem__("text",unicode(jason['results'][0]['alternatives'][0]['transcript']))
+        results.__setitem__("confidence",unicode(jason['results'][0]['alternatives'][0]['confidence']))
+        results.update()
+        current_app.logger.info(
+            "audio_data: %s" % results)
+        # ds = get_client()
+        # if id:
+        #     key = ds.key(kind, int(id))
+        # else:
+        #     key = ds.key(kind)
+        #
+        # entity = datastore.Entity(
+        #     key=key,
+        #     exclude_from_indexes=['description'])
+        #
+        # entity.update(data)
+        ds.put(results)
+        return text_from_audio
 
-            sentiment = _sentiment(en_text.encode('utf-8'))
-            polarity = sentiment['documentSentiment']['polarity']
-            magnitude = sentiment['documentSentiment']['magnitude']
-
-
-
-            results.__setitem__("text", str(es_text))
-            results.__setitem__("confidence",str(jason['results'][0]['alternatives'][0]['confidence']))
-            results.__setitem__("english",str(en_text))
-            results.__setitem__("polarity",str(polarity))
-            results.__setitem__("magnitude",str(magnitude))
-
-            results.update()
-            current_app.logger.info(
-                "audio_data: %s" % results)
-            ds.put(results)
-        else:
-            results.__setitem__("text", "No Transcription")
-            results.__setitem__("confidence","0")
-            results.__setitem__("english","No Translation")
-            results.__setitem__("polarity","0")
-            results.__setitem__("magnitude","0")
-
-            results.update()
-            current_app.logger.info(
-                "audio_data: %s" % results)
-            ds.put(results)
-
-        # return text_from_audio
-        return redirect(url_for('crud.view_audio', id=id))
     # Add a logout handler.
     @app.route('/logout')
     def logout():
@@ -228,10 +216,6 @@ def _get_storage_service():
     #     http://g.co/dv/api-client-library/python/apis/
     return discovery.build('storage', 'v1', credentials=credentials)
 
-def _get_sentiment_service():
-    credentials = GoogleCredentials.get_application_default()
-    return discovery.build('language', 'v1beta1', credentials=credentials)
-
 def _speech(speech_file):
     """Transcribe the given audio file.
     Args:
@@ -244,16 +228,14 @@ def _speech(speech_file):
 
     service = _get_speech_service()
     speech_uri = speech_file.replace('https://storage.googleapis.com/','gs://')
-    
+
     service_request = service.speech().syncrecognize(
         body={
             'config': {
                 # There are a bunch of config options you can specify. See
                 # https://goo.gl/KPZn97 for the full list.
                 'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
-                # 'sampleRate': 16000,  # 16 khz
-                'sampleRate': 8000,  # 16 khz
-
+                'sampleRate': 44100,  # 16 khz
                 # See https://goo.gl/A9KJ1A for a list of supported languages.
                 'languageCode': 'es-ES',  # a BCP-47 language tag en-US
             },
@@ -267,22 +249,3 @@ def _speech(speech_file):
     return json.dumps(response)
     # return response
     # [END send_request]
-def _translate(text_to_translate, target = 'en'):
-    api_key = current_app.config['API_KEY']
-    translate_client = translate.Client(api_key)
-    text = text_to_translate
-    translation = translate_client.translate(text, target_language=target)
-    return format(translation['translatedText'])
-
-def _sentiment(text):
-    service = _get_sentiment_service()
-    service_request = service.documents().analyzeSentiment(
-        body={
-            'document': {
-                'type': 'PLAIN_TEXT',
-                'content': text.decode("utf-8"),
-            }
-        }
-    )
-    response = service_request.execute()
-    return response

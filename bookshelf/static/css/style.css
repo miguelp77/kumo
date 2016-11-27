@@ -130,4 +130,30 @@ p {
 .collapsible-header, .collapsible-body{
   border-bottom:0;
 }
-.container {width: 100%;}
+.container {width: 100%;
+  /*background-color: #f3f3f3;*/
+}
+
+/* etiquetas de entidades */
+.ent_label {    background-color: #a3a3a3;
+    color: white;
+    padding: 4px;
+    margin-left: 4px;
+}
+.ent_value { padding-left: 4px;}
+.ent_box{border: 1px solid #a3a3a3;
+    display: inline-block;
+    margin:4px;
+  }
+
+.OTHER.ent_label{background-color: #a3a3a3;}
+.OTHER.ent_box{border: 1px solid #a3a3a3;}
+.CONSUMER_GOOD.ent_label{background-color: green;}
+.CONSUMER_GOOD.ent_box{border: 1px solid green;}
+.PERSON.ent_label{background-color: #ee6e73;}
+.PERSON.ent_box{border: 1px solid #ee6e73;}
+
+
+/* fonts */
+.russo{font-family: 'Russo One', sans-serif;}
+.orbitron{font-family: 'Orbitron', sans-serif;}

@@ -2,6 +2,7 @@ import json
 import logging
 import base64
 
+
 from flask import current_app, Flask, redirect, request, session, url_for
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler, setup_logging
@@ -94,19 +95,13 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         text_from_audio = _speech(audio_url)
         #audio_data = text_from_audio
         jason = json.loads(text_from_audio)
-        print("text_from_audio")
-        print(jason)
         # El SPEECH API no devuelve siempre text_from_audio
         # - El formato del archivo no es configurado.
         if len(jason) > 0:
             es_text =jason['results'][0]['alternatives'][0]['transcript']
             # es_text = "Enhorabuena por vuestro gran servicio. Me gustaria conocer otros servicios"
-            en_text = _translate(str(es_text))
-            print("en_text")
-            print(en_text)
-            entidades = _analyze_entities(str(es_text))
-            print("entidades")
-            print(entidades)
+            en_text = _translate(es_text)
+
             sentiment = _sentiment(en_text.encode('utf-8'))
             polarity = sentiment['documentSentiment']['polarity']
             magnitude = sentiment['documentSentiment']['magnitude']
@@ -118,7 +113,6 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
             results.__setitem__("english",str(en_text))
             results.__setitem__("polarity",str(polarity))
             results.__setitem__("magnitude",str(magnitude))
-            results['entidades'] = str(entidades)
 
             results.update()
             current_app.logger.info(
@@ -132,14 +126,8 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
             results.__setitem__("magnitude","0")
 
             results.update()
-
             current_app.logger.info(
                 "audio_data: %s" % results)
-            #
-            results = datastore.Entity(
-                    key=key,
-                    exclude_from_indexes=['entidades'])
-
             ds.put(results)
 
         # return text_from_audio
@@ -211,12 +199,8 @@ def _request_user_info(credentials):
         current_app.logger.error(
             "Error while obtaining user profile: %s" % resp)
         return None
-    if "@devoteam.com" in content.decode('utf-8'):
-        session['profile'] = json.loads(content.decode('utf-8'))
-    else:
-        current_app.logger.error(
-            "No devoteam user: %s" % resp)
-        return None
+
+    session['profile'] = json.loads(content.decode('utf-8'))
 
 # APIs ML
 # [START authenticating]
@@ -233,7 +217,15 @@ def _get_speech_service():
         'speech', 'v1beta1', http=http, discoveryServiceUrl=DISCOVERY_URL)
 
 def _get_storage_service():
+    # Get the application default credentials. When running locally, these are
+    # available after running `gcloud init`. When running on compute
+    # engine, these are available from the environment.
     credentials = GoogleCredentials.get_application_default()
+
+    # Construct the service object for interacting with the Cloud Storage API -
+    # the 'storage' service, at version 'v1'.
+    # You can browse other available api services and versions here:
+    #     http://g.co/dv/api-client-library/python/apis/
     return discovery.build('storage', 'v1', credentials=credentials)
 
 def _get_sentiment_service():
@@ -258,11 +250,9 @@ def _speech(speech_file):
             'config': {
                 # There are a bunch of config options you can specify. See
                 # https://goo.gl/KPZn97 for the full list.
-                # 'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
                 'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
                 # 'sampleRate': 16000,  # 16 khz
-                # 'sampleRate': 8000,  # 16 khz
-                'sampleRate': 48000,  # 16 khz
+                'sampleRate': 8000,  # 16 khz
 
                 # See https://goo.gl/A9KJ1A for a list of supported languages.
                 'languageCode': 'es-ES',  # a BCP-47 language tag en-US
@@ -278,7 +268,7 @@ def _speech(speech_file):
     # return response
     # [END send_request]
 def _translate(text_to_translate, target = 'en'):
-    api_key = current_app.config['API_KEY2']
+    api_key = current_app.config['API_KEY']
     translate_client = translate.Client(api_key)
     text = text_to_translate
     translation = translate_client.translate(text, target_language=target)
@@ -295,19 +285,4 @@ def _sentiment(text):
         }
     )
     response = service_request.execute()
-    return response
-def _analyze_entities(text, encoding='UTF32'):
-    body = {
-        'document': {
-            'type': 'PLAIN_TEXT',
-            'content': text,
-        },
-        'encoding_type': encoding,
-    }
-
-    service = _get_sentiment_service()
-
-    request = service.documents().analyzeEntities(body=body)
-    response = request.execute()
-
     return response

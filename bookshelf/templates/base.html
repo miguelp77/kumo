@@ -16,15 +16,17 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Devoteam -  Google Cloud Platform</title>
+    <title>R2C</title>
     <meta charset="utf-8">
     <link rel="shortcut icon" type="image/ico" href="/static/images/favicon.ico"/>
 
     <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" media="screen" title="no title">
-    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons|Orbitron|Russo+One" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
 
 
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
@@ -35,12 +37,13 @@
       <nav>
         <div class="container">
         <div class="nav-wrapper">
-          <a href="/" class="brand-logo">DevoDemo</a>
+          <a href="/" class="brand-logo russo">R2C</a>
           <ul id="nav-mobile" class="right hide-on-med-and-down">
             {# <li><a class="tab" href="/books">Books</a></li> #}
             {% if session.profile %}
               <li><a class="tab" href="/books/mine">My Audios</a></li>
               <li><a class="tab" href="/books/audios">Audios</a></li>
+              <li><a class="tab" href="/books/dashboard">Dashboard</a></li>
             {% endif %}
             <li>
               {% if session.profile %}

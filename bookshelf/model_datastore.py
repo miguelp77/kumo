@@ -54,28 +54,63 @@ def from_datastore(entity):
 #     entities = builtin_list(map(from_datastore, entities))
 #     return entities, cursor.decode('utf-8') if len(entities) == limit else None
 
-def list(limit=10, kind='Book', cursor=None):
+# def list(limit=10, kind='Book', cursor=None):
+#     ds = get_client()
+#     query = ds.query(kind=kind, order=['title'])
+#     it = query.fetch(limit=limit, start_cursor=cursor)
+#     entities, more_results, cursor = it.next_page()
+#     entities = builtin_list(map(from_datastore, entities))
+#     return entities, cursor.decode('utf-8') if len(entities) == limit else None
+#
+#
+# def list_by_user(user_id, kind='Book', limit=10, cursor=None):
+#     ds = get_client()
+#     query = ds.query(
+#         kind=kind,
+#         filters=[
+#             ('createdById', '=', user_id)
+#         ]
+#     )
+#     it = query.fetch(limit=limit, start_cursor=cursor)
+#     entities, more_results, cursor = it.next_page()
+#     entities = builtin_list(map(from_datastore, entities))
+#     return entities, cursor.decode('utf-8') if len(entities) == limit else None
+
+def list(limit=10,  kind='Audio',cursor=None):
     ds = get_client()
-    query = ds.query(kind=kind, order=['title'])
-    it = query.fetch(limit=limit, start_cursor=cursor)
-    entities, more_results, cursor = it.next_page()
-    entities = builtin_list(map(from_datastore, entities))
-    return entities, cursor.decode('utf-8') if len(entities) == limit else None
 
+    query = ds.query(kind='Audio', order=['title'])
+    query_iterator = query.fetch(limit=limit, start_cursor=cursor)
+    page = next(query_iterator.pages)
 
-def list_by_user(user_id, kind='Book', limit=10, cursor=None):
+    entities = builtin_list(map(from_datastore, page))
+    next_cursor = (
+        query_iterator.next_page_token.decode('utf-8')
+        if query_iterator.next_page_token else None)
+
+    return entities, next_cursor
+
+def list_by_user(user_id,  kind='Audio',limit=10, cursor=None):
     ds = get_client()
     query = ds.query(
-        kind=kind,
+        kind='Audio',
         filters=[
             ('createdById', '=', user_id)
         ]
     )
-    it = query.fetch(limit=limit, start_cursor=cursor)
-    entities, more_results, cursor = it.next_page()
-    entities = builtin_list(map(from_datastore, entities))
-    return entities, cursor.decode('utf-8') if len(entities) == limit else None
+    # it = query.fetch(limit=limit, start_cursor=cursor)
+    # entities, more_results, cursor = it.next_page()
+    # entities = builtin_list(map(from_datastore, entities))
+    # return entities, cursor.decode('utf-8') if len(entities) == limit else None
+    query_iterator = query.fetch(limit=limit, start_cursor=cursor)
+    page = next(query_iterator.pages)
 
+    entities = builtin_list(map(from_datastore, page))
+    next_cursor = (
+        query_iterator.next_page_token.decode('utf-8')
+        if query_iterator.next_page_token else None)
+
+    return entities, next_cursor
 
 def read(id):
     ds = get_client()
@@ -101,7 +136,8 @@ def update(data, kind='Book', id=None):
 
     entity = datastore.Entity(
         key=key,
-        exclude_from_indexes=['description'])
+        exclude_from_indexes=['entidades'])
+        # exclude_from_indexes=['description','entidades'])
 
     entity.update(data)
     ds.put(entity)
