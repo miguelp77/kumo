@@ -29,27 +29,37 @@
 
 
 
-    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css?1234">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
   </head>
   <body>
       <nav>
         <div class="container">
+          <div class="burger">
+            <div class="burger01"></div>
+            <div class="burger01"></div>
+            <div class="burger01"></div>
+          </div>
+
         <div class="nav-wrapper">
           <a href="/" class="brand-logo russo">R2C</a>
           <ul id="nav-mobile" class="right hide-on-med-and-down">
             {# <li><a class="tab" href="/books">Books</a></li> #}
             {% if session.profile %}
-              <li><a class="tab" href="/books/mine">My Audios</a></li>
+              {# <li><a class="tab" href="/books/mine">My Audios</a></li> #}
+              <li><b><a class="tab" href="/books/add_audio">Add Audio</a></b></li>
               <li><a class="tab" href="/books/audios">Audios</a></li>
               <li><a class="tab" href="/books/dashboard">Dashboard</a></li>
             {% endif %}
+            {% if session.role =="admin" or session.role =="manager" %}
+              <li><a class="tab" href="/books/user/list">Users</a></li>
+            {% endif %}
             <li>
               {% if session.profile %}
-              {% if session.profile.image %}
-              <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
-              {% endif %}
+                {% if session.profile.image %}
+                  <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
+                {% endif %}
               {% endif %}
             </li>
             <li>
@@ -71,7 +81,7 @@
         {% block content %}{% endblock %}
       </div>
     </div>
-    {{user}}
+    {# {{user}} #}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
     <script src="/static/js/init.js"></script>
 

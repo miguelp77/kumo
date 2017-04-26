@@ -1,19 +1,3 @@
-#!/usr/bin/env python
-# Copyright 2016 Google Inc. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-"""Google Cloud Speech API sample application using the REST API for async
-batch processing."""
 
 # [START import_libraries]
 import argparse
@@ -24,6 +8,7 @@ import time
 from googleapiclient import discovery
 import httplib2
 from oauth2client.client import GoogleCredentials
+import pprint
 # [END import_libraries]
 
 
@@ -42,16 +27,16 @@ def get_speech_service():
 # [END authenticating]
 
 
-def main(speech_file):
+# def main(speech_file):
+def main():
     """Transcribe the given audio file asynchronously.
-
     Args:
         speech_file: the name of the audio file.
     """
     # [START construct_request]
-    with open(speech_file, 'rb') as speech:
-        # Base64 encode the binary audio file for inclusion in the request.
-        speech_content = base64.b64encode(speech.read())
+    # with open(speech_file, 'rb') as speech:
+    #     # Base64 encode the binary audio file for inclusion in the request.
+    #     speech_content = base64.b64encode(speech.read())
 
     service = get_speech_service()
     service_request = service.speech().asyncrecognize(
@@ -59,13 +44,20 @@ def main(speech_file):
             'config': {
                 # There are a bunch of config options you can specify. See
                 # https://goo.gl/KPZn97 for the full list.
+                # 'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
                 'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
-                'sampleRate': 16000,  # 16 khz
-                # See https://goo.gl/A9KJ1A for a list of supported languages.
-                'languageCode': 'en-US',  # a BCP-47 language tag
+                'sampleRate': 8000,  # 16 khz
+                # See http://g.co/cloud/speech/docs/languages for a list of
+                # supported languages.
+                'languageCode': 'es-ES',  # a BCP-47 language tag
+                "speech_context": {
+                    "phrases":["servicedesk Buenos d\\u00edas la atiende"]
+                }
             },
             'audio': {
-                'content': speech_content.decode('UTF-8')
+                # 'content': speech_content.decode('UTF-8')
+                # 'uri': 'gs://devodemo-2016/produban_recortado_mx.wav'
+                'uri': 'gs://devodemo-2016/606312450_29_900_20170102085747-2017-01-25-101807.wav'
                 }
             })
     # [END construct_request]
@@ -84,18 +76,22 @@ def main(speech_file):
         time.sleep(1)
         # Get the long running operation with response.
         response = service_request.execute()
-
+        # if 'progressPercent' in response['metadata']:
+        #     print(response['metadata']['progressPercent'])
         if 'done' in response and response['done']:
             break
 
-    print(json.dumps(response['response']['results']))
+    pprint.pprint(json.dumps(response['response']['results']))
+
+    # print(json.dumps(response['response']['results']))
 
 
 # [START run_application]
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'speech_file', help='Full path of audio file to be recognized')
-    args = parser.parse_args()
-    main(args.speech_file)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument(
+    #     'speech_file', help='Full path of audio file to be recognized')
+    # args = parser.parse_args()
+    # main(args.speech_file)
+    main()
     # [END run_application]

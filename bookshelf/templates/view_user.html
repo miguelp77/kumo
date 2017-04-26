@@ -1,0 +1,32 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Users</h3>
+<hr>
+<div class="media">
+  <div class="media-left">
+    {% if user.email %}
+          <h4>{{user.email}}</h4>
+    {% endif %}
+    {% if user.profile %}
+      <h5>{{user.profile}}</h5>
+    {% endif %}
+    {% if user.comment %}
+          <p>{{user.comment}}</p>
+    {% endif %}
+  </div>
+</div>
+<div class="btn-group">
+  <a href="/books/user/{{user.id}}/edit_user" class="btn btn-primary btn-sm">
+    <i class="glyphicon glyphicon-edit"></i>
+    Edit user
+  </a>
+  <a href="/books/user/{{user.id}}/delete_user" class="btn btn-danger btn-sm">
+    <i class="glyphicon glyphicon-trash"></i>
+    Delete user
+  </a>
+</div>
+
+{% endblock %}

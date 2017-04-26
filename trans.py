@@ -62,13 +62,9 @@ def main(speech_file):
     service_request = service.speech().syncrecognize(
         body={
             'config': {
-                # There are a bunch of config options you can specify. See
-                # https://goo.gl/KPZn97 for the full list.
-                'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
-                # 'sampleRate': w.getframerate(),  # 16 khz
-                'sampleRate': 48000,  # 48 khz
-                # See https://goo.gl/A9KJ1A for a list of supported languages.
-                'languageCode': 'es-ES',  # a BCP-47 language tag
+                'encoding': 'MULAW',
+                'sampleRate': 8000,
+                'languageCode': 'es-ES',
             },
             'audio': {
                 'content': speech_content.decode('UTF-8')
@@ -87,5 +83,6 @@ if __name__ == '__main__':
     parser.add_argument(
         'speech_file', help='Full path of audio file to be recognized')
     args = parser.parse_args()
+    print(args.speech_file)
     main(args.speech_file)
     # [END run_application]

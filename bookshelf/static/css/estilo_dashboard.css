@@ -1,0 +1,50 @@
+.bloque000{
+	float: left;
+	width: 100%;
+
+	background: #ccc
+}
+.bloque001 {
+    float: left;
+    width: 100%;
+    background: #f5f5f5;
+    border: solid 1px rgba(204, 204, 204, 0.19);
+}
+.satisfaction{
+		background: #26f2af
+}
+.graficaCuadrada{
+	float: left;
+	width: 100%;
+}
+.graficaMundo {
+    width: 90%;
+    margin: auto;
+    float: none;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.graficaBarras{
+	width: 100%;
+}
+.title{
+	font-weight: bold
+}
+.graficaCuadrada{
+	float: left;
+	font-size: .85em;
+}
+.tituloh1 {
+ color: #ee6e73;
+ background: #d9d9d9;
+ font-size: 1.2em;
+ padding: 0.25em;
+ font-weight: bold;
+}
+.tituloh2 {
+ color: #ee6e73;
+ background: #d9d9d9;
+ font-size: 0.9em;
+ padding: 0.25em;
+ font-weight: bold;
+}

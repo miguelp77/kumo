@@ -18,7 +18,8 @@
 
 runtime: python
 vm: true
-entrypoint: gunicorn -b :$PORT main:app
+entrypoint: gunicorn -b :$PORT main:app -t 300
+# entrypoint: gunicorn -b :$PORT main:app -t 60
 
 runtime_config:
   python_version: 3

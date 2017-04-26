@@ -5,13 +5,26 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<div class="viewAudio">
 <div class="container">
   <div class="row">
     {% if audio.polarity %}
-    <div class="col s1" title="{{audio.confidence}}"><div id="smallbuddy3" style="width:100px; height:80px"></div></div>
-    <div class="col s1"><div id="smallbuddy" style="width:100px; height:80px"></div></div>
-    <div class="col s1"><div id="smallbuddy2" style="width:100px; height:80px"></div></div>
-    <div class="col s6"><h3>{{audio.publishedDate}}</h3></div>
+
+    <div class="col s12 m5 left-align offset-s1">
+      <h3 class="left-align">{{audio.publishedDate}}</h3>
+    </div>
+
+    <div class="col s12 m5 left-align ">
+
+      <div class="col s3" title="{{audio.confidence}}">
+        <div id="smallbuddy3" class="smallbuddy"></div>
+      </div>
+
+      <div class="col s3 offset-s1"><div id="smallbuddy" class="smallbuddy"></div></div>
+      <div class="col s3 offset-s1"><div id="smallbuddy2" class="smallbuddy"></div></div>
+
+    </div>
     {% endif %}
   </div>
 </div>
@@ -45,7 +58,10 @@
       <i class="material-icons circle blue">chat_bubble_outline</i>
       <span class="badge" title="Confidence {{audio.confidence}}">{{audio.confidence}}</span>
       <span class="title">Transcription - {{audio.title}}</span>
-      <blockquote class="">{{audio.text}}
+      <blockquote class="">
+        {{text}}
+
+
       </blockquote>
       {# ENTIDADES #}
           {% if audio.entidades %}
@@ -81,9 +97,10 @@
       <a href="{{audio.audioUrl}}"><i class="material-icons circle red">play_arrow</i></a>
       <span class="title collapsible-header">File</span>
         <blockquote class="collapsible-body">
-          <div id="waveform"></div>
-
-          <p>Push play to download/reproduce audio file</p>
+          <audio controls>
+            <source src="{{audio.audioUrl}}" type="audio/wav">
+          Your browser does not support the audio element.
+          </audio>
         </blockquote>
     </li>
     {% else %}
@@ -142,13 +159,13 @@
 
   {# Gauge #}
 
-
+</div>
   <script src="/static/js/raphael-2.1.4.min.js"></script>
   <script src="/static/js/justgage.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.0.52/wavesurfer.min.js"></script>
 
   <script>
-  console.log({{audio.magnitude|float}});
+  // console.log({{audio.magnitude|float}});
   var g = new JustGage({
     id: "smallbuddy",
     value: {{audio.polarity|float}},
@@ -158,7 +175,8 @@
     title: "Score",
     label: "",
     levelColorsGradient: false,
-    levelColors: ["#ff0000", "#f9c802", "#a9d70b"]
+    levelColors: ["#ff0000", "#f9c802", "#a9d70b"],
+
   });
   var g2 = new JustGage({
     id: "smallbuddy2",
@@ -180,7 +198,7 @@
     title: "Confidence",
     label: "",
     levelColorsGradient: false,
-    levelColors: ["#ff0000", "#f9c802", "#a9d70b"]
+    levelColors: ["#ff0000", "#f9c802", "#a9d70b"],
   });
 </script>
 

@@ -8,96 +8,92 @@
 {% block content %}
 
 <style media="screen">
-	body{background-image: url("/static/images/google_DC.jpg");}
+	/*body{background-image: url("/static/images/google_DC.jpg");}*/
 	canvas{ display: block; vertical-align: bottom; } /* ---- particles.js container ---- */
 	#particles-js{ display:none; position:absolute; width: 100%; height: 100%;
 		background-color: #b61924; background-image: url("");
 		background-repeat: no-repeat; background-size: cover; background-position: 50% 50%; }
 </style>
 
+
+<div class="UpLoadAudio">
 <div id="uploader">
-<h3>Upload audio</h3>
+<!-- <h3 style="color:#f0f0f0;">Upload audio</h3> -->
 
-<form id="my-awesome-dropzone" class="dropzone">
 
-	<div id="droparea" class="amber lighten-4">
-		<p></p>
-		<div id="previewsContainer" class="amber lighten-4">
-			<p class="msg_drag">Drag your file here</p>
+      <div class="container headCenter">
+        <br><br>
+         <div class="row ">
+         <h3 class="header teal-text text-lighten-2 russo nopadding">Upload audio</h3>
+
+        </div>
+      </div>
+
+
+<form method="POST" enctype="multipart/form-data" action="drop_audio">
+  <div class="file-field input-field row s12">
+
+
+      <div class="col s5 offset-s2">
+        <div class="file-path-wrapper">
+          <input class="file-path validate" type="text">
+        </div>
+      </div>
+      <div class="col s2">
+        <div class="btn">
+          <span>Select File</span>
+          <input type="file" name="audiofile" id="audiofile" value="Seleccione el archivo">
+        </div>
+      </div>
+
+
+  </div>
+
+		<div class="row">
+
+			<div class="col s3 offset-s3">
+				<select class="browser-default" name="language">
+					<option value="es-ES" disabled selected>Choose Language</option>
+					<option value="es-ES">Spanish</option>
+					<option value="es-MX">Mexican</option>
+          <option value="fr-FR">French</option>
+          <option value="it-IT">Italian</option>
+					<option value="pt-PT">Italian</option>
+					<option value="en-GB">English</option>
+				</select>
+			</div>
+
+			<div class="col s3">
+				<button id="submit" type="submit" class="btn btn-success">Start</button>
+
+				{# <button id="fileSubmit" class="btn btn-success disabled">Start</button> #}
+			</div>
 		</div>
-	</div>
-	<input type="email" name="username" />
-	<select class="browser-default" name="frame_rate">
-		<option value="48000" disabled selected>Choose Sample Rate</option>
-		<option value="8000">8 KHz</option>
-		<option value="16000">16 KHz</option>
-		<option value="44000">44 KHz</option>
-		<option value="48000">48 KHz</option>
-	</select>
-	<div class="row">
-
-		{# <form id="my-awesome-dropzone" class="dropzone">
-		  <div class="dropzone-previews"></div> <!-- this is were the previews should be shown. -->
-
-		  <!-- Now setup your input fields -->
-		  <input type="password" name="password" />
-
-		</form> #}
-
-	<div class="col offset-s1 s3 offset-m1 m3">
-		<select class="browser-default" name="frame_rate">
-			<option value="48000" disabled selected>Choose Sample Rate</option>
-			<option value="8000">8 KHz</option>
-			<option value="16000">16 KHz</option>
-			<option value="44000">44 KHz</option>
-			<option value="48000">48 KHz</option>
-		</select>
-	</div>
-	<div class="col s3 m3">
-		<select class="browser-default" name="file_encoding">
-			<option value="LINEAR16" disabled selected>Choose File Encoding</option>
-			<option value="LINEAR16">WAV</option>
-			<option value="AMR">AMR</option>
-			<option value="FLAC">FLAC</option>
-		</select>
-	</div>
-	<div class="col s3 m3">
-		<select class="browser-default" name="language">
-			<option value="es-ES" disabled selected>Choose Language</option>
-			<option value="es-ES">Spanish</option>
-			<option value="fr-FR">French</option>
-		</select>
-	</div>
-	<div class="col s2 m2">
-		<button id="fileSubmit" class="btn btn-success disabled">Start</button>
-	</div>
 
 
+	</form>
 </div>
-</form>
 
-</div>
 
 <div id="infospeech" class="row">
       <div class="col s12 m4">
         <div class="card-panel orange darken-3">
-          <span class="white-text"><h4>Synchronous Recognition</h4>Ssends audio data to the Speech API, performs recognition on that data, and returns results after all audio has been processed.
-						Synchronous recognition requests are limited to audio data of 1 minute or less in duration.
+          <span class="white-text"><h4>Powerful Speech Recognition</h4>
+          	Alison enables to convert audio to text by applying powerful neural network models in an easy to use API. You can transcribe the text of users dictating to an application’s microphone, enable command-and-control through voice, or transcribe audio files, among many other use cases.
           </span>
         </div>
       </div>
       <div class="col s12 m4">
         <div class="card-panel teal darken-3">
-          <span class="white-text"><h4>Asynchronous Recognition</h4>Sends audio data to the Speech API and initiates a Long Running Operation.
-						Using this operation, you can periodically poll for recognition results. Use asynchronous requests for audio data of any duration up to 80 minutes.
+          <span class="white-text"><h4>Sentiments Analysis</h4>
+          	You can use it to understand sentiment about your product or parse intent from customer conversations happening in the call center. You can analyze text uploaded in your requests. Furthermore, the tool accuracy improves over time as Google improves the internal speech recognition technology used by Google products.
           </span>
         </div>
       </div>
       <div class="col s12 m4">
         <div class="card-panel light-blue darken-4">
-          <span class="white-text"><h4>Streaming Recognition</h4>Performs recognition on audio data provided within a gRPC bi-directional stream.
-						Streaming requests are designed for real-time recognition purposes, such as capturing live audio from a microphone.
-						Streaming recognition provides interim results while audio is being captured, allowing result to appear, for example, while a user is still speaking.
+          <span class="white-text"><h4>Decision Making Capacities</h4>
+          	Alison automatically generates metrics based on the messages analyzed and allows you to take better decisions about your products and services. With this information you can complement your database and apply new business models according to your customer's needs.
 
           </span>
         </div>
@@ -105,113 +101,14 @@
     </div>
 
 <div id="particles-js"></div>
+</div>
 
 
-<script src="/static/js/dropzone.js"></script>
 <script src="/static/js/particles.js"></script>
 <script src="/static/js/particles_back.js"></script>
 
 <script type="text/javascript">
-$(function() {
-
-var myDropzone = new Dropzone("div#droparea", {
-  url: "/books/drop_audio",
-  method: "POST", // can be changed to "put" if necessary
-  maxFilesize: 8, // in MB
-  paramName: "file", // The name that will be used to transfer the file
-  uploadMultiple: false, // This option will also trigger additional events (like processingmultiple).
-  // headers: {
-  //   "My-Awesome-Header": "header value"
-  // },
-	// autoDiscover: false
-  addRemoveLinks: true, // add an <a class="dz-remove">Remove file</a> element to the file preview that will remove the file, and it will change to Cancel upload
-  previewsContainer: "#previewsContainer",
-  // clickable: "#selectFile",
-  clickable: true,
-  createImageThumbnails: false,
-  maxThumbnailFilesize: 2, // in MB
-  thumbnailWidth: 300,
-  thumbnailHeight: 300,
-  maxFiles: 1,
-//  acceptedFiles: "image/png, image/jpeg, image/gif", //This is a comma separated list of mime types or file extensions.Eg.: image/*,application/pdf,.psd.
-  autoProcessQueue: false, // When set to false you have to call myDropzone.processQueue() yourself in order to upload the dropped files.
-  forceFallback: false,
-
-  init: function() {
-    console.log("init");
-  },
-  resize: function(file) {
-    console.log("resize");
-    /*
-     * Crop rectangle range
-     * Those values are going to be used by ctx.drawImage().
-     */
-    return {"srcX":0, "srcY":0, "srcWidth":300, "srcHeight":300}
-  },
-  accept: function(file, done) {
-    console.log("accept");
-    console.log(file.name);
-    done();
-  },
-  fallback: function() {
-    console.log("fallback");
-  }
-});
-
-/*
- * Custom preview template here.
- * ex) myDropzone.options.previewTemplate = '';
- */
-myDropzone.options.previewTemplate = '\
-  <div class="dz-preview dz-file-preview">\
-    <div class="dz-details">\
-    <div class="dz-filename"><span data-dz-name></span></div>\
-    <div class="dz-size" data-dz-size></div>\
-  </div>\
-  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>\
-  <div class="dz-error-message"><span data-dz-errormessage></span></div>\
-  </div>';
-
-	myDropzone.on('sending', function(file, xhr, formData){
-	            formData.append('title', file.name);
-							console.log(file.name);
-	        });
-
-/*
- * Available Events
- */
-
-/* receive the "event" as first parameter */
-myDropzone.on("drop", function(event){
-  console.log(event.type);
-  console.log(event)
-});
-myDropzone.on("dragstart", function(event){ console.log(event.type); });
-myDropzone.on("dragend", function(event){ console.log(event.type); });
-myDropzone.on("dragenter", function(event){ console.log(event.type); });
-myDropzone.on("dragover", function(event){ console.log(event.type); });
-myDropzone.on("dragremove", function(event){ console.log(event.type); });
-
-/* receive the "file" as first parameter */
-myDropzone.on("addedfile", function(file) {
-  console.log("addedfile");
-  console.log(file);
-  $('#fileSubmit').click(function(e){
-		e.preventDefault();
-      e.stopPropagation();
-      myDropzone.processQueue(); //processes the queue
-  });
-});
-myDropzone.on("removedfile", function(file) { console.log("removedfile"); });
-myDropzone.on("selectedfiles", function(file) { console.log("selectedfiles"); });
-myDropzone.on("thumbnail", function(file) { console.log("thumbnail"); });
-myDropzone.on("error", function(file) { console.log("error"); });
-myDropzone.on("processing ", function(file) { console.log("processing "); });
-myDropzone.on("uploadprogress", function(file) { console.log("uploadprogress"); });
-// myDropzone.on("sending", function(file) { console.log("sending"); });
-myDropzone.on("success", function(file, responseText) {
-	console.log("success");
-	// location = '/books/audio/'+responseText;
+$('#submit').on('click',function(e){
 	$('#uploader').hide();
 	$('#infospeech').hide();
 	$('.container').css('margin',0);
@@ -220,38 +117,8 @@ myDropzone.on("success", function(file, responseText) {
 	  console.log('callback - particles.js config loaded');
 	});
 
-	location = '/api_tasks/'+responseText;
 });
-myDropzone.on("complete", function(file, responseText) {
-	console.log("complete");
-	myDropzone.removeFile(file);
-	console.log(responseText);
 
-});
-myDropzone.on("canceled", function(file) { console.log("canceled"); });
-myDropzone.on("maxfilesreached", function(file) {
-	console.log("maxfilesreached");
-	$('#droparea').css('border-color','#66bb6a').removeClass('amber lighten-4').addClass('green darken-4');
-	$('.msg_drag').text('File ready.Please, press Start button.');
-	$('#previewsContainer').removeClass('amber lighten-4').addClass('green lighten-4');
-	$('#fileSubmit').removeClass('disabled');
-});
-myDropzone.on("maxfilesexceeded", function(file) { console.log("maxfilesexceeded"); });
-
-/* receive a "list of files" as first parameter
- * only called if the uploadMultiple option is true:
- */
-myDropzone.on("processingmultiple", function(files) { console.log("processingmultiple") });
-myDropzone.on("sendingmultiple", function(files) { console.log("sendingmultiple") });
-myDropzone.on("successmultiple", function(files) { console.log("successmultiple") });
-myDropzone.on("completemultiple", function(files) { console.log("completemultiple") });
-myDropzone.on("canceledmultiple", function(files) { console.log("canceledmultiple") });
-
-/* Special events */
-myDropzone.on("totaluploadprogress", function() { console.log("totaluploadprogress") });
-myDropzone.on("reset", function() { console.log("reset") });
-
-});
 </script>
 
 {% endblock %}

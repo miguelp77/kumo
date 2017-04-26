@@ -1,0 +1,10 @@
+{
+  'config': {
+      'encoding':'LINEAR16',
+      'sampleRate': 8000,
+      'languageCode': 'es-MX'
+  },
+  'audio': {
+      'uri':'gs://devodemo-2016/produban_recortado_mx.wav'
+  }
+}

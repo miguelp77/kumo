@@ -134,9 +134,10 @@ def update(data, kind='Book', id=None):
     else:
         key = ds.key(kind)
 
+    print("**** Updating Datastore")
     entity = datastore.Entity(
         key=key,
-        exclude_from_indexes=['entidades'])
+        exclude_from_indexes=['entidades','english'])
         # exclude_from_indexes=['description','entidades'])
 
     entity.update(data)
@@ -151,3 +152,44 @@ def delete(id, kind='Book'):
     ds = get_client()
     key = ds.key(kind, int(id))
     ds.delete(key)
+
+# Usuarios
+def update_user(data, kind='User', id=None):
+    ds = get_client()
+    if id:
+        key = ds.key(kind, int(id))
+    else:
+        key = ds.key(kind)
+
+    print("**** Updating Datastore")
+    entity = datastore.Entity(
+        key=key,
+        exclude_from_indexes=['entidades','english'])
+        # exclude_from_indexes=['description','entidades'])
+
+    entity.update(data)
+    ds.put(entity)
+    return from_datastore(entity)
+
+create_user = update_user
+
+def read_user(id):
+    ds = get_client()
+    key = ds.key('User', int(id))
+    results = ds.get(key)
+    # print(from_datastore(results))
+    return from_datastore(results)
+
+def list_user(limit=15,  kind='User',cursor=None):
+    ds = get_client()
+
+    query = ds.query(kind='User', order=['email'])
+    query_iterator = query.fetch(limit=limit, start_cursor=cursor)
+    page = next(query_iterator.pages)
+
+    entities = builtin_list(map(from_datastore, page))
+    next_cursor = (
+        query_iterator.next_page_token.decode('utf-8')
+        if query_iterator.next_page_token else None)
+
+    return entities, next_cursor

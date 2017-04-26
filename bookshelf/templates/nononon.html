@@ -1,0 +1,140 @@
+{#
+# Copyright 2015 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>R2C</title>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" type="image/ico" href="/static/images/favicon.ico"/>
+
+    <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" media="screen" title="no title">
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons|Orbitron|Russo+One" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+
+
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  </head>
+  <body>
+      <nav>
+        <div class="container">
+        <div class="nav-wrapper">
+          <a href="/" class="brand-logo russo">R2C</a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            {# <li><a class="tab" href="/books">Books</a></li> #}
+            {% if session.profile %}
+              <li><a class="tab" href="/books/mine">My Audios</a></li>
+              <li><a class="tab" href="/books/audios">Audios</a></li>
+              <li><a class="tab" href="/books/dashboard">Dashboard</a></li>
+            {% endif %}
+            <li>
+              {% if session.profile %}
+              {% if session.profile.image %}
+              <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
+              {% endif %}
+              {% endif %}
+            </li>
+            <li>
+              {% if session.profile %}
+                <a class="tab" href="/logout">
+                  {{session.profile.displayName}}
+                </a>
+              {% else %}
+                <a class="tab" href="/oauth2authorize">Login</a>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div>
+      </nav>
+
+    <div class="container">
+      <div class="row">
+        <div id="index-banner" class="parallax-container">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <br><br>
+        <h1 class="header center teal-text text-lighten-2 russo">Alison</h1>
+        <div class="row center">
+          <h5 class="header col s12 light orbitron">Speech Data Value</h5>
+        </div>
+        {% if session.profile %}
+        <div class="row center">
+          <a href="/books/add_audio" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">Get Started</a>
+        </div>
+        {% endif %}
+        <br><br>
+
+      </div>
+    </div>
+    <div class="parallax"><img src="/static/images/waves2.jpg" alt="Unsplashed background img 1"></div>
+  </div>
+
+
+  <div class="container">
+    <div class="section">
+
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><img src="/static/images/Home-network.png" alt="" width="60px"/></h2>
+            <h5 class="center">Speeds up your CC</h5>
+
+            <p class="light">We analyze all your audios in a short did most of the heavy lifting for you to provide a default stylings that incorporate our custom components. Additionally, we refined animations and transitions to provide a smoother experience for developers.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><img src="/static/images/Home-cloud.png" alt="" width="60px"/></h2>
+            <h5 class="center">Realtime Dashboard</h5>
+
+            <p class="light">By utilizing elements and principles of Material Design, we were able to create a framework that incorporates components and animations that provide more feedback to users. Additionally, a single underlying responsive system across all platforms allow for a more unified user experience.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><img src="/static/images/Home-transformation.png" alt="" width="60px"/></h2>
+            <h5 class="center">Easy to work with</h5>
+
+            <p class="light">We have provided detailed documentation as well as specific code examples to help new users get started. We are also always open to feedback and can answer any questions a user may have about Materialize.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+      </div>
+    </div>
+    {{user}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+    <script src="/static/js/init.js"></script>
+
+    <script>
+      $(document).ready(function(){
+        $('ul.tabs').tabs('select_tab', 'tab_id');
+      });
+    </script>
+  </body>
+</html>

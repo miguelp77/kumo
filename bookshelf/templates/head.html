@@ -14,7 +14,7 @@
 
 
 
-  <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/style.css?1234">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
 </head>
@@ -27,7 +27,8 @@
         <ul id="nav-mobile" class="right hide-on-med-and-down">
           {# <li><a class="tab" href="/books">Books</a></li> #}
           {% if session.profile %}
-            <li><a class="tab" href="/books/mine">My Audios</a></li>
+            {# <li><a class="tab" href="/books/mine">My Audios</a></li> #}
+            <li><b><a class="tab" href="/books/add_audio">Add Audio</a></b></li>
             <li><a class="tab" href="/books/audios">Audios</a></li>
             <li><a class="tab" href="/books/dashboard">Dashboard</a></li>
           {% endif %}
