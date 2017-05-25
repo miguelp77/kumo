@@ -295,10 +295,13 @@ def _speech(speech_file,framerate,language='es-ES'):
         if 'done' in response and response['done']:
             break
 
-    # pprint.pprint(json.dumps(response['response']['results']))
-    resultado = json.dumps(response['response']['results'])
-    # print(json.dumps(resultado))
     # print("***************************")
+    print(json.dumps(response['response']))
+    if 'results' in response['response']:
+        resultado = json.dumps(response['response']['results'])
+    else:
+        resultado = {'text': 'no results'}
+    # print(json.dumps(resultado))
     # print("***************************")
     # print("***************************")
     # print(resultado)
