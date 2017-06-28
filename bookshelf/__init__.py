@@ -405,6 +405,9 @@ def audio_to_text(id):
         if audio_language == 'fr-FR':
             entidades = _analyze_entities(str(en_text))
             sentiment = _sentiment(en_text.encode('utf-8'))
+        elif audio_language == 'ca-ES':
+            entidades = _analyze_entities(str(en_text))
+            sentiment = _sentiment(en_text.encode('utf-8'))
         elif audio_language == 'it-IT':
             entidades = _analyze_entities(str(en_text))
             sentiment = _sentiment(en_text.encode('utf-8'))
