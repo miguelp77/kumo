@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import bookshelf
+import kumo
 import config
 
 
-app = bookshelf.create_app(config)
+app = kumo.create_app(config)
 
 
 # This is only used when running locally. When running live, gunicorn runs

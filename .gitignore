@@ -32,5 +32,7 @@ Muestra
 .idea
 audios
 config.py
+tests
+test.py
 
 
