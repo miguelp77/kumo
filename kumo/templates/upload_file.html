@@ -1,8 +1,3 @@
-{#
-# Miguel Paniagua.
-#
-#}
-
 {% extends "base.html" %}
 
 {% block content %}
@@ -16,110 +11,64 @@
 </style>
 
 
-<div class="UpLoadAudio">
-<div id="uploader">
+<div id="form">
 <!-- <h3 style="color:#f0f0f0;">Upload audio</h3> -->
 
+<h4>Crear Imputación</h4>
 
-      <div class="container headCenter">
-        <br><br>
-         <div class="row ">
-         <h3 class="header teal-text text-lighten-2 russo nopadding">Upload audio</h3>
 
+  <form method="POST" enctype="multipart/form-data" action="add_allocation">
+    <div class="row">
+      <div class="col s4">
+        <div class="form-group">
+          <label for="title">Nombre</label>
+          <input type="text" name="name" id="name" disabled value="{{session.profile.displayName}}" class="form-control"/>
         </div>
       </div>
-
-
-<form method="POST" enctype="multipart/form-data" action="drop_audio">
-  <div class="file-field input-field row s12">
-
-
-      <div class="col s5 offset-s2">
-        <div class="file-path-wrapper">
-          <input class="file-path validate" type="text">
-        </div>
-      </div>
-      <div class="col s2">
-        <div class="btn">
-          <span>Select File</span>
-          <input type="file" name="audiofile" id="audiofile" value="Seleccione el archivo">
-        </div>
-      </div>
-
-
-  </div>
-
-		<div class="row">
-
-			<div class="col s3 offset-s3">
-				<select class="browser-default" name="language">
-					<option value="es-ES" disabled selected>Choose Language</option>
-          <option value="es-ES">Spanish</option>
-					<option value="ca-ES">Catalan</option>
-					<option value="es-MX">Mexican</option>
-          <option value="fr-FR">French</option>
-          <option value="it-IT">Italian</option>
-					<option value="pt-PT">Portuguese</option>
-					<option value="en-GB">English</option>
-				</select>
-			</div>
-
-			<div class="col s3">
-				<button id="submit" type="submit" class="btn btn-success">Start</button>
-
-				{# <button id="fileSubmit" class="btn btn-success disabled">Start</button> #}
-			</div>
-		</div>
-
-
-	</form>
-</div>
-
-
-<div id="infospeech" class="row">
-      <div class="col s12 m4">
-        <div class="card-panel orange darken-3">
-          <span class="white-text"><h4>Powerful Speech Recognition</h4>
-          	Alison enables to convert audio to text by applying powerful neural network models in an easy to use API. You can transcribe the text of users dictating to an application’s microphone, enable command-and-control through voice, or transcribe audio files, among many other use cases.
-          </span>
-        </div>
-      </div>
-      <div class="col s12 m4">
-        <div class="card-panel teal darken-3">
-          <span class="white-text"><h4>Sentiments Analysis</h4>
-          	You can use it to understand sentiment about your product or parse intent from customer conversations happening in the call center. You can analyze text uploaded in your requests. Furthermore, the tool accuracy improves over time as Google improves the internal speech recognition technology used by Google products.
-          </span>
-        </div>
-      </div>
-      <div class="col s12 m4">
-        <div class="card-panel light-blue darken-4">
-          <span class="white-text"><h4>Decision Making Capacities</h4>
-          	Alison automatically generates metrics based on the messages analyzed and allows you to take better decisions about your products and services. With this information you can complement your database and apply new business models according to your customer's needs.
-
-          </span>
+      <div class="col s4">
+        <div class="form-group">
+          <label for="title">Email</label>
+          <input type="text" name="email" id="email" disabled value="{{session.profile.emails.0.value}}" class="form-control"/>
         </div>
       </div>
     </div>
 
-<div id="particles-js"></div>
-</div>
+    <div class="row">
+      <div class="col s4">
+        <div class="form-group">
+          <label for="title">Proyecto</label>
+          <input type="text" name="project" id="project"  class="form-control"/>
+        </div>
+      </div>
+      <div class="col s4">
+        <div class="form-group">
+          <label for="title">Aprovador</label>
+          <input type="text" name="approver" id="approver"  class="form-control"/>
+        </div>
+      </div>   
+    </div>
+    
+    <div class="row">  
+      <div class="col s2">
+        <div class="form-group">
+          <label for="title">Desde</label>
+          <input type="text" id="start_date" name="start_date" class="datepicker" class="form-control"/>
+        </div>
+      </div>  
+      <div class="col s2">
+        <div class="form-group">
+          <label for="title">Hasta</label>
+          <input type="text" id="end_date" name="end_date" class="datepicker" class="form-control"/>
+        </div>
+      </div>  
+    </div>
+    <input type="text" value="{{session.profile.id}}" id="user_id" name="user_id" hidden/>
+    <input type="text" value="submited" id="status" name="status" hidden/>
+    
+  	<div class="col s3">
+			<button id="submit" type="submit" class="btn btn-success">Guardar</button>
+		</div>
+	</form>
 
-
-<script src="/static/js/particles.js"></script>
-<script src="/static/js/particles_back.js"></script>
-
-<script type="text/javascript">
-$('#submit').on('click',function(e){
-	$('#uploader').hide();
-	$('#infospeech').hide();
-	$('.container').css('margin',0);
-	$('#particles-js').show();
-	particlesJS.load('particles-js', '../static/particles.json', function() {
-	  console.log('callback - particles.js config loaded');
-	});
-
-});
-
-</script>
 
 {% endblock %}

@@ -1,33 +1,15 @@
-{#
-# Copyright 2015 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>R2C</title>
+    <title>Kumo by DCS</title>
     <meta charset="utf-8">
     <link rel="shortcut icon" type="image/ico" href="/static/images/favicon.ico"/>
 
     <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" media="screen" title="no title">
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons|Orbitron|Russo+One" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
-
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-
-
+ <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
 
     <link rel="stylesheet" type="text/css" href="/static/css/style.css?1234">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,17 +25,18 @@
           </div>
 
         <div class="nav-wrapper">
-          <a href="/" class="brand-logo russo">R2C</a>
+          <a href="/" class="brand-logo russo">Kumo</a>
           <ul id="nav-mobile" class="right hide-on-med-and-down">
-            {# <li><a class="tab" href="/books">Books</a></li> #}
+            {# <li><a class="tab" href="/a">Main</a></li> #}
             {% if session.profile %}
-              {# <li><a class="tab" href="/books/mine">My Audios</a></li> #}
-              <li><b><a class="tab" href="/books/add_audio">Add Audio</a></b></li>
+              <!-- {# <li><a class="tab" href="/a/mine">Mis imputaciones</a></li> #} -->
+              <li><a class="tab" href="/a/mine">Mis imputaciones</a></li>
+              <!-- <li><b><a class="tab" href="/books/add_audio">Add Audio</a></b></li>
               <li><a class="tab" href="/books/audios">Audios</a></li>
-              <li><a class="tab" href="/books/dashboard">Dashboard</a></li>
+              <li><a class="tab" href="/books/dashboard">Dashboard</a></li> -->
             {% endif %}
             {% if session.role =="admin" or session.role =="manager" %}
-              <li><a class="tab" href="/books/user/list">Users</a></li>
+              <li><a class="tab" href="/a/user/list">Users</a></li>
             {% endif %}
             <li>
               {% if session.profile %}
@@ -81,8 +64,11 @@
         {% block content %}{% endblock %}
       </div>
     </div>
-    {# {{user}} #}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+ 
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
     <script src="/static/js/init.js"></script>
 
     <script>

@@ -1,109 +1,27 @@
-{#
-# Copyright 2015 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#}
-
 {% extends "base.html" %}
 
 {% block content %}
 
- 
+
 <div class="audioList">
-<h3>List audios</h3>
-{# <a href="/books/add" class="btn btn-success btn-sm">
-  <i class="glyphicon glyphicon-plus"></i>
-  Add book
-</a> #}
+<h4>Allocations</h4>
 {% if session.profile %}
-<a href="/books/add_audio" class="btn btn-success btn-sm">
+<a href="/a/add_allocation" class="btn btn-success btn-sm">
   <i class="glyphicon glyphicon-plus"></i>
-  Add audio
+  Add
 </a>
 {% endif %}
-
-  {% for audio in audios %}
-  <div class="card horizontal">
-
-    <div class="card-image waves-effect waves-block waves-light">
-      <img class="activator" src="https://storage.googleapis.com/devodemo-2016/brain-gear-icon.png" height="192px">
-    </div>
-    <div class="card-content card-stacked">
-      <div class="card-title activator grey-text text-darken-4">
-        {{audio.title}}
-          {% if audio.polarity %}
-            {% if (audio.polarity)|float <= -0.75 %}
-              <div class="chip tooltipped red darken-4">
-                {{audio.polarity|float}}
-              </div>
-              <div class="chip tooltipped light-blue darken-3">
-                {{audio.magnitude|float}}
-              </div>
-            {% elif (audio.polarity)|float < 0.25 %}
-              <div class="chip tooltipped yellow lighten-1">
-                {{audio.polarity|float}}
-              </div>
-              <div class="chip tooltipped light-blue darken-3">
-                {{audio.magnitude|float}}
-              </div>
-            {% endif %}
-            {% if (audio.polarity)|float > 0.25 %}
-              <div class="chip tooltipped green lighten-1">
-                {{audio.polarity|float}}
-              </div>
-              <div class="chip tooltipped light-blue darken-3">
-                {{audio.magnitude|float}}
-              </div>
-            {% endif %}
-          {% endif %}
-      </div>
-        <span class="condensed">
-          Added by {{audio.createdBy|default('Anonymous', True)}}
-          on {{audio.publishedDate}}
-        <p class="activator">
-          <a href="/books/audio/{{audio.id}}">More info</a>
-          <i class="material-icons right">more_vert</i>
-        </p>
-      </span>
-    </div>
-
-    <div class="card-reveal">
-      <span class="card-title grey-text text-darken-4">{{audio.title}}<i class="material-icons right">close</i></span>
-      <p><span class="condensed">Description: </span>{{audio.description}}</p>
-      <div class="btn-group">
-        <div class="fixed-action-btn horizontal" style="bottom: 45px; right: 24px;">
-          <a class="tooltipped btn-floating btn-large red" data-position="bottom" data-tooltip="More options">
-            <i class="large material-icons">visibility</i>
-          </a>
-          <ul>
-            {% if audio.audioUrl %}
-              <li><a href="/api_tasks/{{audio.id}}" class="tooltipped btn-floating" data-position="top" data-tooltip="Transcript"><i class="material-icons">message</i></a></li>
-            {% endif %}
-            <li><a href="/books/audio/{{audio.id}}" class="tooltipped btn-floating green" data-position="top" data-tooltip="Details"><i class="material-icons">description</i></a></li>
-            {# <li><a class="btn-floating yellow darken-1"><i class="material-icons">mode_edit</i></a></li>
-            <li><a href="/books/{{audio.id}}/edit_audio" class="btn-floating green"><i class="material-icons">mode_edit</i></a></li>
-            <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li> #}
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-  {% else %}
-  <p>No audios found</p>
-  {% endfor %}
+<table class="striped responsive-table">
+  <tbody>
+    {% for alloc in allocations %}
+    <tr>
+       <td>{{alloc.project}}</td>
+    </tr>
+    {% else %}
+      <p>No allocations</p>
+    {% endfor %}
+  </tbody>
+</table>
 
 
 {% if next_page_token %}

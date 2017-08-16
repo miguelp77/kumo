@@ -1,26 +1,13 @@
 import json
-
-
-from kumo import get_model, oauth2, storage, audio_to_text
+from kumo import get_model, oauth2, storage
 from flask import Blueprint, current_app, redirect, render_template, request, \
     session, url_for
-import datetime
+from datetime import datetime, date
 from werkzeug.utils import secure_filename
-import wave
 import urllib.request
 
 
 crud = Blueprint('crud', __name__)
-
-# Obtenemos la frecuencia de sampleo y la extension del archivo de audio
-def get_samplerate(audio_url):
-    # w = wave.open(file,'r')
-    # framerate = w.getframerate()
-    data = urllib.request.urlopen(audio_url)
-    w = wave.open(data,'r')
-    frame_rate = w.getframerate()
-    file_extension = audio_url.split(".")[-1]
-    return frame_rate, file_extension
 
 
 def upload_audio_file(file):
@@ -69,21 +56,18 @@ def list():
     if token:
         token = token.encode('utf-8')
 
-    audios, next_page_token = get_model().list(kind='Audio',cursor=token)
+    allocations, next_page_token = get_model().list(kind='Allocation',cursor=token)
 
     return render_template(
         "home.html",
-        audios=audios,
+        allocations=allocations,
         next_page_token=next_page_token)
-
-@crud.route("/dashboard")
-def dashboard():
-    # return render_template('dashboard.html')
-    return render_template('graficas.html')
-
 
 @crud.route("/user", methods=['GET', 'POST'])
 def add_user():
+    """
+    Create an administrative user
+    """
     if request.method == 'GET':
         return render_template('add_user.html',user={})
     if request.method == 'POST':
@@ -95,12 +79,18 @@ def add_user():
 
 @crud.route('/user/<id>')
 def view_user(id):
+    """
+    View details
+    """
     user = get_model().read_user(id)
     return render_template("view_user.html", user=user)
 
 # arreglo 2
 @crud.route('/user/<id>/edit_user', methods=['GET', 'POST'])
 def edit_user(id):
+    """
+    Update user
+    """
     user = get_model().read_user(id)
 
     if request.method == 'POST':
@@ -128,19 +118,18 @@ def list_user():
         next_page_token=next_page_token)
 
 # AUDIOS
-@crud.route("/audios")
-def list_audio():
+@crud.route("/allocations")
+def list_allocations():
     token = request.args.get('page_token', None)
     if token:
         token = token.encode('utf-8')
 
-    audios, next_page_token = get_model().list(kind='Audio',cursor=token)
+    allocations, next_page_token = get_model().list(kind='Allocation',cursor=token)
     # books, next_page_token = get_model().list(kind='Book',cursor=token)
-
     return render_template(
         "list.html",
         # books=books,
-        audios=audios,
+        allocations=allocations,
         next_page_token=next_page_token)
 
 
@@ -151,14 +140,14 @@ def list_mine():
     if token:
         token = token.encode('utf-8')
 
-    audios, next_page_token = get_model().list_by_user(
+    allocations, next_page_token = get_model().list_by_user(
         user_id=session['profile']['id'],
-        kind='Audio',
+        kind='Allocation',
         cursor=token)
 
     return render_template(
         "list.html",
-        audios=audios,
+        allocations=allocations,
         next_page_token=next_page_token)
 
 
@@ -167,19 +156,19 @@ def view(id):
     book = get_model().read(id)
     return render_template("view.html", book=book)
 
-@crud.route('/audio/<id>')
-def view_audio(id):
-    audio = get_model().read_audio(id)
-    entidades = "None"
-    # entidades = json.loads(json.dumps(audio['entidades']))
-    # if audio['entidades']:
-    if 'entidades' in audio:
-        cadena = audio['entidades']
-        cadena_tratada = cadena.replace("'","\"")
-        entidades = json.loads(cadena_tratada)
-    text = audio['text']
-    # .replace("'", "\"")
-    return render_template("view_audio.html", audio=audio, entidades=entidades,text=text)
+@crud.route('/allocation/<id>')
+def view_allocation(id):
+    allocation = get_model().read_allocation(id)
+    entidades = json.loads(json.dumps(allocation))
+
+    print(entidades['start_date'])
+    temp =  datetime.strptime(entidades['start_date'], '%Y-%m-%d').date()
+    entidades['trans_start'] = str(temp.day) + "-" + str(temp.month) + "-" + str(temp.year)
+    
+    temp =  datetime.strptime(entidades['end_date'], '%Y-%m-%d').date()
+    entidades['trans_end'] = str(temp.day) + "-" + str(temp.month) + "-" + str(temp.year)    
+    
+    return render_template("view_allocation.html", allocation=allocation, entidades=entidades)
 
 
 # Arreglo 1
@@ -206,34 +195,27 @@ def add():
     return render_template("form.html", action="Add", book={})
 # Arreglo 1 fin
 
-@crud.route('/add_audio', methods=['GET', 'POST'])
-def add_audio():
+@crud.route('/add_allocation', methods=['GET', 'POST'])
+def add_allocation():
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
 
 
         # If an image was uploaded, update the data to point to the new image.
-        audio_url = upload_audio_file(request.files.get('audiofile'))
+        # audio_url = upload_audio_file(request.files.get('audiofile'))
+        
 
-        audio_framerate, audio_extension = get_samplerate(request.files.get(audio_url))
-
-        data['framerate'] = request.files.get('frame_rate')
-        data['fileEncoding'] = request.files.get('file_encoding')
-        data['language'] = request.files.get('language')
-
-        if audio_url:
-            data['audioUrl'] = audio_url
-        if audio_framerate:
-            data['audioFrameRate'] = audio_framerate
+        # if audio_url:
+        #     data['audioUrl'] = audio_url
 
         # If the user is logged in, associate their profile with the new book.
         if 'profile' in session:
             data['createdBy'] = session['profile']['displayName']
             data['createdById'] = session['profile']['id']
 
-        audio = get_model().create(data, kind='Audio')
-        texto = audio['text']
-        return redirect(url_for('.view_audio', id=audio['id'],kind='Audio',text=texto))
+        allocation = get_model().create(data, kind='Allocation')
+
+        return redirect(url_for('.view_allocation', id=allocation['id'],kind='Allocation'))
 
     return render_template("upload_file.html", action="Add", audio={})
 #

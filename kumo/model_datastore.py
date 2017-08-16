@@ -54,63 +54,63 @@ def from_datastore(entity):
 #     entities = builtin_list(map(from_datastore, entities))
 #     return entities, cursor.decode('utf-8') if len(entities) == limit else None
 
-# def list(limit=10, kind='Book', cursor=None):
-#     ds = get_client()
-#     query = ds.query(kind=kind, order=['title'])
-#     it = query.fetch(limit=limit, start_cursor=cursor)
-#     entities, more_results, cursor = it.next_page()
-#     entities = builtin_list(map(from_datastore, entities))
-#     return entities, cursor.decode('utf-8') if len(entities) == limit else None
-#
-#
-# def list_by_user(user_id, kind='Book', limit=10, cursor=None):
-#     ds = get_client()
-#     query = ds.query(
-#         kind=kind,
-#         filters=[
-#             ('createdById', '=', user_id)
-#         ]
-#     )
-#     it = query.fetch(limit=limit, start_cursor=cursor)
-#     entities, more_results, cursor = it.next_page()
-#     entities = builtin_list(map(from_datastore, entities))
-#     return entities, cursor.decode('utf-8') if len(entities) == limit else None
-
-def list(limit=10,  kind='Audio',cursor=None):
+def list(limit=10, kind='Allocation', cursor=None):
     ds = get_client()
+    query = ds.query(kind=kind, order=['project'])
+    it = query.fetch(limit=limit, start_cursor=cursor)
+    entities, more_results, cursor = it.next_page()
+    entities = builtin_list(map(from_datastore, entities))
+    return entities, cursor.decode('utf-8') if len(entities) == limit else None
 
-    query = ds.query(kind='Audio', order=['title'])
-    query_iterator = query.fetch(limit=limit, start_cursor=cursor)
-    page = next(query_iterator.pages)
-
-    entities = builtin_list(map(from_datastore, page))
-    next_cursor = (
-        query_iterator.next_page_token.decode('utf-8')
-        if query_iterator.next_page_token else None)
-
-    return entities, next_cursor
-
-def list_by_user(user_id,  kind='Audio',limit=10, cursor=None):
+#
+def list_by_user(user_id, kind='Allocation', limit=10, cursor=None):
     ds = get_client()
+    print('user_id: ' + user_id)
     query = ds.query(
-        kind='Audio',
+        kind=kind,
         filters=[
             ('createdById', '=', user_id)
         ]
     )
-    # it = query.fetch(limit=limit, start_cursor=cursor)
-    # entities, more_results, cursor = it.next_page()
-    # entities = builtin_list(map(from_datastore, entities))
-    # return entities, cursor.decode('utf-8') if len(entities) == limit else None
-    query_iterator = query.fetch(limit=limit, start_cursor=cursor)
-    page = next(query_iterator.pages)
+    it = query.fetch(limit=limit, start_cursor=cursor)
+    entities, more_results, cursor = it.next_page()
+    entities = builtin_list(map(from_datastore, entities))
+    return entities, cursor.decode('utf-8') if len(entities) == limit else None
 
-    entities = builtin_list(map(from_datastore, page))
-    next_cursor = (
-        query_iterator.next_page_token.decode('utf-8')
-        if query_iterator.next_page_token else None)
+# def list(limit=10,  kind='Allocation',cursor=None):
+#     ds = get_client()
+#     query = ds.query(kind='Allocation', order=['project'])
+#     query_iterator = query.fetch( start_cursor=cursor, limit=limit)
+#     page = next(query_iterator.pages)
 
-    return entities, next_cursor
+#     entities = builtin_list(map(from_datastore, page))
+#     next_cursor = (
+#         query_iterator.next_page_token.decode('utf-8')
+#         if query_iterator.next_page_token else None)
+
+#     return entities, next_cursor
+
+# def list_by_user(user_id,  kind='Allocation',limit=10, cursor=None):
+#     ds = get_client()
+#     query = ds.query(
+#         kind='Allocation',
+#         filters=[
+#             ('createdById', '=', user_id)
+#         ]
+#     )
+#     # it = query.fetch(limit=limit, start_cursor=cursor)
+#     # entities, more_results, cursor = it.next_page()
+#     # entities = builtin_list(map(from_datastore, entities))
+#     # return entities, cursor.decode('utf-8') if len(entities) == limit else None
+#     query_iterator = query.fetch(limit=limit, start_cursor=cursor)
+#     page = next(query_iterator.pages)
+
+#     entities = builtin_list(map(from_datastore, page))
+#     next_cursor = (
+#         query_iterator.next_page_token.decode('utf-8')
+#         if query_iterator.next_page_token else None)
+
+#     return entities, next_cursor
 
 def read(id):
     ds = get_client()
@@ -126,6 +126,12 @@ def read_audio(id):
     print(from_datastore(results))
     return from_datastore(results)
 
+def read_allocation(id):
+    ds = get_client()
+    key = ds.key('Allocation', int(id))
+    results = ds.get(key)
+    print(from_datastore(results))
+    return from_datastore(results)
 
 def update(data, kind='Book', id=None):
     ds = get_client()
