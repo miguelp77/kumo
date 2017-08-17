@@ -140,11 +140,36 @@ def list_mine():
     token = request.args.get('page_token', None)
     if token:
         token = token.encode('utf-8')
-
+    total_hours = 0
     allocations, next_page_token = get_model().list_by_user(
         user_id=session['profile']['id'],
         kind='Allocation',
         cursor=token)
+    for allocs in allocations:
+        if allocs['status'] == 'created':
+            total_hours = total_hours + int(allocs['hours']) 
+    # write_spreadsheet('ooo')
+
+    return render_template(
+        "list.html",
+        allocations=allocations,
+        total_hours=total_hours,
+        next_page_token=next_page_token)
+
+@crud.route("/check_allocations")
+@oauth2.required
+def review_allocations():
+    token = request.args.get('page_token', None)
+    if token:
+        token = token.encode('utf-8')
+    allocations, next_page_token = get_model().assigned_to_me(
+        user_email=session['profile']['emails'][0]['value'],
+        kind='Allocation',
+        cursor=token)
+
+    # for allocs in allocations:
+    #     if allocs['status'] == 'created':
+    #         total_hours = total_hours + int(allocs['hours']) 
     # write_spreadsheet('ooo')
 
     return render_template(
@@ -152,17 +177,17 @@ def list_mine():
         allocations=allocations,
         next_page_token=next_page_token)
 
-
 @crud.route('/<id>')
 def view(id):
-    book = get_model().read(id)
-    return render_template("view.html", book=book)
+    allocation = get_model().read_allocation(id)
+    entidades = json.loads(json.dumps(allocation))   
+    return render_template("view_allocation.html", allocation=allocation, entidades=entidades)
+
 
 @crud.route('/allocation/<id>')
 def view_allocation(id):
     allocation = get_model().read_allocation(id)
     entidades = json.loads(json.dumps(allocation))   
-    
     return render_template("view_allocation.html", allocation=allocation, entidades=entidades)
 
 
@@ -192,6 +217,8 @@ def add():
 
 @crud.route('/add_allocation', methods=['GET', 'POST'])
 def add_allocation():
+    projects, next_page_token2 = get_model().list_projects(50,'Project',None)
+
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
 
@@ -212,9 +239,10 @@ def add_allocation():
 
         allocation = get_model().create(data, kind='Allocation')
 
-        return redirect(url_for('.view_allocation', id=allocation['id'],kind='Allocation'))
+        # return redirect(url_for('.view_allocation', id=allocation['id'],kind='Allocation'))
+        return redirect(url_for('.list_mine'))
 
-    return render_template("upload_file.html", action="Add", audio={})
+    return render_template("upload_file.html", action="Add", audio={},projects=projects)
 #
 # @crud.route('/test', methods=['GET', 'POST'])
 # def test():
@@ -224,23 +252,45 @@ def add_allocation():
 @crud.route('/<id>/edit', methods=['GET', 'POST'])
 def edit(id):
     book = get_model().read(id)
-
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
-
         image_url = upload_image_file(request.files.get('image'))
-
         if image_url:
             data['imageUrl'] = image_url
-
         book = get_model().update(data, id)
-
         return redirect(url_for('.view', id=book['id']))
-
     return render_template("form.html", action="Edit", book=book)
 
 # arreglo 2 fin
+@crud.route('/<id>/submit', methods=['GET', 'POST'])
+def submited(id):
+    allocation = get_model().read_allocation(id)
+    allocation['status'] = 'submit'
+    allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
+    # return render_template("list.html", allocation=allocation)
+    return render_template(
+        "list.html",
+        allocations=allocation)
 
+@crud.route('/<id>/accepted', methods=['GET', 'POST'])
+def accepted(id):
+    allocation = get_model().read_allocation(id)
+    allocation['status'] = 'accepted'
+    allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
+    # return render_template("list.html", allocation=allocation)
+    return render_template(
+        "list.html",
+        allocations=allocation)
+
+@crud.route('/<id>/rejected', methods=['GET', 'POST'])
+def rejected(id):
+    allocation = get_model().read_allocation(id)
+    allocation['status'] = 'rejected'
+    allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
+    # return render_template("list.html", allocation=allocation)
+    return render_template(
+        "list.html",
+        allocations=allocation)
 
 @crud.route('/drop_audio', methods=['GET', 'POST'])
 def upldfile():
@@ -336,7 +386,14 @@ def edit_audio(id):
 
     return render_template("upload_file.html", action="Edit", audio=audio)
 
+# @crud.route('/<id>/delete')
+# def delete(id):
+#     get_model().delete(id, kind='Audio')
+#     return redirect(url_for('.list'))
+
 @crud.route('/<id>/delete')
 def delete(id):
-    get_model().delete(id, kind='Audio')
-    return redirect(url_for('.list'))
+    get_model().delete(id, kind='Allocation')
+    return redirect(url_for('.list_mine'))
+
+

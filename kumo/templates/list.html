@@ -16,6 +16,9 @@
       {% endif %}
     </div>
   </div>
+  {%if total_hours%}
+    <span>{{total_hours}} hours in created status.</span>
+  {% endif %}
 <table class="striped">
     <thead>
     <tr>
@@ -46,15 +49,41 @@
        <td>{{alloc.formated_end_date}}</td>
        <td>{{alloc.hours}}</td>
        <td>{{alloc.status}}</td>
-       <td><a href="#">submit</a></td>
-       <td><a href="#">edit</a></td>
+       <td>
+        {% if alloc.status == 'created' %}
+          <a href="./{{alloc.id}}/submit">submit</a>
+        {% endif %}
+       </td>
+       <td>
+        {% if alloc.status == 'created' or alloc.status == 'rejected' %}
+         <a href="./{{alloc.id}}/delete">delete</a>
+        {% endif %}
+        </td>
+       <td>
+        {% if alloc.status == 'created' or alloc.status == 'rejected' %}
+         <a href="#">edit</a>
+        {% endif %}
+       </td>
+       <td>
+        {% if alloc.status == 'submit' %}
+         <a href="./{{alloc.id}}/rejected"><i class="material-icons" style="color:#b71c1c">cancel</i></a>
+        {% endif %}
+       </td>
+       <td>
+        {% if alloc.status == 'submit' %}
+         <a href="./{{alloc.id}}/accepted"><i class="material-icons" style="color:#1b5e20">check_circle</i></a>
+        {% endif %}
+       </td>
+
+             
+             
+
     </tr>
     {% else %}
       <p>No allocations</p>
     {% endfor %}
   </tbody>
 </table>
-
 
 {% if next_page_token %}
 <nav>

@@ -13,7 +13,6 @@
 
 <div id="form">
 <!-- <h3 style="color:#f0f0f0;">Upload audio</h3> -->
-
 <h4>Crear Imputación</h4>
 
 
@@ -34,18 +33,39 @@
     </div>
 
     <div class="row">
-      <div class="col s4">
+    
+      <!-- <div class="col s4">
         <div class="form-group">
-          <label for="title">Proyecto</label>
-          <input type="text" name="project" id="project"  class="form-control"/>
+          <label for="title">Aprobador</label>
+          <input type="text" name="approver" id="approver" class="form-control"/>
         </div>
+      </div> -->
+      
+      <div class="input-field col s4">
+        <select name="project" id="project" class="form-control">
+          <option value="" disabled selected>Elija una opción</option>
+          {% for pjs in projects %}
+            <option value="{{pjs.name}}" data-id="{{pjs.approver}}">{{pjs.name}}</option>
+          {% endfor %}
+          <option value="Vacaciones 2017">Vacaciones 2017</option>
+          <option value="Ausencia justificada">Ausencia justificada</option>
+        </select>
+        <label>Proyecto</label>
       </div>
-      <div class="col s4">
+      
+      <div class="input-field col s4">
+        <select name="approver" id="approver" class="form-control">
+          <option value="" disabled selected>Elija una opción</option>
+        </select>
+        <label>Aprobador</label>
+      </div>
+
+      <!-- <div class="col s4">
         <div class="form-group">
-          <label for="title">Aprovador</label>
-          <input type="text" name="approver" id="approver"  class="form-control"/>
+          <label for="title">Aprobador</label>
+          <input type="text" name="approver" id="approver" class="form-control"/>
         </div>
-      </div>   
+      </div>    -->
     </div>
     
     <div class="row">  
@@ -69,12 +89,18 @@
       </div>  
     </div>
     <input type="text" value="{{session.profile.id}}" id="user_id" name="user_id" hidden/>
-    <input type="text" value="submited" id="status" name="status" hidden/>
-    
-  	<div class="col s3">
-			<button id="submit" type="submit" class="btn btn-success">Guardar</button>
-		</div>
-	</form>
+    <input type="text" value="{{session.profile.emails[0].value}}" id="user_email" name="user_email" hidden/>
+    <input type="text" value="created" id="status" name="status" hidden/>
+    <div class="row">
+      <div id="split_data">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s3">
+        <button id="submit" type="submit" class="btn btn-success">Guardar</button>
+      </div>
+    </div>
+  </form>
 
-
+ 
 {% endblock %}

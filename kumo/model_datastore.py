@@ -54,6 +54,14 @@ def from_datastore(entity):
 #     entities = builtin_list(map(from_datastore, entities))
 #     return entities, cursor.decode('utf-8') if len(entities) == limit else None
 
+def list_projects(limit=50, kind='Project', cursor=None):
+    ds = get_client()
+    query = ds.query(kind=kind, order=['country'])
+    it = query.fetch(limit=limit, start_cursor=cursor)
+    entities, more_results, cursor = it.next_page()
+    entities = builtin_list(map(from_datastore, entities))
+    return entities, cursor.decode('utf-8') if len(entities) == limit else None
+
 def list(limit=10, kind='Allocation', cursor=None):
     ds = get_client()
     query = ds.query(kind=kind, order=['project'])
@@ -65,7 +73,6 @@ def list(limit=10, kind='Allocation', cursor=None):
 #
 def list_by_user(user_id, kind='Allocation', limit=10, cursor=None):
     ds = get_client()
-    print('user_id: ' + user_id)
     query = ds.query(
         kind=kind,
         filters=[
@@ -76,6 +83,22 @@ def list_by_user(user_id, kind='Allocation', limit=10, cursor=None):
     entities, more_results, cursor = it.next_page()
     entities = builtin_list(map(from_datastore, entities))
     return entities, cursor.decode('utf-8') if len(entities) == limit else None
+
+# list of allocations pending to review
+def assigned_to_me(user_email, kind='Allocation', limit=50, cursor=None):
+    ds = get_client()
+    query = ds.query(
+        kind=kind,
+        filters=[
+            ('approver', '=', user_email),
+            ('status', '=', 'submit'),
+        ]
+    )
+    it = query.fetch(limit=limit, start_cursor=cursor)
+    entities, more_results, cursor = it.next_page()
+    entities = builtin_list(map(from_datastore, entities))
+    return entities, cursor.decode('utf-8') if len(entities) == limit else None
+
 
 # def list(limit=10,  kind='Allocation',cursor=None):
 #     ds = get_client()
@@ -126,6 +149,13 @@ def read_audio(id):
     print(from_datastore(results))
     return from_datastore(results)
 
+def read_project(id):
+    ds = get_client()
+    key = ds.key('Audio', int(id))
+    results = ds.get(key)
+    print(from_datastore(results))
+    return from_datastore(results)
+
 def read_allocation(id):
     ds = get_client()
     key = ds.key('Allocation', int(id))
@@ -154,7 +184,19 @@ def update(data, kind='Book', id=None):
 create = update
 
 
-def delete(id, kind='Book'):
+def update_allocation(data, kind='Allocation', id=None):
+    ds = get_client()
+    if id:
+        key = ds.key(kind, int(id))
+    else:
+        key = ds.key(kind)
+    entity = datastore.Entity(key=key)
+    entity.update(data)
+    ds.put(entity)
+    return from_datastore(entity)
+
+
+def delete(id, kind='Allocation'):
     ds = get_client()
     key = ds.key(kind, int(id))
     ds.delete(key)
