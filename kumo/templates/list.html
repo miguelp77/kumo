@@ -17,11 +17,26 @@
     </div>
   </div>
 <table class="striped">
+    <thead>
+    <tr>
+        <th> 
+         <input type="checkbox" id="check_all" />
+         <label for="all">Todos</label>
+        </th>
+        <th>Nombre</th>
+        <th>Proyecto</th>
+        <th>Aprobador</th>
+        <th>Desde</th>
+        <th>Hasta</th>
+        <th>Horas</th>
+        <th>Estado</th>
+    </tr>
+  </thead>
   <tbody>
     {% for alloc in allocations %}
     <tr>
        <td>
-         <input type="checkbox" id="{{alloc.id}}" />
+         <input type="checkbox" id="{{alloc.id}}" class="checkBoxClass"/>
          <label for="{{alloc.id}}"></label>
       </td>
        <td>{{alloc.createdBy}}</td>
@@ -49,9 +64,6 @@
 </nav>
 </div>
 {% endif %}
-<script>
-  $(document).ready(function(){
-      $('.tooltipped').tooltip({delay: 50});
-    });
-</script>
+
 {% endblock %}
+

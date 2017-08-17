@@ -88,6 +88,15 @@
       console.log(wh);
       $('#hours').val(wh);
     }
-  });
+  });  
+  $('#check_all[type="checkbox"]+label').on('click', function(){
+    if(!$("#check_all").prop('checked')){
+      $("#check_all").prop('checked', true);
+      $(".checkBoxClass").prop('checked', true);
+    }else{
+      $("#check_all").prop('checked', false);
+      $(".checkBoxClass").prop('checked', false);
+    }
+  })
+});
 
-  });
