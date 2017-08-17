@@ -4,18 +4,35 @@
 
 
 <div class="audioList">
-<h4>Allocations</h4>
-{% if session.profile %}
-<a href="/a/add_allocation" class="btn btn-success btn-sm">
-  <i class="glyphicon glyphicon-plus"></i>
-  Add
-</a>
-{% endif %}
-<table class="striped responsive-table">
+  <div class="row">
+    <div class="col s2">
+      <h4>Imputaciones</h4>
+    </div>
+    <div class="col s2 right">
+      {% if session.profile %}
+      <a href="/a/add_allocation" class="btn btn-success btn-sm">
+      Nueva
+      </a>
+      {% endif %}
+    </div>
+  </div>
+<table class="striped">
   <tbody>
     {% for alloc in allocations %}
     <tr>
+       <td>
+         <input type="checkbox" id="{{alloc.id}}" />
+         <label for="{{alloc.id}}"></label>
+      </td>
+       <td>{{alloc.createdBy}}</td>
        <td>{{alloc.project}}</td>
+       <td>{{alloc.approver}}</td>
+       <td>{{alloc.formated_start_date}}</td>
+       <td>{{alloc.formated_end_date}}</td>
+       <td>{{alloc.hours}}</td>
+       <td>{{alloc.status}}</td>
+       <td><a href="#">submit</a></td>
+       <td><a href="#">edit</a></td>
     </tr>
     {% else %}
       <p>No allocations</p>

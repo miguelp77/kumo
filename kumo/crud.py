@@ -1,5 +1,5 @@
 import json
-from kumo import get_model, oauth2, storage
+from kumo import get_model, oauth2, storage, format_date, write_spreadsheet
 from flask import Blueprint, current_app, redirect, render_template, request, \
     session, url_for
 from datetime import datetime, date
@@ -125,6 +125,7 @@ def list_allocations():
         token = token.encode('utf-8')
 
     allocations, next_page_token = get_model().list(kind='Allocation',cursor=token)
+
     # books, next_page_token = get_model().list(kind='Book',cursor=token)
     return render_template(
         "list.html",
@@ -144,6 +145,7 @@ def list_mine():
         user_id=session['profile']['id'],
         kind='Allocation',
         cursor=token)
+    # write_spreadsheet('ooo')
 
     return render_template(
         "list.html",
@@ -159,14 +161,7 @@ def view(id):
 @crud.route('/allocation/<id>')
 def view_allocation(id):
     allocation = get_model().read_allocation(id)
-    entidades = json.loads(json.dumps(allocation))
-
-    print(entidades['start_date'])
-    temp =  datetime.strptime(entidades['start_date'], '%Y-%m-%d').date()
-    entidades['trans_start'] = str(temp.day) + "-" + str(temp.month) + "-" + str(temp.year)
-    
-    temp =  datetime.strptime(entidades['end_date'], '%Y-%m-%d').date()
-    entidades['trans_end'] = str(temp.day) + "-" + str(temp.month) + "-" + str(temp.year)    
+    entidades = json.loads(json.dumps(allocation))   
     
     return render_template("view_allocation.html", allocation=allocation, entidades=entidades)
 
@@ -200,6 +195,8 @@ def add_allocation():
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
 
+        data['formated_start_date'] = format_date(data['start_date'])
+        data['formated_end_date'] = format_date(data['end_date'])
 
         # If an image was uploaded, update the data to point to the new image.
         # audio_url = upload_audio_file(request.files.get('audiofile'))

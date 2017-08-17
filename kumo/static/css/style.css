@@ -753,3 +753,14 @@ h5.header.col.s12.light.orbitron {
 
 .opciones{display:inline-block;}
 .banned{text-decoration:line-through;color:#ddd;}
+
+
+@media only screen and (min-width: 1200px){
+  html {
+      font-size: 12px;
+  }
+  td, th {
+    padding: 10px 5px;
+  }
+  h4{margin-top: 0.14rem;}
+}

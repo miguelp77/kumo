@@ -14,6 +14,8 @@ from google.cloud import datastore
 from google.cloud import storage as cloud_storage
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
+import pygsheets
+
 
 oauth2 = UserOAuth2()
 
@@ -119,6 +121,14 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
     return app
 
+def format_date(date):
+    """
+    Give format to date. From YYYY-MM-DD to DD-MM-YYYY
+    """
+    temp =  datetime.strptime(date, '%Y-%m-%d').date()
+    formated_date = str(temp.day) + "-" + str(temp.month) + "-" + str(temp.year)
+
+    return formated_date
 
 def get_model():
     model_backend = current_app.config['DATA_BACKEND']
@@ -167,10 +177,7 @@ def _request_user_info(credentials):
             "No devoteam user: %s" % resp)
         return None
     # Se ha creado un listado de usuarios autorizados
-    print('*' * 80)
-    print('USER_INFO')
-    print(user_info)
-    print('*' * 80)
+
     current_app.logger.info("%s is logged" % user_email)
     # if is_auth_user(user_email):
     # else:
@@ -243,9 +250,46 @@ def _get_storage_service():
     credentials = GoogleCredentials.get_application_default()
     return discovery.build('storage', 'v1', credentials=credentials)
 
+
+def _get_spreadsheets_service():
+    credentials = GoogleCredentials.get_application_default()
+    service = discovery.build('sheets', 'v4', credentials=credentials)
+
+    return service
+
 # def _get_sentiment_service():
 #     credentials = GoogleCredentials.get_application_default()
 #     return discovery.build('language', 'v1beta1', credentials=credentials)
+
+def write_spreadsheet(test):
+    """Transcribe the given audio file.
+    Args:
+        speech_file: the name of the audio file.
+    """
+    service = _get_spreadsheets_service()
+    spreadsheetId = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
+    rangeName = 'Class Data!A2:E'
+    print('*' * 80)
+    request = service.spreadsheets().values().get(spreadsheetId=spreadsheetId, range=rangeName)
+    response = request.execute()
+    print(response)
+
+    # result = service.spreadsheets().values().get(
+    #     spreadsheetId=spreadsheetId, range=rangeName).execute()
+    # values = result.get('values', [])
+
+    # if not values:
+    #     print('No data found.')
+    # else:
+    #     print('Name, Major:')
+    #     for row in values:
+    #         # Print columns A and E, which correspond to indices 0 and 4.
+    #         print('%s, %s' % (row[0], row[4]))
+
+
+    # sht1 = gc.open_by_key('18Gkc--JBp_EKkREyTn5P9CNSgb2flQ80-EKk_9E990M')
+    # wks = sht1.add_worksheet("new sheet",rows=50,cols=60)
+
 
 def _speech(speech_file,framerate,language='es-ES'):
     """Transcribe the given audio file.
