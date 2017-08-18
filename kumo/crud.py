@@ -268,9 +268,7 @@ def submited(id):
     allocation['status'] = 'submit'
     allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
     # return render_template("list.html", allocation=allocation)
-    return render_template(
-        "list.html",
-        allocations=allocation)
+    return redirect(url_for('.list_mine'))
 
 @crud.route('/<id>/accepted', methods=['GET', 'POST'])
 def accepted(id):
@@ -278,9 +276,10 @@ def accepted(id):
     allocation['status'] = 'accepted'
     allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
     # return render_template("list.html", allocation=allocation)
-    return render_template(
-        "list.html",
-        allocations=allocation)
+    # return render_template(
+    #     "list.html",
+    #     allocations=allocation)
+    return redirect(url_for('.review_allocations'))
 
 @crud.route('/<id>/rejected', methods=['GET', 'POST'])
 def rejected(id):
@@ -288,9 +287,11 @@ def rejected(id):
     allocation['status'] = 'rejected'
     allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
     # return render_template("list.html", allocation=allocation)
-    return render_template(
-        "list.html",
-        allocations=allocation)
+    # return render_template(
+    #     "list.html",
+    #     allocations=allocation)
+    return redirect(url_for('.review_allocations'))
+
 
 @crud.route('/drop_audio', methods=['GET', 'POST'])
 def upldfile():

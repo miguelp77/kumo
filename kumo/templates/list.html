@@ -19,6 +19,7 @@
   {%if total_hours%}
     <span>{{total_hours}} hours in created status.</span>
   {% endif %}
+    {% if allocations %}
 <table class="striped">
     <thead>
     <tr>
@@ -79,11 +80,15 @@
              
 
     </tr>
-    {% else %}
-      <p>No allocations</p>
     {% endfor %}
   </tbody>
 </table>
+<br>
+<small class='right'><a href="check_allocations">Revisar Imputaciones</a></small>
+<br>
+    {% else %}
+      <p>No allocations</p>
+    {% endif %}
 
 {% if next_page_token %}
 <nav>
@@ -93,6 +98,5 @@
 </nav>
 </div>
 {% endif %}
-
 {% endblock %}
 
