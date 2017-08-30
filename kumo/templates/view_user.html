@@ -1,5 +1,3 @@
-
-
 {% extends "base.html" %}
 
 {% block content %}
@@ -16,14 +14,15 @@
     {% if user.comment %}
           <p>{{user.comment}}</p>
     {% endif %}
+    {{session}}
   </div>
 </div>
 <div class="btn-group">
-  <a href="/books/user/{{user.id}}/edit_user" class="btn btn-primary btn-sm">
+  <a href="../user/{{user.id}}/edit_user" class="btn btn-primary btn-sm">
     <i class="glyphicon glyphicon-edit"></i>
     Edit user
   </a>
-  <a href="/books/user/{{user.id}}/delete_user" class="btn btn-danger btn-sm">
+  <a href="../user/{{user.id}}/delete_user" class="btn btn-danger btn-sm">
     <i class="glyphicon glyphicon-trash"></i>
     Delete user
   </a>

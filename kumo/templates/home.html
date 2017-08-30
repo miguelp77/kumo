@@ -1,42 +1,12 @@
-{% extends "head.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
-          <div class="burger">
-            <div class="burger01"></div>
-            <div class="burger01"></div>
-            <div class="burger01"></div>
-          </div>
-
-
-  <div id="index-banner" class="parallax-container">
-    <div class="section no-pad-bot">
-      <div class="container headCenter">
-        <br><br>
-         <div class="row ">
-         <h1 class="header teal-text text-lighten-2 russo nopadding">Alison</h1>       
-          <h5 class="header col s12 light orbitron nopadding">Speech Data Value</h5>
-        </div>
-        {% if session.profile %}
-        <div class="row center">
-          <a href="/books/add_audio" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">Get Started</a>
-        </div>
-        {% endif %}
-
-        <div class="row center">
-           
-           <h5 class="col s12   center-align claimHome"> Welcome to Machine Learning Generation</h5>
-           
-        </div>
-        <br><br>
-
-      </div>
+    <div class="caption center-align">
+        <h3>Kumo</h3>
+        <h5 class="light red-text text-lighten-4">KIP</h5>
     </div>
-    <div class="parallax"><img src="/static/images/waves2.jpg" alt="Unsplashed background img 1"></div>
-  </div>
 
-
-  <div class="container">
     <div class="section">
 
       <!--   Icon Section   -->
@@ -46,9 +16,9 @@
             <h2 class="center brown-text"><img src="/static/images/Home-network.png" alt="" width="60px"/></h2>
 
             <div class="boxText">
-              <h5 class="center">Powerful Speech Recognition</h5>
+              <h5 class="center">Atualización de tareas</h5>
 
-              <p class="light ">Alison enables to convert audio to text by applying powerful neural network models in an easy to use API. You can transcribe the text of users dictating to an application’s microphone, enable command-and-control through voice, or transcribe audio files, among many other use cases.</p>
+              <p class="light ">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum doloribus nulla ab, similique! Enim officia laborum suscipit, consequatur quis sequi perferendis doloremque porro expedita? Neque possimus quaerat nesciunt perferendis quae?</p>
             </div>
           </div>
         </div>
@@ -58,9 +28,9 @@
             <h2 class="center brown-text"><img src="/static/images/Home-cloud.png" alt="" width="60px"/></h2>
 
             <div class="boxText">
-              <h5 class="center">Sentiments Analysis</h5>
+              <h5 class="center">Accesible desde internet</h5>
 
-              <p class="light ">You can use it to understand sentiment about your product or parse intent from customer conversations happening in the call center. You can analyze text uploaded in your requests. Furthermore, the tool accuracy improves over time as Google improves the internal speech recognition technology used by Google products.</p>
+              <p class="light ">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus minus facilis pariatur, ratione accusamus itaque quas vel, asperiores consequatur, blanditiis perspiciatis ullam libero atque iste voluptate fugit explicabo enim ex?</p>
             </div>
 
           </div>
@@ -71,16 +41,24 @@
             <h2 class="center brown-text"><img src="/static/images/Home-transformation.png" alt="" width="60px"/></h2>
 
             <div class="boxText">
-              <h5 class="center">Decision Making Capacities</h5>
+              <h5 class="center">Reporting</h5>
 
-              <p class="light ">Alison automatically generates metrics based on the messages analyzed and allows you to take better decisions about your products and services. With this information you can complement your database and apply new business models according to your customer's needs.</p>
+              <p class="light ">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consectetur quia accusantium beatae magni minus quas veniam ratione adipisci labore aliquid culpa sapiente dolorum atque repellendus, ducimus maiores officiis eius. Illum.</p>
             </div>
           </div>
         </div>
       </div>
 
     </div>
-  </div>
 
+
+
+    {% if session.profile %}
+    <h3>Mensajes</h3>
+    <p>No hay mensajes</p>
+    <!-- {{allocations}} -->
+    {% else %}
+        <a class="waves-effect waves-light btn-large" href="/oauth2authorize">Login</a>
+    {% endif %}
 
 {% endblock %}

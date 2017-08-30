@@ -11,31 +11,25 @@
     <div class="col s4 right">
       {% if session.profile %}
       <span> 
-      <span> 
-        <a href="#" class="btn btn-success btn-sm" id="buttonDelete" disabled="disabled" >
+        <a href="#" class="btn btn-success btn-sm hidden" id="buttonDelete" disabled="disabled" >
          Borrar
         </a>
       </span>
       <span> 
-        <a href="#" class="btn btn-success btn-sm" id="buttonSubmit" disabled="disabled" >
+        <a href="#" class="btn btn-success btn-sm hidden" id="buttonSubmit" disabled="disabled" >
          Enviar
         </a>
       </span>      
       <span> 
-        <a href="#" class="btn btn-success btn-sm hidden" id="buttonReject" disabled="disabled">
+        <a href="#" class="btn btn-success btn-sm" id="buttonReject" disabled="disabled">
          Rechazar
         </a>
       </span>
       <span> 
-        <a href="#" class="btn btn-success btn-sm hidden" id="buttonApprove" disabled="disabled">
+        <a href="#" class="btn btn-success btn-sm" id="buttonApprove" disabled="disabled">
          Aprobar
         </a>
-      </span>     
-      <span> 
-        <a href="/a/add_allocation" class="btn btn-success btn-sm">
-        Nueva
-        </a>
-      </span>
+      </span>      
       {% endif %}
     </div>
   </div>
@@ -48,7 +42,7 @@
           {% endfor%}
           <br>
         {% else %}
-            <a href="/a/mine">all</a>
+            <a href="../../mine">all</a>
         {% endif %}
       {% endfor %}
       <br>
@@ -77,12 +71,10 @@
   </thead>
   <tbody>
     {% for alloc in allocations|sort(attribute='datetime_start') %}
-    <tr title="{{alloc.comment}}">
+    <tr>
        <td>
-         {% if not alloc.status == 'accepted' and not alloc.status == 'submit' %}
          <input type="checkbox" id="{{alloc.id}}" class="checkBoxClass"/>
          <label for="{{alloc.id}}"></label>
-         {% endif %}
       </td>
        <td>{{alloc.createdBy}}</td>
        {% if alloc.project_name is string %}
@@ -131,7 +123,7 @@
         </td>
        <td>
         {% if alloc.status == 'created' or alloc.status == 'rejected' %}
-         <a href="/a/edit_allocation/{{alloc.id}}">edit</a>
+         <a href="#">edit</a>
         {% endif %}
        </td>
       

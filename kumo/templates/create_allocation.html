@@ -13,51 +13,49 @@
 
 <div id="form">
 <!-- <h3 style="color:#f0f0f0;">Upload audio</h3> -->
-<h4>Crear Imputación</h4>
+<h4>{{action}} Imputación</h4>
 
 
-  <form method="POST" enctype="multipart/form-data" action="add_allocation">
+  <form method="POST" enctype="multipart/form-data">
     <div class="row">
-      <div class="col s4">
+      <div class="col s3">
         <div class="form-group">
           <label for="title">Nombre</label>
           <input type="text" name="name" id="name" disabled value="{{session.profile.displayName}}" class="form-control"/>
         </div>
       </div>
-      <div class="col s4">
+      <div class="col s3">
         <div class="form-group">
           <label for="title">Email</label>
           <input type="text" name="email" id="email" disabled value="{{session.profile.emails.0.value}}" class="form-control"/>
         </div>
       </div>
     </div>
-
+{{allocation}}
     <div class="row">
-    
-      <!-- <div class="col s4">
-        <div class="form-group">
-          <label for="title">Aprobador</label>
-          <input type="text" name="approver" id="approver" class="form-control"/>
-        </div>
-      </div> -->
-      
-      <div class="input-field col s4">
+      <div class="input-field col s3">
         <select name="project" id="project" class="form-control">
-          <option value="" disabled selected>Elija una opción</option>
+          <option value="{{allocation.project}}" disabled selected>{% if allocation.project %}{{allocation.project_name}}{%else%}Elija una opción{%endif%}</option>
           {% for pjs in projects %}
-            <option value="{{pjs.id}}" data-id="{{pjs.approver}}">{{pjs.name}}</option>
+            <option value="{{pjs.id}}" data-id="{{pjs.approver}}" data-type="{{pjs.hours_type}}" >{{pjs.name}}</option>
           {% endfor %}
-          <option value="Vacaciones 2017">Vacaciones 2017</option>
-          <option value="Ausencia justificada">Ausencia justificada</option>
+          <option value="Vaciones_2017">Vacaciones 2017</option>
+          <option value="Ausencia_justificada">Ausencia justificada</option>
         </select>
         <label>Proyecto</label>
       </div>
       
-      <div class="input-field col s4">
+      <div class="input-field col s3">
         <select name="approver" id="approver" class="form-control">
-          <option value="" disabled selected>Elija una opción</option>
+          <option value="{{allocation.approver}}" disabled selected>{% if allocation.project %}{{allocation.approver}}{%else%}Elija una opción{%endif%}</option>
         </select>
         <label>Aprobador</label>
+      </div>
+      <div class="input-field col s3">
+        <select name="hours_type" id="hours_type" class="form-control">
+          <option value="{{allocation.hours_type}}" disabled selected>{% if allocation.project %}{{allocation.hours_type}}{%else%}Elija una opción{%endif%}</option>
+        </select>
+        <label>Tipo</label>
       </div>
 
       <!-- <div class="col s4">
@@ -69,25 +67,33 @@
     </div>
     
     <div class="row">  
-      <div class="col s2">
+      <div class="col s1">
         <div class="form-group">
           <label for="title">Desde</label>
-          <input type="text" id="start_date" name="start_date" class="form-control datepicker" />
+          <input type="text" id="start_date" name="start_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" />
         </div>
       </div>  
-      <div class="col s2">
+      <div class="col s1">
         <div class="form-group">
           <label for="title">Hasta</label>
-          <input type="text" id="end_date" name="end_date" class="form-control datepicker" />
+          <input type="text" id="end_date" name="end_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" />
         </div>
       </div>  
       <div class="col s1">
         <div class="form-group">
           <label for="title">Horas</label>
-          <input type="text" id="hours" name="hours" class="form-control"/>
+          <input type="text" id="hours" name="hours" value="{{allocation.hours}}"class="form-control"/>
         </div>
       </div>
+     <div class="col s3">
+        <div class="form-group">
+          <label for="comment">Comentario</label>
+          <textarea id="comment" name="comment" class="materialize-textarea" rows="1">{{allocation.comment}}</textarea>
+        </div>
     </div>
+
+    </div>
+    
     <div class="row">
       <div class="col s6">
         <table id="days" class="responsive-table">
@@ -107,7 +113,7 @@
     </div>
     <div class="row">
       <div class="col s3">
-        <button id="submit" type="submit" class="btn btn-success">Guardar</button>
+        <button id="submit" type="submit" class="btn btn-success">Generar</button>
       </div>
     </div>
   </form>

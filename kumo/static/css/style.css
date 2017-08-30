@@ -753,6 +753,7 @@ h5.header.col.s12.light.orbitron {
 
 .opciones{display:inline-block;}
 .banned{text-decoration:line-through;color:#ddd;}
+.badge.cwhite{color:white;}
 
 
 @media only screen and (min-width: 1200px){
@@ -763,4 +764,20 @@ h5.header.col.s12.light.orbitron {
     padding: 10px 5px;
   }
   h4{margin-top: 0.14rem;}
+}
+
+textarea.materialize-textarea {padding: 0;}
+.hidden{display: none;}
+th.headerSortDown{
+    background-color: #ffaa00; 
+}
+th.headerSortUp{
+    background-color: #3399FF; 
+}
+
+th.headerSortDown::after { 
+    content: "  \021E9";
+}
+th.headerSortUp::after { 
+    content: "  \021E7";
 }

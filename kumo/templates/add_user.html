@@ -14,10 +14,13 @@
 
     <h4>Profile</h4>
     <p>
+      <input name="profile" type="radio" id="user" value="user" {{ 'checked' if user.profile else 'unchecked' }} />
+      <label for="user">User</label>
+    </p>
+    <p>
       <input name="profile" type="radio" id="viewer" value="viewer" {{ 'checked' if user.profile else 'unchecked' }} />
       <label for="viewer">Viewer</label>
     </p>
-
     <p>
       <input name="profile" type="radio" id="manager" value="manager" {{ 'checked' if user.profile else 'unchecked' }} />
       <label for="manager">Manager</label>

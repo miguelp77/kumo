@@ -3,7 +3,7 @@ import logging
 import base64
 import time
 from datetime import timedelta, datetime
-
+import datetime as dt
 
 from flask import current_app, Flask, redirect, request, session, url_for
 import google.cloud.logging
@@ -14,7 +14,6 @@ from google.cloud import datastore
 from google.cloud import storage as cloud_storage
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
-import pygsheets
 
 
 oauth2 = UserOAuth2()
@@ -130,6 +129,22 @@ def format_date(date):
 
     return formated_date
 
+def format_datetime(date):
+    """
+    returns datetime value
+    """
+    temp =  datetime.strptime(date, '%Y-%m-%d').date()
+    formated_date = dt.datetime(temp.year, temp.month, temp.day)
+    return formated_date
+
+def date_to_string(date,reverse=False):
+    """
+    return YYYY-MM-DD from date
+    """
+    if reverse:
+        return date.strftime('%d-%m-%Y')
+    return date.strftime('%Y-%m-%d')
+
 def get_model():
     model_backend = current_app.config['DATA_BACKEND']
     if model_backend == 'cloudsql':
@@ -179,15 +194,16 @@ def _request_user_info(credentials):
     # Se ha creado un listado de usuarios autorizados
 
     current_app.logger.info("%s is logged" % user_email)
-    # if is_auth_user(user_email):
-    # else:
-    #     current_app.logger.error("Devoteam user is not in allow list")
-    #     return None
-    # profile = get_profile(user_email)
-    # current_app.logger.info("user is %s" % profile)
-    # if profile == 'banned':
-    #     return None
-    # session['role'] = profile
+    if is_auth_user(user_email):
+        pass
+    else:
+        current_app.logger.error("Devoteam user is not in list")
+        return None
+    profile = get_profile(user_email)
+    current_app.logger.info("user is %s" % profile)
+    if profile == 'banned':
+        return None
+    session['role'] = profile
     session['profile'] = json.loads(content.decode('utf-8'))
     # print(content.decode('utf-8'))
 
@@ -205,8 +221,19 @@ def is_auth_user(user):
 
         return True
     else:
-        current_app.logger.error("Error: user %s is not in access list" % user)
-        return False
+        current_app.logger.error("WARNING: user %s is not in access list" % user)
+        data['user'] = user
+        data['profile'] = 'user'
+        data['comment'] = 'Created in first login'
+        data['country'] = 'tbd'
+
+        key = ds.key('User')
+        entity = datastore.Entity(key=key)
+        entity.update(data)
+        ds.put(entity)
+        current_app.logger.error("ALERT: User %s was created" % user)
+
+        return True
 
 def get_profile(user):
     ds = get_client()
@@ -251,44 +278,43 @@ def _get_storage_service():
     return discovery.build('storage', 'v1', credentials=credentials)
 
 
-def _get_spreadsheets_service():
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('sheets', 'v4', credentials=credentials)
+# def _get_spreadsheets_service():
+#     credentials = GoogleCredentials.get_application_default()
+#     print('AAAAAA')
+#     service = discovery.build('sheets', 'v4', credentials=credentials)
 
     return service
+
+def _get_spreadsheets_service():
+    # credentials = GoogleCredentials.get_application_default().create_scoped(
+    #     [
+    #     'https://www.googleapis.com/auth/spreadsheets',
+    #     'https://www.googleapis.com/auth/drive'
+    #     ])
+    # http = httplib2.Http()
+    # credentials.authorize(http)
+    credentials = GoogleCredentials.get_application_default()
+
+    return discovery.build(
+        'sheets', 'v4', credentials=credentials)
+
 
 # def _get_sentiment_service():
 #     credentials = GoogleCredentials.get_application_default()
 #     return discovery.build('language', 'v1beta1', credentials=credentials)
 
-def write_spreadsheet(test):
+def write_spreadsheet():
     """Transcribe the given audio file.
     Args:
         speech_file: the name of the audio file.
     """
     service = _get_spreadsheets_service()
-    spreadsheetId = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
-    rangeName = 'Class Data!A2:E'
+    spreadsheetId = '18Gkc--JBp_EKkREyTn5P9CNSgb2flQ80-EKk_9E990M'
+    rangeName = 'Data!A2:E'
     print('*' * 80)
     request = service.spreadsheets().values().get(spreadsheetId=spreadsheetId, range=rangeName)
     response = request.execute()
     print(response)
-
-    # result = service.spreadsheets().values().get(
-    #     spreadsheetId=spreadsheetId, range=rangeName).execute()
-    # values = result.get('values', [])
-
-    # if not values:
-    #     print('No data found.')
-    # else:
-    #     print('Name, Major:')
-    #     for row in values:
-    #         # Print columns A and E, which correspond to indices 0 and 4.
-    #         print('%s, %s' % (row[0], row[4]))
-
-
-    # sht1 = gc.open_by_key('18Gkc--JBp_EKkREyTn5P9CNSgb2flQ80-EKk_9E990M')
-    # wks = sht1.add_worksheet("new sheet",rows=50,cols=60)
 
 
 def _speech(speech_file,framerate,language='es-ES'):

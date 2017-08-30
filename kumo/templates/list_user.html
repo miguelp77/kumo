@@ -6,7 +6,7 @@
 
 <h3>Users</h3>
 {% if session.role =="admin" or session.role =="manager" %}
-  <a href="/books/user" class="btn btn-danger btn-sm">
+  <a href="../user" class="btn btn-danger btn-sm">
     <i class="glyphicon glyphicon-trash"></i>
     Add user
   </a>
@@ -18,14 +18,14 @@
   {{user.email}}   <div class="chip"> {{user.profile}} </div>{{user.lastAccess}}
   <div class="opciones right">
     {% if session.role =="admin" or session.role =="manager" %}
-      <a href="/books/user/{{user.id}}/edit_user" class="btn btn-primary btn-sm">
+      <a href="../user/{{user.id}}/edit_user" class="btn btn-primary btn-sm">
         <i class="glyphicon glyphicon-edit"></i>
         Edit user
       </a>
       {% endif %}
       {% if session.role =="admin" %}
 
-      <a href="/books/user/{{user.id}}/delete_user" class="btn btn-danger btn-sm">
+      <a href="../user/{{user.id}}/delete_user" class="btn btn-danger btn-sm">
         <i class="glyphicon glyphicon-trash"></i>
         Delete user
       </a>

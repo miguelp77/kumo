@@ -95,8 +95,30 @@
       wd = work_days[1]
       console.log(work_days);
       $('#hours').val(wh);
+      if(wh>8) {
+        console.log("APPEND");
+        $('#workdays').remove();
+        $('#hours').closest( "div" ).append("<span class='badget light-blue accent-3' id='workdays'>" + wh/8 + " jornadas </span>");
+      }
+      
+      // for(var i=0;i < wd.length;i++){
+      //   console.log(wd[i]);
+      //   // $('#days').append('<li class="collection-item">' + 
+      //   //     '<span class="title">' + wd[i] +'</span>' +
+      //   //     '<p>' + $('#project').val() + '<br>' +
+      //   //     $('#approver').val() + 
+      //   //     '</p>' + 
+      //   //     '</li>');
+      //   $('#days > tbody:last-child').append('<tr>' + 
+      //     '<td>' + wd[i] + '</td>' + 
+      //     '<td>' + $('#project').val() + '</td>' + 
+      //     '<td>' + $('#approver').val() + '</td>' + 
+      //   '</tr>');
+
+      // }
     }
   });  
+
   $('#check_all[type="checkbox"]+label').on('click', function(){
     if(!$("#check_all").prop('checked')){
       $("#check_all").prop('checked', true);
@@ -108,27 +130,181 @@
   });
 
 
-    $('select').material_select();
-  //   $(document).on('change', '#project', function() {
-  // // Does some stuff and logs the event to the console
-  //     console.log($(this));
-  //   });
-  //   $('select[name=project]').change(function() { console.log($(this).attr('data')); });
-  $('select[name=project]').on('change', function(e){ 
-    var data = $(this).find("option:selected").data('id');
-    console.log( data ); 
-    var opts = data.split(',');
-    console.log(opts);
-      $('select[name=approver]').material_select('destroy');
+  $('select').material_select();
 
+  $('select[name=project]').on('change', function(e){ 
+    // TODO: Limpiar los dropdown
+    $('select[name=approver]').material_select('destroy');
+    $('select[name=hours_type]').material_select('destroy');
+
+
+    // var selection = $(this).find("option:selected");
+    // console.log(selection.data()); 
+    var data = $(this).find("option:selected").data('id');
+    var a = data;
+    data = a.replace("[", "").replace("]", "").replace(/'/g,"");  
+ 
+    var opts = data.split(',');
+    $('#approver').children('option:not(:first)').remove();
     for(var i =0;i < opts.length; i++){
-      // $('select[name=approver]').append('<option value="'+opts[i]+'">'+opts[i]+'</option>');
       $('#approver').append('<option value="'+opts[i]+'">'+opts[i]+'</option>');
-      console.log(opts[i]);
     }
+    var hours_type = $(this).find("option:selected").data("type");
+     a = hours_type.replace("[", "").replace("]", "").replace(/'/g,"");
+     opts  = a.split(',');
+     $('#hours_type').children('option:not(:first)').remove();
+     for(var i =0;i < opts.length; i++){
+      $('#hours_type').append('<option value="'+opts[i]+'">'+opts[i]+'</option>');
+      console.log(opts[i])
+    }
+
+
     e.preventDefault(); 
     $('select[name=approver]').material_select();
+    $('select[name=hours_type]').material_select();
   }); 
 
-});
 
+//BBULK Buttons
+        $('ul.tabs').tabs('select_tab', 'tab_id');
+   
+        //Si estan todos los checkbox marcados y desmarcas uno, el checkbox_all se desactiva. 
+        $('.checkBoxClass').on('click',function(){
+          if ($('#check_all').is(':checked')){
+            if ($('.checkBoxClass').is(':checked')) {
+              $('#check_all').prop('checked', false);
+            }
+          }
+        });
+
+        //Activa o desactiva el boton de borrar imputaciones dependiendo de si el checkbox del header esta marcado o no
+        $('#check_all[type="checkbox"]+label').on('click',function(){
+          if($("#check_all").prop('checked')){
+            document.getElementById("buttonDelete").removeAttribute("disabled");            
+            document.getElementById("buttonSubmit").removeAttribute("disabled");            
+            document.getElementById("buttonReject").removeAttribute("disabled");            
+            document.getElementById("buttonApprove").removeAttribute("disabled");            
+          } else {
+            document.getElementById("buttonDelete").setAttribute("disabled","disabled");
+            document.getElementById("buttonSubmit").setAttribute("disabled","disabled");
+            document.getElementById("buttonReject").setAttribute("disabled","disabled");
+            document.getElementById("buttonApprove").setAttribute("disabled","disabled");
+          }
+        });
+
+        //activa o desactiva el boton de borrar imputaciones dependiendo de si hay alguna umputacion con el checkbox marcado.
+        $('.checkBoxClass').on('change',function(){
+          
+          if($('.checkBoxClass').is(':checked')){
+            document.getElementById("buttonDelete").removeAttribute("disabled");                    
+            document.getElementById("buttonSubmit").removeAttribute("disabled");                    
+            document.getElementById("buttonReject").removeAttribute("disabled");                    
+            document.getElementById("buttonApprove").removeAttribute("disabled");                    
+          } else {
+            document.getElementById("buttonDelete").setAttribute("disabled","disabled");          
+            document.getElementById("buttonSubmit").setAttribute("disabled","disabled");          
+            document.getElementById("buttonReject").setAttribute("disabled","disabled");          
+            document.getElementById("buttonApprove").setAttribute("disabled","disabled");          
+          }
+        });  
+
+        arrRows = [];
+        rowCount = 0;
+        ids = []
+
+        // Bulk deletion 
+        $('#buttonDelete').on('click', function() {
+          $('.checkBoxClass').each(function(){
+            rowCount++;
+            if($(this).prop( "checked" )){
+              var selected_id = $(this).attr('id');
+              ids.push(selected_id);
+            }
+          });
+
+          // Borrar todas las seleccionadas y recargar
+          // TOODO: Alert message 
+          $.getJSON($SCRIPT_ROOT + '/a/_delete_selection', { ids: JSON.stringify(ids) } )
+            .done(function( data ) {
+              // console.log( "JSON Data: " + data );
+              window.location.reload(false);
+            })
+            .fail(function( jqxhr, textStatus, error ) {
+              var err = textStatus + ", " + error;
+              console.log( "Request Failed: " + err );
+          });
+        });
+        // Bulk submit 
+        $('#buttonSubmit').on('click', function(){
+
+          $('.checkBoxClass').each(function(){
+            rowCount++;
+            if($(this).prop( "checked" )){
+              var selected_id = $(this).attr('id');
+              ids.push(selected_id);
+            }
+          });
+
+          // Borrar todas las seleccionadas y recargar
+          // TOODO: Alert message 
+          $.getJSON($SCRIPT_ROOT + '/a/_submit_selection', { ids: JSON.stringify(ids) } )
+            .done(function( data ) {
+              console.log( "JSON Data: " + data );
+              window.location.reload(false);
+            })
+            .fail(function( jqxhr, textStatus, error ) {
+              var err = textStatus + ", " + error;
+              console.log( "Request Failed: " + err );
+          });            
+        });
+        // Bulk buttonReject
+        $('#buttonReject').on('click', function(){
+
+          $('.checkBoxClass').each(function(){
+            rowCount++;
+            if($(this).prop( "checked" )){
+              var selected_id = $(this).attr('id');
+              ids.push(selected_id);
+            }
+          });
+
+          // Borrar todas las seleccionadas y recargar
+          // TOODO: Alert message 
+          $.getJSON($SCRIPT_ROOT + '/a/_reject_selection', { ids: JSON.stringify(ids) } )
+            .done(function( data ) {
+              console.log( "JSON Data: " + data );
+              window.location.reload(false);
+            })
+            .fail(function( jqxhr, textStatus, error ) {
+              var err = textStatus + ", " + error;
+              console.log( "Request Failed: " + err );
+          });            
+        });
+
+        // Bulk buttonApprove
+        $('#buttonApprove').on('click', function(){
+
+          $('.checkBoxClass').each(function(){
+            rowCount++;
+            if($(this).prop( "checked" )){
+              var selected_id = $(this).attr('id');
+              ids.push(selected_id);
+            }
+          });
+
+          // Borrar todas las seleccionadas y recargar
+          // TOODO: Alert message 
+          $.getJSON($SCRIPT_ROOT + '/a/_approve_selection', { ids: JSON.stringify(ids) } )
+            .done(function( data ) {
+              console.log( "JSON Data: " + data );
+              window.location.reload(false);
+            })
+            .fail(function( jqxhr, textStatus, error ) {
+              var err = textStatus + ", " + error;
+              console.log( "Request Failed: " + err );
+          });            
+        });
+
+        // TABLE ORDER
+        $("#table-allocations").tablesorter({headers: { 0: { sorter: false} }}); 
+});

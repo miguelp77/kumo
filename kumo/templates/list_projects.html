@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="audioList">
+  <div class="row">
+    <div class="col s2">
+      <h4>Projects</h4>
+    </div>
+    <div class="col s2 right">
+      {% if session.profile %}
+      <a href="#" class="btn btn-success btn-sm">
+      Nuevo
+      </a>
+      {% endif %}
+    </div>
+  </div>
+    {% if projects %}
+<table class="striped">
+    <thead>
+    <tr>
+
+        <th>Name</th>
+        <th>Head</th>
+        <th>Country</th>
+        <th>Approver</th>
+        <th>Hours</th>
+        <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pj in projects %}
+    <tr>
+       <td><a href="/a/view_project/{{pj.id}}/">{{pj.name}}</a></td>
+       <td>{{pj.head}}</td>
+       <td>{{pj.country}}</td>
+       <td>
+         {% for app in pj.approver %}
+          {{ app }} <br>
+        {% endfor %}
+       </td>
+      <td><a href="./update_project/{{pj.id}}/" title="click for update">{{pj.consumed_hours}}</a></td>
+      <td><a href="#" title="click for update">on</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+<small class='right'><a href="check_allocations">Revisar Imputaciones</a></small>
+<br>
+    {% else %}
+      <p>No projects</p>
+    {% endif %}
+
+{% if next_page_token %}
+<nav>
+  <ul class="pager">
+    <li><a href="?page_token={{next_page_token}}">More</a></li>
+  </ul>
+</nav>
+</div>
+{% endif %}
+{% endblock %}
+

@@ -42,3 +42,5 @@ automatic_scaling:
   cool_down_period_sec: 120 # default value
   cpu_utilization:
     target_utilization: 0.5
+
+
