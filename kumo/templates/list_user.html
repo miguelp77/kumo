@@ -17,13 +17,13 @@
 <div class="user {{ 'banned' if user.banned else 'no-banned' }}">
   {{user.email}}   <div class="chip"> {{user.profile}} </div>{{user.lastAccess}}
   <div class="opciones right">
-    {% if session.role =="admin" or session.role =="manager" %}
+    {% if session.role =="admin" or session.role =="manager" or session.role == "su" %}
       <a href="../user/{{user.id}}/edit_user" class="btn btn-primary btn-sm">
         <i class="glyphicon glyphicon-edit"></i>
         Edit user
       </a>
       {% endif %}
-      {% if session.role =="admin" %}
+      {% if session.role =="admin"  or session.role == "su" %}
 
       <a href="../user/{{user.id}}/delete_user" class="btn btn-danger btn-sm">
         <i class="glyphicon glyphicon-trash"></i>

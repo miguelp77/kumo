@@ -54,32 +54,25 @@
         </select>
         <label>Tipo</label>
       </div>
-
-      <!-- <div class="col s4">
-        <div class="form-group">
-          <label for="title">Aprobador</label>
-          <input type="text" name="approver" id="approver" class="form-control"/>
-        </div>
-      </div>    -->
     </div>
     
     <div class="row">  
       <div class="col s1">
         <div class="form-group">
           <label for="title">Desde</label>
-          <input type="text" id="start_date" name="start_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" required/>
+          <input type="text" id="start_date" name="start_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" />
         </div>
       </div>  
       <div class="col s1">
         <div class="form-group">
           <label for="title">Hasta</label>
-          <input type="text" id="end_date" name="end_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" required/>
+          <input type="text" id="end_date" name="end_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" />
         </div>
       </div>  
       <div class="col s1">
         <div class="form-group">
           <label for="title">Horas</label>
-          <input type="text" id="hours" name="hours" value="{{allocation.hours}}" class="form-control" required/>
+          <input type="text" id="hours" name="hours" value="{{allocation.hours}}" class="form-control" />
         </div>
       </div>
      <div class="col s3">
@@ -111,9 +104,9 @@
     <div class="row">
       <div class="col s3">
         {% if action == 'Editar'%}
-          <input id="submit" value="" type="submit" formnovalidate class="btn btn-success" disabled></input>
+          <input id="submit" value="submit" type="submit"  class="btn btn-success" disabled></input>
         {% else %}
-          <input id="submit" type="submit" formnovalidate class="btn btn-success" disabled></input>
+          <input id="submit" type="submit"  class="btn btn-success" disabled></input>
         {% endif %}
         </div>
     </div>

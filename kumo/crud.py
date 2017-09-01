@@ -88,7 +88,7 @@ def user_test_admin(req_roles = 'None'):
         def decorated_view(*args, **kwargs):
             email=session['profile']['emails'][0]['value']
             auth_role = get_model().get_profile(email)
-            if str(req_roles) == str(auth_role):
+            if str(req_roles) == str(auth_role) or 'su' == str(auth_role):
                 return func(*args, **kwargs)
             else:
                 return render_template('not_access.html')
@@ -124,10 +124,18 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 def work_days(start_date, end_date_inc):
+    """
+    Split date range. Exception for Weekends
+    """
     dates = []
+    if start_date.weekday() >= 5:
+        # Imputacion de fin de semana
+        for single_date in daterange(start_date, end_date_inc):
+            dates.append(single_date)
+        return dates    
     for single_date in daterange(start_date, end_date_inc):
         weekno = single_date.weekday()
-        if weekno<5 and not is_holiday(single_date):
+        if weekno < 5 and not is_holiday(single_date):
             dates.append(single_date)
     return dates
 

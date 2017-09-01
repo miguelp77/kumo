@@ -40,7 +40,7 @@
               <li><a class="tab" href="/books/audios">Audios</a></li>
               <li><a class="tab" href="/books/dashboard">Dashboard</a></li> -->
             {% endif %}
-            {% if session.role =="admin" or session.role =="manager" %}
+            {% if session.role =="admin" or session.role =="manager" or session.role =="su" %}
               <li><a class="tab" href="/a/check_allocations">Revisar</a></li>
               <li><a class="tab" href="/a/user/list">Users</a></li>
               <li><a class="tab" href="/a/my_projects">Proyectos</a></li>
