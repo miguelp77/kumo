@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <title>Kumo by DCS</title>
     <meta charset="utf-8">
@@ -41,6 +41,7 @@
               <li><a class="tab" href="/books/dashboard">Dashboard</a></li> -->
             {% endif %}
             {% if session.role =="admin" or session.role =="manager" %}
+              <li><a class="tab" href="/a/check_allocations">Revisar</a></li>
               <li><a class="tab" href="/a/user/list">Users</a></li>
               <li><a class="tab" href="/a/my_projects">Proyectos</a></li>
             {% endif %}

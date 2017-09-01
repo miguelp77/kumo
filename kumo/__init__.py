@@ -88,11 +88,13 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     @app.route('/logout')
     def logout():
         # Delete the user's profile and the credentials stored by oauth2.
-        del session['profile']
+        if 'profile' in session:
+            del session['profile']
         session.modified = True
         oauth2.storage.delete()
         session.clear()
-        return redirect(request.referrer or '/')
+        # return redirect(request.referrer or '/')
+        return redirect('/')
 
     # Register the Kumo CRUD blueprint.
     from .crud import crud
@@ -101,7 +103,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     # Add a default root route.
     @app.route("/")
     def index():
-        return redirect(url_for('crud.list'))
+        return redirect(url_for('crud.showHome'))
 
     # Add an error handler. This is useful for debugging the live application,
     # however, you should disable the output of the exception for production
@@ -221,12 +223,13 @@ def is_auth_user(user):
 
         return True
     else:
+        data = {}
         current_app.logger.error("WARNING: user %s is not in access list" % user)
         data['user'] = user
         data['profile'] = 'user'
         data['comment'] = 'Created in first login'
         data['country'] = 'tbd'
-
+        data['email'] = user
         key = ds.key('User')
         entity = datastore.Entity(key=key)
         entity.update(data)
@@ -236,13 +239,15 @@ def is_auth_user(user):
         return True
 
 def get_profile(user):
+    temp_date = datetime.utcnow()+ timedelta(hours=1)
+    date = temp_date.strftime("%Y-%m-%d at %H%M%S")
+    
     ds = get_client()
     query = ds.query(kind='User')
     query.add_filter('email','=',user)
     results = iter(query.fetch(1))
     result = results.__next__()
-    temp_date = datetime.utcnow()+ timedelta(hours=1)
-    date = temp_date.strftime("%Y-%m-%d at %H%M%S")
+    
     if not 'banned' in result:
         result['lastAccess']= date
         result.update()

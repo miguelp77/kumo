@@ -6,7 +6,25 @@
 
   }); // end of document ready
 })(jQuery); // end of jQuery name space
-
+  // params url
+  function removeParam(key, sourceURL) {
+      var rtn = sourceURL.split("?")[0],
+          param,
+          params_arr = [],
+          queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+      if (queryString !== "") {
+          params_arr = queryString.split("&");
+          for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+              param = params_arr[i].split("=")[0];
+              if (param === key) {
+                  params_arr.splice(i, 1);
+              }
+          }
+          rtn = rtn + "?" + params_arr.join("&");
+      }
+      return rtn;
+  }
+  // end params
   var work_hours = function (s,e) {
     var i = 0;
     var idx = 0;
@@ -98,7 +116,7 @@
       if(wh>8) {
         console.log("APPEND");
         $('#workdays').remove();
-        $('#hours').closest( "div" ).append("<span class='badget light-blue accent-3' id='workdays'>" + wh/8 + " jornadas </span>");
+        $('#hours').closest( "div" ).append("<span class='badget light-blue accent-3' id='workdays'>" + wh/8 + " jornadas aprox</span>");
       }
       
       // for(var i=0;i < wd.length;i++){
@@ -118,6 +136,20 @@
       // }
     }
   });  
+
+  // Validation form
+  $('#form').on('change', function(){
+         if($('#project').val() != null && $('#approver').val() != null ){
+           if($('#start_date').siblings('input').val() != "" && $('#end_date').siblings('input').val() != "" ){       
+               console.log($('#start_date'));
+               $('#submit').removeAttr('disabled');  
+           } else {
+             $('#submit').attr('disabled','disabled');
+           }
+         } else {
+           $('#submit').attr('disabled','disabled');
+         }
+       });
 
   $('#check_all[type="checkbox"]+label').on('click', function(){
     if(!$("#check_all").prop('checked')){
@@ -211,7 +243,13 @@
         arrRows = [];
         rowCount = 0;
         ids = []
+        function courtain_show() {
+          $('#preloader').css({display: "block"});
+        }
 
+        function courtain_hide() {
+          $('#preloader').css({display: "none"});
+        }
         // Bulk deletion 
         $('#buttonDelete').on('click', function() {
           $('.checkBoxClass').each(function(){
@@ -221,7 +259,7 @@
               ids.push(selected_id);
             }
           });
-
+          courtain_show();
           // Borrar todas las seleccionadas y recargar
           // TOODO: Alert message 
           $.getJSON($SCRIPT_ROOT + '/a/_delete_selection', { ids: JSON.stringify(ids) } )
@@ -231,7 +269,8 @@
             })
             .fail(function( jqxhr, textStatus, error ) {
               var err = textStatus + ", " + error;
-              console.log( "Request Failed: " + err );
+              // console.log( "Request Failed: " + err );
+              courtain_hide();
           });
         });
         // Bulk submit 
@@ -244,17 +283,19 @@
               ids.push(selected_id);
             }
           });
-
+          courtain_show();
           // Borrar todas las seleccionadas y recargar
           // TOODO: Alert message 
           $.getJSON($SCRIPT_ROOT + '/a/_submit_selection', { ids: JSON.stringify(ids) } )
             .done(function( data ) {
-              console.log( "JSON Data: " + data );
+              // console.log( "JSON Data: " + data );
               window.location.reload(false);
             })
             .fail(function( jqxhr, textStatus, error ) {
               var err = textStatus + ", " + error;
-              console.log( "Request Failed: " + err );
+              // console.log( "Request Failed: " + err );
+              courtain_hide();
+
           });            
         });
         // Bulk buttonReject
@@ -267,17 +308,18 @@
               ids.push(selected_id);
             }
           });
-
+          courtain_show();
           // Borrar todas las seleccionadas y recargar
           // TOODO: Alert message 
           $.getJSON($SCRIPT_ROOT + '/a/_reject_selection', { ids: JSON.stringify(ids) } )
             .done(function( data ) {
-              console.log( "JSON Data: " + data );
+              // console.log( "JSON Data: " + data );
               window.location.reload(false);
             })
             .fail(function( jqxhr, textStatus, error ) {
               var err = textStatus + ", " + error;
               console.log( "Request Failed: " + err );
+              courtain_hide();
           });            
         });
 
@@ -291,6 +333,7 @@
               ids.push(selected_id);
             }
           });
+          courtain_show();
 
           // Borrar todas las seleccionadas y recargar
           // TOODO: Alert message 
@@ -302,6 +345,7 @@
             .fail(function( jqxhr, textStatus, error ) {
               var err = textStatus + ", " + error;
               console.log( "Request Failed: " + err );
+              courtain_hide();
           });            
         });
 

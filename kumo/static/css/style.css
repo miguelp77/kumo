@@ -255,7 +255,7 @@ nav ul li {
   width: 100%;
 }
 .box001, .box002, .box003 {
-  min-height: 360px!important;
+  min-height: 230px!important;
 }
 h2.center.brown-text {
   text-align: right;
@@ -781,3 +781,5 @@ th.headerSortDown::after {
 th.headerSortUp::after { 
     content: "  \021E7";
 }
+
+th.shortWidth{max-width: 150px;}

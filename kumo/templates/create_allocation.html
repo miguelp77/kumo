@@ -11,7 +11,7 @@
 </style>
 
 
-<div id="form">
+<div id="form" class="create-allocation">
 <!-- <h3 style="color:#f0f0f0;">Upload audio</h3> -->
 <h4>{{action}} Imputación</h4>
 
@@ -31,22 +31,19 @@
         </div>
       </div>
     </div>
-{{allocation}}
     <div class="row">
       <div class="input-field col s3">
-        <select name="project" id="project" class="form-control">
+        <select name="project" id="project" class="form-control" required>
           <option value="{{allocation.project}}" disabled selected>{% if allocation.project %}{{allocation.project_name}}{%else%}Elija una opción{%endif%}</option>
           {% for pjs in projects %}
             <option value="{{pjs.id}}" data-id="{{pjs.approver}}" data-type="{{pjs.hours_type}}" >{{pjs.name}}</option>
           {% endfor %}
-          <option value="Vaciones_2017">Vacaciones 2017</option>
-          <option value="Ausencia_justificada">Ausencia justificada</option>
         </select>
         <label>Proyecto</label>
       </div>
       
       <div class="input-field col s3">
-        <select name="approver" id="approver" class="form-control">
+        <select name="approver" id="approver" class="form-control" required>
           <option value="{{allocation.approver}}" disabled selected>{% if allocation.project %}{{allocation.approver}}{%else%}Elija una opción{%endif%}</option>
         </select>
         <label>Aprobador</label>
@@ -70,19 +67,19 @@
       <div class="col s1">
         <div class="form-group">
           <label for="title">Desde</label>
-          <input type="text" id="start_date" name="start_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" />
+          <input type="text" id="start_date" name="start_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" required/>
         </div>
       </div>  
       <div class="col s1">
         <div class="form-group">
           <label for="title">Hasta</label>
-          <input type="text" id="end_date" name="end_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" />
+          <input type="text" id="end_date" name="end_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" required/>
         </div>
       </div>  
       <div class="col s1">
         <div class="form-group">
           <label for="title">Horas</label>
-          <input type="text" id="hours" name="hours" value="{{allocation.hours}}"class="form-control"/>
+          <input type="text" id="hours" name="hours" value="{{allocation.hours}}" class="form-control" required/>
         </div>
       </div>
      <div class="col s3">
@@ -113,8 +110,12 @@
     </div>
     <div class="row">
       <div class="col s3">
-        <button id="submit" type="submit" class="btn btn-success">Generar</button>
-      </div>
+        {% if action == 'Editar'%}
+          <input id="submit" value="" type="submit" formnovalidate class="btn btn-success" disabled></input>
+        {% else %}
+          <input id="submit" type="submit" formnovalidate class="btn btn-success" disabled></input>
+        {% endif %}
+        </div>
     </div>
   </form>
 

@@ -5,7 +5,14 @@
     <div class="caption center-align">
         <h3>Kumo</h3>
         <h5 class="light red-text text-lighten-4">KIP</h5>
+        <small>internet explorer no está soportado.</small>
+        {%if session.profile %}
+          <br>
+          <a class="waves-effect waves-light btn-large" href="/a/add_allocation">Imputar</a>
+        {% endif %}
     </div>
+
+
 
     <div class="section">
 
@@ -14,11 +21,9 @@
         <div class="col s12 m4 box001 ">
           <div class="icon-block">
             <h2 class="center brown-text"><img src="/static/images/Home-network.png" alt="" width="60px"/></h2>
-
             <div class="boxText">
-              <h5 class="center">Atualización de tareas</h5>
-
-              <p class="light ">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum doloribus nulla ab, similique! Enim officia laborum suscipit, consequatur quis sequi perferendis doloremque porro expedita? Neque possimus quaerat nesciunt perferendis quae?</p>
+              <h5 class="center">Actualización de tareas</h5>
+              <p class="light ">Imputa las actividades realizadas durante el mes. </p>
             </div>
           </div>
         </div>
@@ -28,9 +33,9 @@
             <h2 class="center brown-text"><img src="/static/images/Home-cloud.png" alt="" width="60px"/></h2>
 
             <div class="boxText">
-              <h5 class="center">Accesible desde internet</h5>
+              <h5 class="center">Accesibilidad</h5>
 
-              <p class="light ">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus minus facilis pariatur, ratione accusamus itaque quas vel, asperiores consequatur, blanditiis perspiciatis ullam libero atque iste voluptate fugit explicabo enim ex?</p>
+              <p class="light ">Accesible desde cualquier dispositivo conectado a internet</p>
             </div>
 
           </div>
@@ -43,7 +48,7 @@
             <div class="boxText">
               <h5 class="center">Reporting</h5>
 
-              <p class="light ">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consectetur quia accusantium beatae magni minus quas veniam ratione adipisci labore aliquid culpa sapiente dolorum atque repellendus, ducimus maiores officiis eius. Illum.</p>
+              <p class="light ">Facilita el seguimiento de las actividades</p>
             </div>
           </div>
         </div>
