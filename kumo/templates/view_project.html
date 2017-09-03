@@ -50,9 +50,26 @@
     {% endif %}
     </div>
     <div class="row">
-      {% for user in project.users%}
-        <a href="/a/allocations/{{user}}"><span class="badget green black-text">{{user}}</span></a> 
-      {% endfor %}
+      <div class="col s5">
+        <ul class="collection with-header">
+          <li><h4>Han imputado</h4></li>
+          {% for user in project.users%}
+            <li class="collection-item green lighten-4">
+              <a href="/a/allocations/{{user}}"><span class="black-text">{{user}}</span></a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col s5">
+        <ul class="collection with-header">
+          <li><h4>Participantes</h4></li>
+          {% for user in project.users%}
+            <li class="collection-item green lighten-4">
+              <a href="/a/allocations/{{user}}"><span class="black-text">{{user}}</span></a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
     {{project}}
 <!-- <table class="striped">

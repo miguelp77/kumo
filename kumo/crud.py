@@ -234,15 +234,25 @@ def list_allocations():
     project = request.args.get('project', None)
     hours = request.args.get('hours', None)
     status = request.args.get('status', None)
-    csv = request.args.get('csv', None)
+    email = request.args.get('user_email', None)
 
     if token:
         token = token.encode('utf-8')
-    allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token,
+    allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token, email=email,
          day=day, month=month, year=year, project=project, hours=hours, status=status)
 
+    total_hours = {}
+    for allocs in allocations:
+        s = allocs['status']
+        if s in total_hours:
+            total_hours[s] = int(total_hours[s]) + int(allocs['hours'])
+        else:
+            total_hours[s] = int(allocs['hours'])
+
+        print(total_hours)
+
     return render_template(
-        "list.html",
+        "list_all.html",
         allocations=allocations,
         day = day,
         month = month,
@@ -250,6 +260,8 @@ def list_allocations():
         project=project,
         hours=hours,
         status=status,
+        user_email=email,
+        total_hours=total_hours,
         next_page_token=next_page_token)
 
 @crud.route("/allocations/<email>")
@@ -296,6 +308,16 @@ def csv_allocations():
     allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token,
          day=day, month=month, year=year, project=project, hours=hours, status=status)
 
+    total_hours = {}
+    for allocs in allocations:
+        s = allocs['status']
+        if s in total_hours:
+            total_hours[s] = int(total_hours[s]) + int(allocs['hours'])
+        else:
+            total_hours[s] = int(allocs['hours'])
+
+        print(total_hours)
+
     if csv:
         datos = []   
         for a in allocations:
@@ -316,7 +338,7 @@ def csv_allocations():
     print(allocations)
 
     return render_template(
-        "list.html",
+        "list_all.html",
         allocations=allocations,
         day = day,
         month = month,
@@ -324,6 +346,7 @@ def csv_allocations():
         project=project,
         hours=hours,
         status=status,
+        total_hours=total_hours,
         next_page_token=next_page_token)
 
 

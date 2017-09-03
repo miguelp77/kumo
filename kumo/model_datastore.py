@@ -83,7 +83,7 @@ def list_all(limit=1000,  email=None,  day=None, month=None, year=None, project=
         query.add_filter('hours_type', '=', str(hours))
     if  status:
         query.add_filter('status', '=', str(status))
-    
+    limit=None
     query_iterator = query.fetch( start_cursor=cursor, limit=limit)
     page = next(query_iterator.pages)
 
