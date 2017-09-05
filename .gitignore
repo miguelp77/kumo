@@ -35,5 +35,6 @@ config.py
 tests
 test.py
 drafts
-
-
+.ipynb_checkpoints
+kumo/templates/toDelete
+kumo/toDelete

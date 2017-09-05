@@ -8,7 +8,9 @@ from flask import Blueprint, current_app, redirect, render_template, request, \
 from datetime import datetime, date, timedelta
 from werkzeug.utils import secure_filename
 import urllib.request
+from collections import defaultdict
 from functools import wraps
+
 
 
 crud = Blueprint('crud', __name__)
@@ -235,6 +237,8 @@ def list_allocations():
     hours = request.args.get('hours', None)
     status = request.args.get('status', None)
     email = request.args.get('user_email', None)
+    csv = request.args.get('csv', None)
+
 
     if token:
         token = token.encode('utf-8')
@@ -249,7 +253,25 @@ def list_allocations():
         else:
             total_hours[s] = int(allocs['hours'])
 
-        print(total_hours)
+    print(total_hours)
+
+    if csv:
+        datos = []   
+        for a in allocations:
+            linea = str(a['year']) + ',' + \
+                str(a['month']) + ',' + \
+                str(a['formated_start_date']) + ',' + \
+                str(a['createdBy']) + ',' + \
+                str(a['hours']) + ',' + \
+                str(a['project_name']) + ',' + \
+                str(a['status']) + ',' + \
+                str(a['approver']) + '\n'
+            datos.append(linea)
+
+        return Response(list(datos),
+            mimetype="text/csv",
+            headers={"Content-disposition": "attachment; filename=" + csv +".csv"}
+            )
 
     return render_template(
         "list_all.html",
@@ -262,31 +284,6 @@ def list_allocations():
         status=status,
         user_email=email,
         total_hours=total_hours,
-        next_page_token=next_page_token)
-
-@crud.route("/allocations/<email>")
-@oauth2.required
-@user_test_admin(req_roles='manager')
-def user_allocations(email):
-    token = request.args.get('page_token', None)
-    if token:
-        token = token.encode('utf-8')
-
-    day = request.args.get('date', None)
-    month = request.args.get('month', None)
-    year = request.args.get('year', None)
-    project = request.args.get('project', None)
-    hours = request.args.get('hours', None)
-    status = request.args.get('status', None)
-
-    allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token,email=email,
-        day=day, month=month, year=year, project=project, hours=hours, status=status)
-
-    # books, next_page_token = get_model().list(kind='Book',cursor=token)
-    return render_template(
-        "list.html",
-        # books=books,
-        allocations=allocations,
         next_page_token=next_page_token)
 
 
@@ -316,7 +313,7 @@ def csv_allocations():
         else:
             total_hours[s] = int(allocs['hours'])
 
-        print(total_hours)
+        # print(total_hours)
 
     if csv:
         datos = []   
@@ -335,7 +332,6 @@ def csv_allocations():
             mimetype="text/csv",
             headers={"Content-disposition": "attachment; filename=" + csv +".csv"}
             )
-    print(allocations)
 
     return render_template(
         "list_all.html",
@@ -347,6 +343,39 @@ def csv_allocations():
         hours=hours,
         status=status,
         total_hours=total_hours,
+        next_page_token=next_page_token)
+
+
+@crud.route("/allocations/<email>")
+@oauth2.required
+@user_test_admin(req_roles='manager')
+def user_allocations(email):
+    token = request.args.get('page_token', None)
+    if token:
+        token = token.encode('utf-8')
+
+    day = request.args.get('date', None)
+    month = request.args.get('month', None)
+    year = request.args.get('year', None)
+    project = request.args.get('project', None)
+    hours = request.args.get('hours', None)
+    status = request.args.get('status', None)
+
+    allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token,email=email,
+        day=day, month=month, year=year, project=project, hours=hours, status=status)
+
+    start_dates = defaultdict(list)
+    for allocation in allocations:
+        start_date = allocation['datetime_start']
+        hour = allocation['hours']
+        start_dates[str(start_date.timestamp()*1000)].append(int(hour))
+
+
+    return render_template(
+        "list_by_user.html",
+        # books=books,
+        allocations=allocations,
+        start_dates=start_dates,
         next_page_token=next_page_token)
 
 
@@ -389,6 +418,7 @@ def all_projects():
         # books=books,
         projects=projects,
         next_page_token=next_page_token)
+
 
 @crud.route("/view_project/<id>/")
 @oauth2.required
@@ -617,7 +647,7 @@ def edit_allocation(id):
 
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
-
+        data['user_id'] = allocation['user_id']
         if not 'project' in data:
             data['project'] = allocation['project']
         if not 'createdBy' in data:
@@ -762,3 +792,26 @@ def approve_selection():
             accepted(id)
     return jsonify('approve')
 
+# @crud.route('/_cleandb')
+# @oauth2.required
+# def cleandb():
+#     if request.method == 'GET':
+#         # newdata = ['Normal']
+#         newdata = 'Normal'
+#         field = 'hours_type'
+#         res = get_model().set_value(kind='Allocation', field=field, newdata=newdata)
+
+#     return jsonify('clean')
+
+
+@crud.route('/roadmap')
+def roadmap():
+    next_release = [
+        {'v.0.0.1':'Init','Release':'31-08-2017'},
+        {'v.0.0.2':'Current, some issues has been fixed.',
+            'Release':'04-09-2017',
+            'Details':' /allocations can download CSV. Project manager can review and view a calendar by user.'
+        },
+        {'v.0.0.3':'Hora inicio, Hora Fin','ETA':'TBD'}
+        ]
+    return jsonify(next_release)

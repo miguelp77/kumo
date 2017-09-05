@@ -209,7 +209,7 @@ nav .brand-logo {
   font-family: "pf_benchmark_probold","Arial Black";
   font-size: 14px;
   color: #FFFFFF;
-  background: transparent url(../images/icon_globe.png) left center no-repeat;
+  /* background: transparent url(../images/icon_globe.png) left center no-repeat; */
   padding-left: 25px;
   height: 100%;
   margin-top: 1px;
@@ -574,7 +574,7 @@ nav .brand-logo {
     font-family: "pf_benchmark_probold","Arial Black";
     font-size: 14px;
     color: #FFFFFF;
-    background: transparent url(../images/icon_globe.png) left center no-repeat;
+    /* background: transparent url(../images/.png) left center no-repeat; */
     padding-left: 25px;
     height: 100%;
     margin-top: 1px;
@@ -623,7 +623,7 @@ nav .brand-logo {
     font-family: "pf_benchmark_probold","Arial Black";
     font-size: 14px;
     color: #FFFFFF;
-    background: transparent url(../images/icon_globe.png) left center no-repeat;
+    /* background: transparent url(../images/icon_globe.png) left center no-repeat; */
     padding-left: 25px;
     height: 100%;
     margin-top: 1px;

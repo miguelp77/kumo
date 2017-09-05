@@ -21,6 +21,13 @@ import datetime as dt
 
 builtin_list = list
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 
 def get_profile(user=None):
     if not user:
@@ -133,12 +140,7 @@ def list_by_user(user_id, day=None, month=None, year=None, project=None, hours=N
 
         dates[d.strftime('%Y')].append(d.strftime('%m'))
 
-        # if d.strftime('%Y') in dates:
-        #     dates[d.strftime('%Y')][d.strftime('%m')]
-        # else:
-        #     # dates[d.strftime('%Y')]=d.strftime('%m')
-        #     dates[d.strftime('%Y')][d.strftime('%m')]=d.strftime('%m')
-        #     # dates[d.strftime('%Y')].append(d.strftime('%m'))
+
 
 
     for k,v in dates.items():
@@ -440,3 +442,52 @@ def list_user(limit=15,  kind='User',cursor=None):
         if query_iterator.next_page_token else None)
 
     return entities, next_cursor
+
+
+# def set_value(kind, data=None, id=None, field=None, newdata=None):
+#     if newdata:
+#         ds = get_client()
+#         if id:
+#             key = ds.key(kind, int(id))
+#         else:
+#             key = ds.key(kind)
+        
+#         query = ds.query(kind=kind)
+#         query_iterator = query.fetch()
+#         page = next(query_iterator.pages)
+#         entities = builtin_list(map(from_datastore, page))
+
+#         for e in entities:
+#             if is_number(e['hours']) == True:
+#                 e['hours']=int(e['hours'])
+                
+#                 entity = datastore.Entity(key=key)
+#                 entity.update(e)
+#                 ds.put(e)
+#             else:
+#                 print('STRING')
+
+#             # if 'hours_type' in e:
+#             #     print(e['hours_type'])
+#             #     if e['hours_type'] == 'propertyValue':
+#             #         print('ARRAY')
+#             #         entity = datastore.Entity(key=key)
+
+#             #         e[field]=newdata
+#             #         entity.update(e)
+#             #         ds.put(e)
+#             # else:
+#             #     print(e['id'])
+#             #     print("O"*80)
+#             #     print('EDIT')
+#             #     # print(len(e['hours_type']))
+#             #     # if len(e['hours_type']) == 0:
+#             #     data={}
+#             #     print("**** Updating Datastore")
+#             #     entity = datastore.Entity(key=key)
+
+#             #     e[field]=newdata
+#             #     entity.update(e)
+#             #     ds.put(e)
+#         return from_datastore(entity)
+

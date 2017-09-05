@@ -4,6 +4,7 @@ import base64
 import time
 from datetime import timedelta, datetime
 import datetime as dt
+import time
 
 from flask import current_app, Flask, redirect, request, session, url_for
 import google.cloud.logging
@@ -119,6 +120,11 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     def make_session_permanent():
         session.permanent = True
         app.permanent_session_lifetime = timedelta(minutes=30)
+
+    @app.template_filter('date_to_millis')
+    def date_to_millis(d):
+        """Converts a datetime object to the number of milliseconds since the unix epoch."""
+        return int(time.mktime(d.timetuple())) * 1000
 
     return app
 

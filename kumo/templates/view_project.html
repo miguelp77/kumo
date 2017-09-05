@@ -71,50 +71,45 @@
         </ul>
       </div>
     </div>
-    {{project}}
-<!-- <table class="striped">
-    <thead>
-    <tr>
 
-        <th>Name</th>
-        <th>Head</th>
-        <th>Country</th>
-        <th>Approver</th>
-        <th>Hours</th>
-        <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for pj in projects %}
-    <tr>
-       <td><a href="/a/view_project/{{pj.id}}/">{{pj.name}}</a></td>
-       <td>{{pj.head}}</td>
-       <td>{{pj.country}}</td>
-       <td>
-         {% for app in pj.approver %}
-          {{ app }} <br>
-        {% endfor %}
-       </td>
-      <td><a href="./{{pj.id}}/update_pj_hours" title="click for update">8</a></td>
-      <td><a href="#" title="click for update">on</a></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<br>
-<small class='right'><a href="check_allocations">Revisar Imputaciones</a></small>
-<br> -->
     {% else %}
       <p>No projects</p>
     {% endif %}
 
-{% if next_page_token %}
-<nav>
-  <ul class="pager">
-    <li><a href="?page_token={{next_page_token}}">More</a></li>
-  </ul>
-</nav>
-</div>
-{% endif %}
+<!-- <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["calendar"]});
+      google.charts.setOnLoadCallback(drawChart);
+
+   function drawChart() {
+       var dataTable = new google.visualization.DataTable();
+       dataTable.addColumn({ type: 'date', id: 'Date' });
+       dataTable.addColumn({ type: 'number', id: 'Won/Loss' });
+       dataTable.addRows([
+
+          [ new Date(2013, 9, 4), 38177 ],
+          [ new Date(2013, 9, 5), 38705 ],
+          [ new Date(2013, 9, 12), 38210 ],
+          [ new Date(2013, 9, 13), 38029 ],
+          [ new Date(2013, 9, 19), 38823 ],
+          [ new Date(2013, 9, 23), 38345 ],
+          [ new Date(2013, 9, 24), 38436 ],
+          [ new Date(2013, 9, 30), 38447 ]
+        ]);
+
+       var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
+
+       var options = {
+         title: "{{project.name}}",
+         height: 350,
+       };
+
+       chart.draw(dataTable, options);
+   }
+    </script>
+
+
+    <div id="calendar_basic" style="width: 1000px; height: 350px;"></div> -->
+
 {% endblock %}
 
