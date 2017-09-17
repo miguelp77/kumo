@@ -12,8 +12,8 @@ from collections import defaultdict
 from functools import wraps
 
 
-
 crud = Blueprint('crud', __name__)
+
 
 def getCSV(datos):
     # with open("outputs/Adjacency.csv") as fp:
@@ -24,6 +24,7 @@ def getCSV(datos):
         mimetype="text/csv",
         headers={"Content-disposition":
                  "attachment; filename=" + datos +".csv"})
+
 
 def upload_audio_file(file):
     """
@@ -43,11 +44,9 @@ def upload_audio_file(file):
 
     return public_url
 
+
 # Control de usuarios
 # El perfil nos indica que opciones sobre los usuarios podemos realizar
-
-
-
 def get_role(role):
     print(role)
     r = 'No'
@@ -116,6 +115,7 @@ HOLIDAYS = {
     'h13': '2017-12-08',
     'h14': '2017-12-25'}
 
+
 def is_holiday(date):
     formated = date_to_string(date)
     print(str(formated) in HOLIDAYS.values())
@@ -180,6 +180,7 @@ def add_user():
         user = get_model().create_user(data, kind='User')
 
         return redirect(url_for('.view_user', id=user['id'], kind='User'))
+
 
 @crud.route('/user/<id>')
 @oauth2.required
@@ -807,11 +808,15 @@ def approve_selection():
 @crud.route('/roadmap')
 def roadmap():
     next_release = [
-        {'v.0.0.1':'Init','Release':'31-08-2017'},
+        {'v.0.0.1':'Init',
+            'Release':'31-08-2017'
+        },
         {'v.0.0.2':'Current, some issues has been fixed.',
             'Release':'04-09-2017',
             'Details':' /allocations can download CSV. Project manager can review and view a calendar by user.'
         },
-        {'v.0.0.3':'Hora inicio, Hora Fin','ETA':'TBD'}
+        {'v.0.0.3':'Hora inicio, Hora Fin',
+            'ETA':'TBD'
+        }
         ]
     return jsonify(next_release)

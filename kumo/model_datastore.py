@@ -155,7 +155,7 @@ def list_by_month(user_id,  kind='Allocation',limit=50, cursor=None,year='2017',
     query = ds.query(
         kind='Allocation',
     )
-    # query.add_filter('createdById', '=', user_id)
+    query.add_filter('createdById', '=', user_id)
     query.add_filter('month', '=', int(month))
     # query.add_filter('year', '=', year)
 
