@@ -19,41 +19,41 @@
 {%- endmacro %}
 
 <div class="audioList">
-  <div class="row">
-    <div class="col s2">
-      <h4>Imputaciones</h4>
-    </div>
-    <div class="col s4 m12 right">
-      {% if session.profile %}
-      <span> 
-      <span> 
-        <a href="#" class="btn btn-success btn-sm" id="buttonDelete" disabled="disabled" >
-         Borrar
-        </a>
-      </span>
-      <span> 
-        <a href="#" class="btn btn-success btn-sm" id="buttonSubmit" disabled="disabled" >
-         Enviar
-        </a>
-      </span>      
-      <span> 
-        <a href="#" class="btn btn-success btn-sm hidden" id="buttonReject" disabled="disabled">
-         Rechazar
-        </a>
-      </span>
-      <span> 
-        <a href="#" class="btn btn-success btn-sm hidden" id="buttonApprove" disabled="disabled">
-         Aprobar
-        </a>
-      </span>     
-      <span> 
-        <a href="/a/add_allocation" class="btn btn-success btn-sm">
-        Nueva
-        </a>
-      </span>
-      {% endif %}
-    </div>
-  </div>
+  <!--<div class="row">-->
+    <!--<div class="col s2">-->
+      <!--<h4>Imputaciones</h4>-->
+    <!--</div>-->
+    <!--<div class="col s4 m12 right">-->
+      <!--{% if session.profile %}-->
+      <!--<span> -->
+      <!--<span> -->
+        <!--<a href="#" class="btn btn-success btn-sm" id="buttonDelete" disabled="disabled" >-->
+         <!--Borrar-->
+        <!--</a>-->
+      <!--</span>-->
+      <!--<span> -->
+        <!--<a href="#" class="btn btn-success btn-sm" id="buttonSubmit" disabled="disabled" >-->
+         <!--Enviar-->
+        <!--</a>-->
+      <!--</span>      -->
+      <!--<span> -->
+        <!--<a href="#" class="btn btn-success btn-sm hidden" id="buttonReject" disabled="disabled">-->
+         <!--Rechazar-->
+        <!--</a>-->
+      <!--</span>-->
+      <!--<span> -->
+        <!--<a href="#" class="btn btn-success btn-sm hidden" id="buttonApprove" disabled="disabled">-->
+         <!--Aprobar-->
+        <!--</a>-->
+      <!--</span>     -->
+      <!--<span> -->
+        <!--<a href="/a/add_allocation" class="btn btn-success btn-sm">-->
+        <!--Nueva-->
+        <!--</a>-->
+      <!--</span>-->
+      <!--{% endif %}-->
+    <!--</div>-->
+  <!--</div>-->
   <div class="row">
     
     {% if month %}
@@ -118,7 +118,7 @@
   </thead>
   <tbody>
 
-    {% for alloc in allocations|sort(attribute='datetime_start')|rejectattr('archived') %}
+    {% for alloc in allocations|sort(attribute='datetime_start')|selectattr('archived') %}
     <tr>
        <td>
          {% if not alloc.status == 'accepted' and not alloc.status == 'submit' %}
@@ -156,9 +156,9 @@
         <td>
             <span class="badge green cwhite left">{{alloc.status}}</span>
         </td>
-        <td>
-            <a href="/a/archive/{{alloc.id}}">archive</a>
-        </td>
+        <!--<td>-->
+            <!--<a href="/a/archive/{{alloc.id}}">archive</a>-->
+        <!--</td>-->
        {% endif %}
         {% if alloc.status == 'rejected' %}
         <td>
@@ -203,11 +203,7 @@
   </tbody>
 </table>
 <br>
-    {% if archived %}
-     <small class='right'><a href="check_archived">Revisar archivadas</a></small>
-    {% else %}
-    {{allocations.archived}}
-    {% endif %}
+     <small class='right'><a href="mine">Volver</a></small>
 <br>
     {% else %}
       <p>No allocations</p>

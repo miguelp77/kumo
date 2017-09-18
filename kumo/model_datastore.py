@@ -115,15 +115,17 @@ def list_by_user(user_id, day=None, month=None, year=None, project=None, hours=N
         query.add_filter('formated_start_date', '=', str(day))
     if month:
         query.add_filter('month', '=', int(month))
-    if  year:
+    if year:
         query.add_filter('year', '=', int(year))
-    if  project:
+    if project:
         query.add_filter('project_name', '=', str(project))
-    if  hours:
+    if hours:
         query.add_filter('hours_type', '=', str(hours))
-    if  status:
+    if status:
         query.add_filter('status', '=', str(status))
-    
+
+    # query.add_filter('archived', '=', '-')
+
     query_iterator = query.fetch(limit=limit, start_cursor=cursor)
     page = next(query_iterator.pages)
 
@@ -137,11 +139,7 @@ def list_by_user(user_id, day=None, month=None, year=None, project=None, hours=N
     dates = defaultdict(list)
     for e in entities:
         d = e['datetime_start']
-
         dates[d.strftime('%Y')].append(d.strftime('%m'))
-
-
-
 
     for k,v in dates.items():
         ms = list(set(v))
@@ -197,91 +195,6 @@ def assigned_to_me(user_email, kind='Allocation', limit=50, cursor=None):
     print(entities)
     return entities, next_cursor
 
-def list_projects(limit=50, kind='Project', cursor=None):
-    ds = get_client()
-    query = ds.query(kind=kind, order=['country'])
-    query_iterator = query.fetch( start_cursor=cursor, limit=limit)
-    page = next(query_iterator.pages)
-
-    entities = builtin_list(map(from_datastore, page))
-    next_cursor = (
-        query_iterator.next_page_token.decode('utf-8')
-        if query_iterator.next_page_token else None)
-    return entities, next_cursor
-
-def check_projects(user_email, limit=50, kind='Project', cursor=None):
-    ds = get_client()
-    print(user_email)
-    query = ds.query(kind=kind,
-            filters=[
-            # ('approver', '>=', user_email)
-        ]
-    )
-    if user_email:
-        query.add_filter('approver','=',user_email)
-    query_iterator = query.fetch( start_cursor=cursor, limit=limit)
-    page = next(query_iterator.pages)
-
-    entities = builtin_list(map(from_datastore, page))
-    next_cursor = (
-        query_iterator.next_page_token.decode('utf-8')
-        if query_iterator.next_page_token else None)
-    return entities, next_cursor
-
-def read_project(id):
-    ds = get_client()
-    key = ds.key('Project', int(id))
-    results = ds.get(key)
-    return from_datastore(results)
-
-def update_project(data, id, users, submit_hours, accept_hours):
-    ds = get_client()
-    if id:
-        key = ds.key('Project', int(id))
-    else:
-        key = ds.key('Project')
-    entity = datastore.Entity(key=key)
-
-    if not data:
-        data = ds.get(key)
-    if users:
-        data['users'] = users 
-    if submit_hours:
-        data['submit_hours'] = int(submit_hours)
-    if accept_hours:
-        data['accept_hours'] = int(accept_hours)
-    data['consumed_hours'] = int(submit_hours) + int(accept_hours)
-    entity.update(data)
-    ds.put(entity)
-    return from_datastore(entity)
-
-def collect_project_hours(id):
-    ds = get_client()
-    query = ds.query(kind='Allocation',
-    filters=[
-            ('project', '=', id)
-        ])
-    query_iterator = query.fetch()
-    page = next(query_iterator.pages)
-    entity = builtin_list(map(from_datastore, page))
-
-    submit_hours = 0
-    accept_hours = 0
-    emails = []
-    for e in entity:
-        if not e['user_email'] in emails:
-            emails.append(e['user_email'])
-
-        if e['status'] == 'submit':
-            submit_hours = submit_hours + int(e['hours'])
-        if e['status'] == 'accepted':
-            accept_hours = accept_hours + int(e['hours'])
-
-    data = update_project(data=None, id=id, users = emails,
-        submit_hours=submit_hours, accept_hours= accept_hours)
-    print('O0'*80)
-    print(emails)    
-    return data, submit_hours, accept_hours
 
 def give_me_name(id,kind):
     """
@@ -444,50 +357,95 @@ def list_user(limit=15,  kind='User',cursor=None):
     return entities, next_cursor
 
 
-# def set_value(kind, data=None, id=None, field=None, newdata=None):
-#     if newdata:
-#         ds = get_client()
-#         if id:
-#             key = ds.key(kind, int(id))
-#         else:
-#             key = ds.key(kind)
-        
-#         query = ds.query(kind=kind)
-#         query_iterator = query.fetch()
-#         page = next(query_iterator.pages)
-#         entities = builtin_list(map(from_datastore, page))
+#Projects
+def list_projects(limit=50, kind='Project', cursor=None):
+    ds = get_client()
+    query = ds.query(kind=kind, order=['country'])
+    query_iterator = query.fetch( start_cursor=cursor, limit=limit)
+    page = next(query_iterator.pages)
 
-#         for e in entities:
-#             if is_number(e['hours']) == True:
-#                 e['hours']=int(e['hours'])
-                
-#                 entity = datastore.Entity(key=key)
-#                 entity.update(e)
-#                 ds.put(e)
-#             else:
-#                 print('STRING')
+    entities = builtin_list(map(from_datastore, page))
+    next_cursor = (
+        query_iterator.next_page_token.decode('utf-8')
+        if query_iterator.next_page_token else None)
+    return entities, next_cursor
 
-#             # if 'hours_type' in e:
-#             #     print(e['hours_type'])
-#             #     if e['hours_type'] == 'propertyValue':
-#             #         print('ARRAY')
-#             #         entity = datastore.Entity(key=key)
+def check_projects(user_email, limit=50, kind='Project', cursor=None):
+    ds = get_client()
+    print(user_email)
+    query = ds.query(kind=kind,
+            filters=[
+            # ('approver', '>=', user_email)
+        ]
+    )
+    if user_email:
+        query.add_filter('approver','=',user_email)
+    query_iterator = query.fetch( start_cursor=cursor, limit=limit)
+    page = next(query_iterator.pages)
 
-#             #         e[field]=newdata
-#             #         entity.update(e)
-#             #         ds.put(e)
-#             # else:
-#             #     print(e['id'])
-#             #     print("O"*80)
-#             #     print('EDIT')
-#             #     # print(len(e['hours_type']))
-#             #     # if len(e['hours_type']) == 0:
-#             #     data={}
-#             #     print("**** Updating Datastore")
-#             #     entity = datastore.Entity(key=key)
+    entities = builtin_list(map(from_datastore, page))
+    next_cursor = (
+        query_iterator.next_page_token.decode('utf-8')
+        if query_iterator.next_page_token else None)
+    return entities, next_cursor
 
-#             #     e[field]=newdata
-#             #     entity.update(e)
-#             #     ds.put(e)
-#         return from_datastore(entity)
+def read_project(id):
+    ds = get_client()
+    key = ds.key('Project', int(id))
+    results = ds.get(key)
+    return from_datastore(results)
 
+def update_project(data, id, users, submit_hours, accept_hours):
+    ds = get_client()
+    if id:
+        key = ds.key('Project', int(id))
+    else:
+        key = ds.key('Project')
+    entity = datastore.Entity(key=key)
+
+    if not data:
+        data = ds.get(key)
+    if users:
+        data['users'] = users
+    if submit_hours:
+        data['submit_hours'] = int(submit_hours)
+    if accept_hours:
+        data['accept_hours'] = int(accept_hours)
+    data['consumed_hours'] = int(submit_hours) + int(accept_hours)
+    entity.update(data)
+    ds.put(entity)
+    return from_datastore(entity)
+
+def collect_project_hours(id):
+    """
+    Collect all the information of one Project
+
+    :param id: Project ID in allocations
+    :return: submit_hours and accept_hours
+    """
+    ds = get_client()
+    query = ds.query(kind='Allocation',
+    filters=[
+            ('project', '=', id)
+        ])
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+    entity = builtin_list(map(from_datastore, page))
+
+    submit_hours = 0
+    accept_hours = 0
+    emails = []
+    for e in entity:
+        if not e['user_email'] in emails:
+            emails.append(e['user_email'])
+
+        if e['status'] == 'submit':
+            submit_hours = submit_hours + int(e['hours'])
+        if e['status'] == 'accepted':
+            accept_hours = accept_hours + int(e['hours'])
+
+    data = update_project(data=None, id=id, users = emails,
+        submit_hours=submit_hours, accept_hours= accept_hours)
+    print('O0'*80)
+    print(emails)
+    return data, submit_hours, accept_hours

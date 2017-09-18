@@ -59,30 +59,8 @@ def get_role(role):
         return r
     # return session['role'] if session['role'] else None
 
+
 # DECORADOR
-# def user_test_admin(req_roles = None):
-#     if req_roles is None:
-#         req_roles = ['any']
-#     # print('='*80)
-#     # print('DECORADOR')
-#     # print(req_roles)
-#     r = get_role(req_roles)
-#     # print(r)
-#     # render_template("home.html")
-#     # print(session)
-#     def decorator (f):
-#         def decorated_view(*args, **kwargs):
-#             # …
-#             r = get_role(req_roles)
-#             # print('r=' + r)
-#             if r == 'manager':
-#                 return f(*args, **kwargs)
-#             else:
-#                 return render_template('not_access.html')
-
-#         return decorated_view
-
-#     return decorator
 def user_test_admin(req_roles = 'None'):
     def decorator (func):
         @wraps(func)
@@ -95,7 +73,7 @@ def user_test_admin(req_roles = 'None'):
                 return render_template('not_access.html')
         return decorated_view
     return decorator
-# DECORADOR
+# FIN DECORADOR
 
 
 # Calculo de horas
@@ -121,9 +99,11 @@ def is_holiday(date):
     print(str(formated) in HOLIDAYS.values())
     return str(formated) in HOLIDAYS.values()
 
+
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):
         yield start_date + timedelta(n)
+
 
 def work_days(start_date, end_date_inc):
     """
@@ -150,6 +130,7 @@ def work_hours(start_date,end_date_inc):
             hours = hours + 8
     return hours
 
+
 # Routing
 @crud.route("/")
 def showHome():
@@ -163,6 +144,7 @@ def showHome():
         "home.html",
         allocations=allocations,
         next_page_token=next_page_token)
+
 
 @crud.route("/user", methods=['GET', 'POST'])
 @oauth2.required
@@ -192,6 +174,7 @@ def view_user(id):
     user = get_model().read_user(id)
     return render_template("view_user.html", user=user)
 
+
 # arreglo 2
 @crud.route('/user/<id>/edit_user', methods=['GET', 'POST'])
 @oauth2.required
@@ -211,6 +194,7 @@ def edit_user(id):
 
     return render_template("add_user.html", action="Edit", user=user)
 
+
 @crud.route('/user/list')
 @oauth2.required
 @user_test_admin(req_roles='manager')
@@ -224,6 +208,18 @@ def list_user():
         "list_user.html",
         users=users,
         next_page_token=next_page_token)
+
+
+def _get_hours(allocations):
+    total_hours = {}
+    for allocs in allocations:
+        s = allocs['status']
+        if s in total_hours:
+            total_hours[s] = int(total_hours[s]) + int(allocs['hours'])
+        else:
+            total_hours[s] = int(allocs['hours'])
+
+    return total_hours
 
 # Imputaciones
 @crud.route("/allocations")
@@ -246,15 +242,7 @@ def list_allocations():
     allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token, email=email,
          day=day, month=month, year=year, project=project, hours=hours, status=status)
 
-    total_hours = {}
-    for allocs in allocations:
-        s = allocs['status']
-        if s in total_hours:
-            total_hours[s] = int(total_hours[s]) + int(allocs['hours'])
-        else:
-            total_hours[s] = int(allocs['hours'])
-
-    print(total_hours)
+    total_hours = _get_hours(allocations)
 
     if csv:
         datos = []   
@@ -371,21 +359,25 @@ def user_allocations(email):
         hour = allocation['hours']
         start_dates[str(start_date.timestamp()*1000)].append(int(hour))
 
+    total_hours = _get_hours(allocations)
+
 
     return render_template(
         "list_by_user.html",
-        # books=books,
         allocations=allocations,
         start_dates=start_dates,
+        total_hours=total_hours,
         next_page_token=next_page_token)
-
 
 
 @crud.route("/my_projects")
 @oauth2.required
 @user_test_admin(req_roles='manager')
 def my_projects():
-    print(get_model().give_me_name(5664248772427776	,'Project'))
+    """
+    List the projects for logged user
+    :return:
+    """
     token = request.args.get('page_token', None)
     if token:
         token = token.encode('utf-8')
@@ -393,13 +385,12 @@ def my_projects():
     projects, next_page_token = get_model().check_projects(
         user_email=session['profile']['emails'][0]['value'],
         kind='Project',cursor=token)
-    print(projects)
-    # books, next_page_token = get_model().list(kind='Book',cursor=token)
+
     return render_template(
         "list_projects.html",
-        # books=books,
         projects=projects,
         next_page_token=next_page_token)
+
 
 @crud.route("/all_projects")
 @oauth2.required
@@ -431,6 +422,7 @@ def view_project(id):
         "view_project.html",
         project=project)
 
+
 @crud.route("/update_project/<id>/")
 @oauth2.required
 @user_test_admin(req_roles='manager')
@@ -439,6 +431,7 @@ def update_project(id):
     return render_template(
         "view_project.html",
         project=project)
+
 
 @crud.route("/mine")
 @oauth2.required
@@ -466,15 +459,17 @@ def list_mine():
         limit=100,
         kind='Allocation',
         cursor=token)
-
+    archived = False
     for allocs in allocations:
         s = allocs['status']
         if s in total_hours:
             total_hours[s] = int(total_hours[s]) + int(allocs['hours'])
         else:
             total_hours[s] = int(allocs['hours'])
-
-        print(total_hours)
+        if 'archived' in allocs:
+            if allocs['archived']:
+                archived = True
+        # print(total_hours)
         # if allocs['status'] == 'created':
         #     total_hours.created = total_hours.created + int(allocs['hours']) 
     # write_spreadsheet('ooo')
@@ -482,6 +477,7 @@ def list_mine():
 
     return render_template(
         "list.html",
+        archived=archived,
         allocations=allocations,
         total_hours=total_hours,
         logged_user=logged_user,
@@ -493,6 +489,8 @@ def list_mine():
         project=project,
         status=status,
         next_page_token=next_page_token)
+
+
 
 @crud.route("/<year>/<month>/mine")
 @oauth2.required
@@ -525,10 +523,76 @@ def list_mine_date(year,month):
         dates=dates,
         next_page_token=next_page_token)
 
+
+@crud.route("/check_archived")
+@oauth2.required
+def list_archived():
+    """
+    List archived allocations
+    :return:
+    """
+    token = request.args.get('page_token', None)
+    day = request.args.get('date', None)
+    month = request.args.get('month', None)
+    year = request.args.get('year', None)
+    project = request.args.get('project', None)
+    hours = request.args.get('hours', None)
+    status = request.args.get('status', None)
+
+    if token:
+        token = token.encode('utf-8')
+    total_hours = {}
+
+    allocations, next_page_token, dates = get_model().list_by_user(
+        user_id=session['profile']['id'],
+        day = day,
+        month = month,
+        year=year,
+        project=project,
+        hours=hours,
+        status=status,
+        limit=100,
+        kind='Allocation',
+        cursor=token)
+
+    for allocs in allocations:
+        s = allocs['status']
+        if s in total_hours:
+            total_hours[s] = int(total_hours[s]) + int(allocs['hours'])
+        else:
+            total_hours[s] = int(allocs['hours'])
+
+
+
+        # print(total_hours)
+        # if allocs['status'] == 'created':
+        #     total_hours.created = total_hours.created + int(allocs['hours'])
+    # write_spreadsheet('ooo')
+    logged_user = session['profile']['emails'][0]['value']
+
+    return render_template(
+        "list_archived.html",
+        allocations=allocations,
+        total_hours=total_hours,
+        logged_user=logged_user,
+        dates=dates,
+        day=day,
+        month=month,
+        year=year,
+        hours=hours,
+        project=project,
+        status=status,
+        next_page_token=next_page_token)
+
+
 @crud.route("/check_allocations")
 @oauth2.required
 @user_test_admin(req_roles='manager')
 def review_allocations():
+    """
+    check allocations
+    :return:
+    """
     token = request.args.get('page_token', None)
     if token:
         token = token.encode('utf-8')
@@ -715,6 +779,17 @@ def submited(id):
     # return render_template("list.html", allocation=allocation)
     return redirect(url_for('.list_mine'))
 
+
+@crud.route('/archive/<id>/', methods=['GET', 'POST'])
+@oauth2.required
+def archive(id):
+    allocation = get_model().read_allocation(id)
+    allocation['archived'] = True
+    allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
+    # return render_template("list.html", allocation=allocation)
+    return redirect(url_for('.list_mine'))
+
+
 @crud.route('/accept/<id>/', methods=['GET', 'POST'])
 @oauth2.required
 @user_test_admin(req_roles='manager')
@@ -736,7 +811,6 @@ def rejected(id):
 
 # Prjects
 # ./{{pj.id}}/update_pj_hours
-
 @crud.route('/<id>/update_pj_hours', methods=['GET', 'POST'])
 @oauth2.required
 @user_test_admin(req_roles='manager')
@@ -750,6 +824,7 @@ def update_pj_hours(id):
     allocation['status'] = 'rejected'
     allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
     return render_template("upload_file.html", action="Add", audio={},projects=projects)
+
 
 @crud.route('/delete/<id>/')
 @oauth2.required
@@ -766,6 +841,7 @@ def delete_selection():
         get_model().delete_multi(data)
     return jsonify('DELEETED')
 
+
 @crud.route('/_submit_selection')
 @oauth2.required
 def submit_selection():
@@ -775,6 +851,7 @@ def submit_selection():
             submited(id)
     return jsonify('submit')
 
+
 @crud.route('/_reject_selection')
 @oauth2.required
 def reject_selection():
@@ -783,6 +860,7 @@ def reject_selection():
         for id in data:
             rejected(id)
     return jsonify('reject')
+
 
 @crud.route('/_approve_selection')
 @oauth2.required
