@@ -433,6 +433,19 @@ def update_project(id):
         project=project)
 
 
+@crud.route("/create_project/", methods=['GET', 'POST'])
+@oauth2.required
+@user_test_admin(req_roles='manager')
+def create_project():
+    if request.method == 'POST':
+        data = request.form.to_dict(flat=True)
+        project = get_model().create_project(data)
+        return redirect(url_for('.view_project', id=project['id']))
+
+    return render_template("create_project.html", action="Crear")
+
+
+# Logged User
 @crud.route("/mine")
 @oauth2.required
 def list_mine():
@@ -594,17 +607,42 @@ def review_allocations():
     :return:
     """
     token = request.args.get('page_token', None)
+    day = request.args.get('date', None)
+    month = request.args.get('month', None)
+    year = request.args.get('year', None)
+    project = request.args.get('project', None)
+    hours = request.args.get('hours', None)
+    status = request.args.get('status', None)
+    email = request.args.get('user_email', None)
+    csv = request.args.get('csv', None)
+
+
+
+    token = request.args.get('page_token', None)
     if token:
         token = token.encode('utf-8')
+
     allocations, next_page_token = get_model().assigned_to_me(
         user_email=session['profile']['emails'][0]['value'],
         kind='Allocation',
-        cursor=token)
+        cursor=token, email=email,
+        day=day, month=month, year=year,
+        project=project, hours=hours, status=status)
+
+    total_hours = _get_hours(allocations)
     logged_user = session['profile']['emails'][0]['value']
 
     return render_template(
         "review_allocations.html",
         allocations=allocations,
+        day = day,
+        month = month,
+        year=year,
+        project=project,
+        hours=hours,
+        status=status,
+        user_email=email,
+        total_hours=total_hours,
         logged_user=logged_user,
         next_page_token=next_page_token)
 
@@ -668,11 +706,16 @@ def add():
     return render_template("form.html", action="Add", book={})
 # Arreglo 1 fin
 
+
+
+
+
 @crud.route('/add_allocation', methods=['GET', 'POST'])
 @oauth2.required
 def add_allocation():
-    projects, next_page_token2 = get_model().list_projects(50,'Project',None)
-
+    user_email = session['profile']['emails'][0]['value']
+    projects, next_page_token2 = get_model().list_projects(50,'Project', user_email, None)
+    generics = get_model().generic_projects()
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
 
@@ -702,12 +745,15 @@ def add_allocation():
         # return redirect(url_for('.view_allocation', id=allocation['id'],kind='Allocation'))
         return redirect(url_for('.list_mine'))
 
-    return render_template("create_allocation.html", action="Crear",projects=projects, allocation={})
+    return render_template("create_allocation.html", action="Crear",
+                           projects=projects, generics=generics, allocation={})
+
 
 @crud.route('/edit_allocation/<id>', methods=['GET', 'POST'])
 @oauth2.required
 def edit_allocation(id):
-    projects, next_page_token2 = get_model().list_projects(50,'Project',None)
+    user_email = session['profile']['emails'][0]['value']
+    projects, next_page_token2 = get_model().list_projects(50,'Project', user_email, None)
     allocation = get_model().read_allocation(id)
 
     if request.method == 'POST':
@@ -871,6 +917,36 @@ def approve_selection():
             accepted(id)
     return jsonify('approve')
 
+
+@crud.route('/_add_auth/', methods=['GET', 'POST'])
+@oauth2.required
+def _add_auth():
+    if request.method == 'POST':
+
+        data = request.form.to_dict(flat=True)
+        id = data['id']
+        get_model().add_auths(id,emails=data['auths'])
+        project = get_model().read_project(id)
+    return render_template(
+        "view_project.html",
+        project=project)
+
+
+@crud.route('/_remove_auth/<id>/<email>', methods=['GET', 'POST'])
+@oauth2.required
+def _remove_auth(id, email):
+    if request.method == 'POST':
+        data = request.form.to_dict(flat=True)
+        id = data['id']
+        get_model().add_auths(id,emails=data['auths'])
+        project = get_model().read_project(id)
+    else:
+        get_model().remove_auth(id,email=email)
+        project = get_model().read_project(id)
+
+    return render_template(
+        "view_project.html",
+        project=project)
 # @crud.route('/_cleandb')
 # @oauth2.required
 # def cleandb():
@@ -881,6 +957,8 @@ def approve_selection():
 #         res = get_model().set_value(kind='Allocation', field=field, newdata=newdata)
 
 #     return jsonify('clean')
+
+
 
 
 @crud.route('/roadmap')

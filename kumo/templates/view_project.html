@@ -4,79 +4,92 @@
 
 
 <div class="audioList">
-  <div class="row">
-    <div class="col s2">
-      <h4>Project</h4>
-    </div>
-    
-    {% if project %}
-    <div class="col s2 right">
-      {% if session.profile %}
-         <a href="/a/update_project/{{project.id}}/" class="btn btn-success btn-sm">
-        Actualizar
-        </a> 
-      {% endif %}
-    </div>
-    </div>
-  
     <div class="row">
-      <h5>{{project.name}} - {{project.country}}</h5>
-      <div class="col s3">
-        <ul>
-          <li><b>Approvers:</b>
-              <ul>
-              {% for app in project.approver %}
-                <li>{{app}}</li>
-              {% endfor %}
-              </ul>
-          </li>
-        </ul>
-      </div>
-      {% if project.estimated_hours %}
+        <div class="col s2">
+            <h4>Project</h4>
+        </div>
+
+        {% if project %}
+        <div class="col s2 right">
+            {% if session.profile %}
+            <a href="/a/update_project/{{project.id}}/" class="btn btn-success btn-sm">
+                Actualizar
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <h5>{{project.name}} - {{project.country}}</h5>
+
         <div class="col s3">
-          <ul>
-            <li><b>Progreso: </b>{{ (project.consumed_hours/project.estimated_hours) * 100 }} %</li>
-            <li><b>Consumido: </b>{{project.consumed_hours}}</li>
-            <li><b>Total: </b>{{project.estimated_hours}}</li>
-          </ul>
+            <ul>
+                <li><b>Approvers:</b>
+                    <ul>
+                        {% for app in project.approver %}
+                        <li>{{app}}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        {% if project.estimated_hours %}
+        <div class="col s3">
+            <ul>
+                <li><b>Progreso: </b>{{ (project.consumed_hours/project.estimated_hours) * 100 }} %</li>
+                <li><b>Consumido: </b>{{project.consumed_hours}}</li>
+                <li><b>Total: </b>{{project.estimated_hours}}</li>
+            </ul>
         </div>
         <div class="col s3">
-          <ul>
-            <li><b>Progreso: </b>{{ (project.consumed_hours/project.estimated_hours) * 100 }} %</li>
-            <li><b>Consumido: </b>{{project.consumed_hours}}</li>
-            <li><b>Total: </b>{{project.estimated_hours}}</li>
-          </ul>
+            <ul>
+                <li><b>Progreso: </b>{{ (project.consumed_hours/project.estimated_hours) * 100 }} %</li>
+                <li><b>Consumido: </b>{{project.consumed_hours}}</li>
+                <li><b>Total: </b>{{project.estimated_hours}}</li>
+            </ul>
         </div>
-    {% endif %}
+        {% endif %}
     </div>
     <div class="row">
-      <div class="col s5">
-        <ul class="collection with-header">
-          <li><h4>Han imputado</h4></li>
-          {% for user in project.users%}
-            <li class="collection-item green lighten-4">
-              <a href="/a/allocations/{{user}}"><span class="black-text">{{user}}</span></a>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div class="col s5">
-        <ul class="collection with-header">
-          <li><h4>Participantes</h4></li>
-          {% for user in project.users%}
-            <li class="collection-item green lighten-4">
-              <a href="/a/allocations/{{user}}"><span class="black-text">{{user}}</span></a>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
+        <div class="col s5">
+            <ul class="collection with-header">
+                <li><h4>Han imputado</h4></li>
+                {% for user in project.users%}
+                <li class="collection-item green lighten-4">
+                    <a href="/a/allocations/{{user}}"><span class="black-text">{{user}}</span></a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col s5">
+            <ul class="collection with-header">
+                <li><h4>Participantes</h4></li>
+                {% for user in project.auths%}
+                <li class="collection-item green lighten-4">
+                    <a href="/a/allocations/{{user}}">
+                        <span class="black-text">{{user}}</span>
+                    </a>
+
+                    <a href="/a/_remove_auth/{{project.id}}/{{user}}" class="right">-</a>
+                </li>
+                {% endfor %}
+                <li>
+                    <span>
+                        <form action="/a/_add_auth/" method="post">
+                            <input type="text" name="auths">
+                            <input type="text" class="hidden" name="id" id="id" value="{{project.id}}">
+                            <input type="submit">
+                        </form>
+                    </span>
+                    </li>
+            </ul>
+        </div>
     </div>
 
     {% else %}
-      <p>No projects</p>
+    <p>No projects</p>
     {% endif %}
 
 
-
-{% endblock %}
+    {% endblock %}
 

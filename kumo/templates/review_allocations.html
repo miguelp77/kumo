@@ -2,164 +2,215 @@
 
 {% block content %}
 
+{% macro params(value,new) %}
+{% if request.args|length %}
+<a href="{{request.full_path}}&{{new}}">{{value}}</a>
+{% else %}
+<a href="{{request.full_path}}{{new}}">{{value}}</a>
+{% endif %}
+{%- endmacro %}
+
+{% macro chip(name, value='')%}
+<div class="chip">
+    {{ name }}={{ value }}
+    <a href="{{ request.full_path | replace(name+'='+value|e, '') | replace(name+'='+value|urlencode, '') | replace('&&','&',1) | replace('?&','?',1) }}"><i
+            class="close material-icons">adjust</i></a>
+</div>
+{%- endmacro %}
+
 
 <div class="audioList">
-  <div class="row">
-    <div class="col s2">
-      <h4>Imputaciones</h4>
-    </div>
-    <div class="col s4 right">
-      {% if session.profile %}
-      <span> 
-        <a href="#" class="btn btn-success btn-sm hidden" id="buttonDelete" disabled="disabled" >
-         Borrar
+    <div class="row">
+        <div class="col s2">
+            <h4>Imputaciones</h4>
+        </div>
+        <div class="col s4 right">
+            {% if session.profile %}
+      <span>
+        <a href="{{request.full_path}}&csv=download" class="btn btn-success btn-sm hidden" id="buttonCSV">
+            CSV
         </a>
       </span>
-      <span> 
-        <a href="#" class="btn btn-success btn-sm hidden" id="buttonSubmit" disabled="disabled" >
-         Enviar
+      <span>
+        <a href="#" class="btn btn-success btn-sm hidden" id="buttonDelete" disabled="disabled">
+            Borrar
         </a>
-      </span>      
-      <span> 
+      </span>
+      <span>
+        <a href="#" class="btn btn-success btn-sm hidden" id="buttonSubmit" disabled="disabled">
+            Enviar
+        </a>
+      </span>
+      <span>
         <a href="#" class="btn btn-success btn-sm" id="buttonReject" disabled="disabled">
-         Rechazar
+            Rechazar
         </a>
       </span>
-      <span> 
+      <span>
         <a href="#" class="btn btn-success btn-sm" id="buttonApprove" disabled="disabled">
-         Aprobar
+            Aprobar
         </a>
-      </span>      
-      {% endif %}
+      </span>
+      <span>
+        <a href="/a/add_allocation" class="btn btn-success btn-sm hidden" disabled="disabled">
+            Nueva
+        </a>
+      </span>
+            {% endif %}
+        </div>
     </div>
-  </div>
+    <div class="row">
+
+        {% if month %}
+        {{ chip( 'month', month ) }}
+        {% endif %}
+        {% if year %}
+        {{ chip( 'year', year ) }}
+        {% endif %}
+        {% if project %}
+        {{ chip( 'project', project ) }}
+        {% endif %}
+        {% if hours %}
+        {{ chip( 'hours', hours ) }}
+        {% endif %}
+        {% if day %}
+        {{ chip( 'day', day ) }}
+        {% endif %}
+        {% if status %}
+        {{ chip( 'status', status ) }}
+        {% endif %}
+        {% if user_email %}
+        {{ chip( 'user_email', user_email ) }}
+        {% endif %}
+    </div>
+    <div class="progress" style="display: none;" id="preloader">
+        <div class="indeterminate"></div>
+    </div>
+    <!--Filtro de fechas  -->
     {% if dates %}
-      {% for year,months in dates.items() %}
-        {% if months|length > 1%}
-          <i class="material-icons left">date_range</i>
-          {% for month in months %}
-            <a href="{{year}}/{{month}}/mine"><span class="badge {{loop.cycle('red accent-2', 'teal lighten-2', 'blue lighten-1')}} black-text left">{{year}}/{{month}}</span></a> &nbsp;
-          {% endfor%}
-          <br>
-        {% else %}
-            <a href="../../mine">all</a>
-        {% endif %}
-      {% endfor %}
-      <br>
-    {% endif %}
-  {%if total_hours%}
-    {%for key, value in total_hours.items() %}
-      <span><b>{{value}}</b> hours in {{key}} status. </span>
-    {% endfor %}
-  {% endif %}
-    {% if allocations %}
-<table class="striped tablesorter" id="table-allocations">
-    <thead>
-    <tr>
-        <th> 
-         <input type="checkbox" id="check_all" />
-         <label for="all">Todos</label>
-        </th>
-        <th>Nombre</th>
-        <th>Proyecto</th>
-        <th>Aprobador</th>
-        <th>Fecha</th>
-        <th>Horas</th>
-        <th>Tipo</th>
-        <th>Estado</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for alloc in allocations|sort(attribute='datetime_start') %}
-    <tr>
-       <td>
-         <input type="checkbox" id="{{alloc.id}}" class="checkBoxClass"/>
-         <label for="{{alloc.id}}"></label>
-      </td>
-       <td>{{alloc.createdBy}}</td>
-       {% if alloc.project_name is string %}
-          <td>{{alloc.project_name}}</td>
-       {% else %}
-          <td>{{alloc.project}}</td>
-       {% endif %}
-       <td>{{alloc.approver}}</td>
-       <td>{{alloc.formated_start_date}}</td>
-       <td>{{alloc.hours}}</td>
-
-       <td>{{alloc.hours_type}}</td>
-
-       {% if alloc.status == 'created' %}
-        <td>
-          <span class="badge blue cwhite left">{{alloc.status}}</span>
-        </td>
-       {% endif %}
-
-       {% if alloc.status == 'submit'%}
-        <td>
-          <span class="badge orange cwhite left">{{alloc.status}}</span>
-        </td>
-        {% endif %}
-       
-        {% if alloc.status == 'accepted' %}
-        <td>
-          <span class="badge green cwhite left">{{alloc.status}}</span>
-        </td>
-       {% endif %}
-        {% if alloc.status == 'rejected' %}
-        <td>
-          <span class="badge red cwhite left">{{alloc.status}}</span>
-        </td>
-       {% endif %}
-
-        <td>
-        {% if alloc.status == 'created' %}
-          <a href="/a/submit/{{alloc.id}}/">submit</a>
-        {% endif %}
-        </td>
-        <td>
-          {% if alloc.status == 'created' or alloc.status == 'rejected' %}
-            <a href="/a/delete/{{alloc.id}}/">delete</a>
-          {% endif %}
-        </td>
-       <td>
-        {% if alloc.status == 'created' or alloc.status == 'rejected' %}
-         <a href="#">edit</a>
-        {% endif %}
-       </td>
-      
-       {% if alloc.approver ==  logged_user %}
-       <td>
-        {% if alloc.status == 'submit' %}
-         <a href="/a/reject/{{alloc.id}}/"><i class="material-icons" style="color:#b71c1c">cancel</i></a>
-        {% endif %}
-       </td>
-       <td>
-        {% if alloc.status == 'submit' %}
-         <a href="/a/accept/{{alloc.id}}/"><i class="material-icons" style="color:#1b5e20">check_circle</i></a>
-        {% endif %}
-       </td>
-      {% endif %}
-
-             
-             
-
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<br>
-<small class='right'><a href="check_allocations">Revisar Imputaciones</a></small>
-<br>
+    {% for year,months in dates.items() %}
+    {% if months|length > 1%}
+    <i class="material-icons left">date_range</i>
+    {% for month in months %}
+    <a href="{{year}}/{{month}}/mine"><span
+            class="chip {{loop.cycle('red accent-2', 'teal lighten-2', 'blue lighten-1')}} black-text left">{{year}}/{{month}}</span></a>
+    &nbsp;
+    {% endfor%}
+    <br>
+    <br>
     {% else %}
-      <p>No allocations</p>
+    <a href="/a/mine">all</a>
+    {% endif %}
+    {% endfor %}
+    <br>
+    {% endif %}
+    {%if total_hours%}
+    {%for key, value in total_hours.items() %}
+    <span><b>{{value}}</b> hours in {{key}} status. </span>
+    {% endfor %}
+    {% endif %}
+    {% if allocations %}
+    <table class="striped tablesorter" id="table-allocations">
+        <thead>
+        <tr>
+            <th>
+                <input type="checkbox" id="check_all"/>
+                <label for="all">Todos</label>
+            </th>
+            <th style="width:150px;">Nombre</th>
+            <th>Proyecto</th>
+            <th>Aprobador</th>
+            <th>Fecha</th>
+            <th>Horas</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for alloc in allocations|sort(attribute='createdBy')|sort(attribute='datetime_start') %}
+        <tr>
+            <td>
+                <input type="checkbox" id="{{alloc.id}}" class="checkBoxClass"/>
+                <label for="{{alloc.id}}"></label>
+                {% if alloc.comment %}
+                <i class="material-icons" title="{{alloc.comment}}">chat</i>
+                {% endif %}
+            </td>
+            <td>
+                <small>{{alloc.createdBy}}{{ params(alloc.user_email,'user_email='+alloc.user_email|e) }}</small>
+            </td>
+
+            {% if alloc.project_name is string %}
+            <td>{{ params(alloc.project_name,'project='+alloc.project_name|e) }}</td>
+            {% else %}
+            <td>{{alloc.project}}</td>
+            {% endif %}
+            <td>{{alloc.approver}}</td>
+            <td>{{ params(alloc.formated_start_date,'month='+alloc.month|e) }}</td>
+            <td>{{alloc.hours}}</td>
+            <td>{% if alloc.hours_type|length > 1 %}{{ params(alloc.hours_type,'hours='+alloc.hours_type|e) }} {% else
+                %} - {% endif %}
+            </td>
+
+            {% if alloc.status == 'created' %}
+            <td>
+                <span class="badge blue cwhite left">{{alloc.status}}</span>
+            </td>
+            {% endif %}
+
+            {% if alloc.status == 'submit'%}
+            <td>
+                <span class="badge orange cwhite left">{{alloc.status}}</span>
+            </td>
+            {% endif %}
+
+            {% if alloc.status == 'accepted' %}
+            <td>
+                <span class="badge green cwhite left">{{alloc.status}}</span>
+            </td>
+            {% endif %}
+            {% if alloc.status == 'rejected' %}
+            <td>
+                <span class="badge red cwhite left">{{alloc.status}}</span>
+            </td>
+            {% endif %}
+            {% if alloc.approver ==  logged_user %}
+            <td>
+                {% if alloc.status == 'submit' %}
+                <a href="/a/reject/{{alloc.id}}/"><i class="material-icons" style="color:#b71c1c">cancel</i></a>
+                {% endif %}
+            </td>
+            <td>
+                {% if alloc.status == 'submit' %}
+                <a href="/a/accept/{{alloc.id}}/"><i class="material-icons" style="color:#1b5e20">check_circle</i></a>
+                {% endif %}
+            </td>
+            {% endif %}
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <!-- <small class='right'><a href="check_allocations">Revisar Imputaciones</a></small> -->
+    <br>
+    {% else %}
+    <p>No allocations</p>
     {% endif %}
 
-{% if next_page_token %}
-<nav>
-  <ul class="pager">
-    <li><a href="?page_token={{next_page_token}}">More</a></li>
-  </ul>
-</nav>
+    {% if next_page_token != request.args['page_token'] %}
+    <nav>
+        <ul class="pager">
+            {% if 'page_token' in request.full_path %}
+            <li><a href="{{ request.full_path | replace(request.args['page_token'],next_page_token,1)}}">Next >></a>
+            </li>
+            {% else %}
+            <li><a href="{{request.full_path }}&page_token={{next_page_token}}">More</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
 </div>
 {% endif %}
 {% endblock %}

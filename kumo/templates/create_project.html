@@ -2,105 +2,143 @@
 
 {% block content %}
 
-<div id="form" class="create-allocation">
-  <h4>{{action}} Imputación</h4>
+<div id="form" class="create-project">
+    <h4>{{action}} Proyecto</h4>
 
 
-  <form method="POST" enctype="multipart/form-data">
-    <div class="row">
-      <div class="col s3">
-        <div class="form-group">
-          <label for="title">Nombre</label>
-          <input type="text" name="name" id="name" disabled value="{{session.profile.displayName}}" class="form-control"/>
+    <form method="POST" enctype="multipart/form-data">
+        <h5>Datos básicos</h5>
+        <div class="row">
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="name">Nombre del Proyecto</label>
+                    <input type="text" name="name" id="name" value=""
+                           class="form-control"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="client">Nombre del Cliente</label>
+                    <input type="text" name="client" id="client"  value=""
+                           class="form-control"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="contact">Email del cliente</label>
+                    <input type="text" name="contact" id="contact" value=""
+                           class="form-control"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="salesrep">Comercial</label>
+                    <input type="text" name="salesrep" id="salesrep" value=""
+                           class="form-control"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="product">Producto</label>
+                    <input type="text" name="product" id="product" value=""
+                           class="form-control"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="description">Descripción</label>
+                    <input type="text" name="description" id="description" value=""
+                           class="form-control"/>
+                </div>
+            </div>
+            <div class="col s12 m8">
+                <div class="form-group">
+                    <label for="doc_link">Enlace a documentación</label>
+                    <input type="text" id="doc_link" name="doc_link" value="" class="form-control"/>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col s3">
-        <div class="form-group">
-          <label for="title">Email</label>
-          <input type="text" name="email" id="email" disabled value="{{session.profile.emails.0.value}}" class="form-control"/>
+        <div class="divider"></div>
+        <h5>Tiempo de ejecución</h5>
+        <div class="row">
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s3">
-        <select name="project" id="project" class="form-control" required>
-          <option value="{{allocation.project}}" disabled selected>{% if allocation.project %}{{allocation.project_name}}{%else%}Elija una opción{%endif%}</option>
-          {% for pjs in projects %}
-            <option value="{{pjs.id}}" data-id="{{pjs.approver}}" data-type="{{pjs.hours_type}}" >{{pjs.name}}</option>
-          {% endfor %}
-        </select>
-        <label>Proyecto</label>
-      </div>
-      
-      <div class="input-field col s3">
-        <select name="approver" id="approver" class="form-control" required>
-          <option value="{{allocation.approver}}" disabled selected>{% if allocation.project %}{{allocation.approver}}{%else%}Elija una opción{%endif%}</option>
-        </select>
-        <label>Aprobador</label>
-      </div>
-      <div class="input-field col s3">
-        <select name="hours_type" id="hours_type" class="form-control">
-          <option value="{{allocation.hours_type}}" disabled selected>{% if allocation.project %}{{allocation.hours_type}}{%else%}Elija una opción{%endif%}</option>
-        </select>
-        <label>Tipo</label>
-      </div>
-    </div>
-    
-    <div class="row">  
-      <div class="col s1">
-        <div class="form-group">
-          <label for="title">Desde</label>
-          <input type="text" id="start_date" name="start_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" />
-        </div>
-      </div>  
-      <div class="col s1">
-        <div class="form-group">
-          <label for="title">Hasta</label>
-          <input type="text" id="end_date" name="end_date" value="{{allocation.formated_start_date}}" class="form-control datepicker" />
-        </div>
-      </div>  
-      <div class="col s1">
-        <div class="form-group">
-          <label for="title">Horas</label>
-          <input type="text" id="hours" name="hours" value="{{allocation.hours}}" class="form-control" />
-        </div>
-      </div>
-     <div class="col s3">
-        <div class="form-group">
-          <label for="comment">Comentario</label>
-          <textarea id="comment" name="comment" class="materialize-textarea" rows="1">{{allocation.comment}}</textarea>
-        </div>
-    </div>
 
-    </div>
-    
-    <div class="row">
-      <div class="col s6">
-        <table id="days" class="responsive-table">
-          <tbody>
-          </tbody>
-        </table>
-      
-      </div>  
-    </div>  
+        <div class="row">
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="start_date">Comienzo aprox.</label>
+                    <input type="text" id="start_date" name="start_date" value=""
+                           class="form-control datepicker"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="end_date">Finalización aprox.</label>
+                    <input type="text" id="end_date" name="end_date" value=""
+                           class="form-control datepicker"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="work_days">Jornadas</label>
+                    <input type="text" id="work_days" name="work_days" value="" class="form-control"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="hours">Horas</label>
+                    <input type="text" id="hours" name="hours" value="" class="form-control"/>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="hours_type">Tipo de Horas</label>
+                    <textarea id="hours_type" name="hours_type" class="materialize-textarea"
+                              rows="1">
+                    </textarea>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="form-group">
+                    <label for="approver">Aprobadores</label>
+                    <textarea id="approver" name="approver" class="materialize-textarea"
+                              rows="1">
+                    </textarea>
+                </div>
+            </div>
 
-    <input type="text" value="{{session.profile.id}}" id="user_id" name="user_id" hidden/>
-    <input type="text" value="{{session.profile.emails[0].value}}" id="user_email" name="user_email" hidden/>
-    <input type="text" value="created" id="status" name="status" hidden/>
-    <div class="row">
-      <div id="split_data">
-      </div>
-    </div>
-    <div class="row">
-      <div class="col s3">
-        {% if action == 'Editar'%}
-          <input id="submit" value="submit" type="submit"  class="btn btn-success" disabled></input>
-        {% else %}
-          <input id="submit" type="submit"  class="btn btn-success" disabled></input>
-        {% endif %}
+
         </div>
-    </div>
-  </form>
 
- 
-{% endblock %}
+        <div class="row">
+            <div class="col s6">
+                <table id="days" class="responsive-table">
+                    <tbody>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <input type="text" value="{{session.profile.id}}" id="created_by_id" name="created_by_id" hidden/>
+        <input type="text" value="{{session.profile.emails[0].value}}" id="created_by_email" name="created_by_email" hidden/>
+        <input type="text" value="created" id="status" name="status" hidden/>
+        <input type="text" value="es" id="country" name="country" hidden/>
+
+        <div class="row">
+            <div id="split_data">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s3">
+                {% if action == 'Editar'%}
+                <input id="submitProject" value="submit" type="submit" class="btn btn-success" ></input>
+                {% else %}
+                <input id="submitProject" type="submit" class="btn btn-success" ></input>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+
+
+    {% endblock %}

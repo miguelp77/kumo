@@ -90,8 +90,8 @@ def list_all(limit=1000,  email=None,  day=None, month=None, year=None, project=
         query.add_filter('hours_type', '=', str(hours))
     if  status:
         query.add_filter('status', '=', str(status))
-    limit=None
-    query_iterator = query.fetch( start_cursor=cursor, limit=limit)
+
+    query_iterator = query.fetch( start_cursor=cursor)
     page = next(query_iterator.pages)
 
     entities = builtin_list(map(from_datastore, page))
@@ -165,7 +165,6 @@ def list_by_month(user_id,  kind='Allocation',limit=50, cursor=None,year='2017',
         if query_iterator.next_page_token else None)
 
     #get the months
-    
     dates = defaultdict(list)
     for e in entities:
         d = e['datetime_start']
@@ -178,21 +177,37 @@ def list_by_month(user_id,  kind='Allocation',limit=50, cursor=None,year='2017',
     return entities, next_cursor, dates
 
 
-def assigned_to_me(user_email, kind='Allocation', limit=50, cursor=None):
+def assigned_to_me(user_email, kind='Allocation', limit=1000,  email=None,  day=None, month=None, year=None, project=None, hours=None,
+     status=None, cursor=None):
     ds = get_client()
-    print(user_email)
+
     query = ds.query(kind='Allocation')
+
+    if email:
+        query.add_filter('user_email', '=', str(email))
+    if day:
+        query.add_filter('formated_start_date', '=', str(day))
+    if month:
+        query.add_filter('month', '=', int(month))
+    if  year:
+        query.add_filter('year', '=', int(year))
+    if  project:
+        query.add_filter('project_name', '=', str(project))
+    if  hours:
+        query.add_filter('hours_type', '=', str(hours))
+    if  status:
+        query.add_filter('status', '=', str(status))
+
     query.add_filter('approver','=',str(user_email))
     query.add_filter('status','=','submit')
 
-    query_iterator = query.fetch(limit=limit, start_cursor=cursor)
+    query_iterator = query.fetch()
     page = next(query_iterator.pages)
 
     entities = builtin_list(map(from_datastore, page))
     next_cursor = (
         query_iterator.next_page_token.decode('utf-8')
         if query_iterator.next_page_token else None)
-    print(entities)
     return entities, next_cursor
 
 
@@ -342,11 +357,11 @@ def read_user(id):
     # print(from_datastore(results))
     return from_datastore(results)
 
-def list_user(limit=15,  kind='User',cursor=None):
+def list_user(limit=50,  kind='User',cursor=None):
     ds = get_client()
 
     query = ds.query(kind='User', order=['email'])
-    query_iterator = query.fetch(limit=limit, start_cursor=cursor)
+    query_iterator = query.fetch(start_cursor=cursor)
     page = next(query_iterator.pages)
 
     entities = builtin_list(map(from_datastore, page))
@@ -357,10 +372,27 @@ def list_user(limit=15,  kind='User',cursor=None):
     return entities, next_cursor
 
 
+
 #Projects
-def list_projects(limit=50, kind='Project', cursor=None):
+def set_auths(id):
     ds = get_client()
-    query = ds.query(kind=kind, order=['country'])
+    key = ds.key('Project', int(id))
+
+    entity = datastore.Entity(key=key)
+
+    data = ds.get(key)
+    if data['users']:
+        data["auths"]=data["users"]
+
+    entity.update(data)
+    ds.put(entity)
+    return from_datastore(entity)
+
+def list_projects(limit=50, kind='Project', user_email=None, cursor=None):
+    ds = get_client()
+    query = ds.query(kind=kind)
+    if user_email:
+        query.add_filter('auths','=',user_email)
     query_iterator = query.fetch( start_cursor=cursor, limit=limit)
     page = next(query_iterator.pages)
 
@@ -369,6 +401,20 @@ def list_projects(limit=50, kind='Project', cursor=None):
         query_iterator.next_page_token.decode('utf-8')
         if query_iterator.next_page_token else None)
     return entities, next_cursor
+
+
+def generic_projects(kind='Project', user_email=None, cursor=None):
+    ds = get_client()
+    query = ds.query(kind=kind)
+    query.add_filter('for_all','=',True)
+    query_iterator = query.fetch( start_cursor=cursor, limit=10)
+    page = next(query_iterator.pages)
+
+    entities = builtin_list(map(from_datastore, page))
+    next_cursor = (
+        query_iterator.next_page_token.decode('utf-8')
+        if query_iterator.next_page_token else None)
+    return entities
 
 def check_projects(user_email, limit=50, kind='Project', cursor=None):
     ds = get_client()
@@ -392,8 +438,39 @@ def check_projects(user_email, limit=50, kind='Project', cursor=None):
 def read_project(id):
     ds = get_client()
     key = ds.key('Project', int(id))
+    # set_auths(int(id))
     results = ds.get(key)
     return from_datastore(results)
+
+
+
+def create_project(data, id=None):
+    ds = get_client()
+    if id:
+        key = ds.key('Project', int(id))
+    else:
+        key = ds.key('Project')
+    entity = datastore.Entity(key=key)
+    # if not data:
+    #     data = ds.get(key)
+
+    if data['approver']:
+        approvers =[]
+        approvers = [x.strip() for x in str(data['approver']).split(',')]
+        data['approver'] = ''
+        data['approver'] = approvers
+
+    if data['hours_type']:
+        hours_type =[]
+        hours_type = [x.strip() for x in str(data['hours_type']).split(',')]
+        data['hours_type'] = hours_type
+    if data['name']:
+        data['dvt_code'] = data['name']
+
+    entity.update(data)
+    ds.put(entity)
+    return from_datastore(entity)
+
 
 def update_project(data, id, users, submit_hours, accept_hours):
     ds = get_client()
@@ -415,6 +492,55 @@ def update_project(data, id, users, submit_hours, accept_hours):
     entity.update(data)
     ds.put(entity)
     return from_datastore(entity)
+
+
+def add_auths(id,emails):
+    ds = get_client()
+    if id:
+        key = ds.key('Project', int(id))
+    else:
+        key = ds.key('Project')
+    entity = datastore.Entity(key=key)
+    data = ds.get(key)
+
+    if emails:
+        auths = [x.strip() for x in str(emails).split(',')]
+        if 'auths' in data:
+            data['auths'].extend(auths)
+            # data['auths'] = set(data['auths'])
+        else:
+            data['auths'] = auths
+            # data['auths'] = set(data['auths'])
+
+    entity.update(data)
+    ds.put(entity)
+    return from_datastore(entity)
+
+
+def remove_auth(id,email):
+    ds = get_client()
+    if id:
+        key = ds.key('Project', int(id))
+    else:
+        key = ds.key('Project')
+    entity = datastore.Entity(key=key)
+    data = ds.get(key)
+
+    if email:
+        if 'auths' in data:
+            if email in data['auths']: data['auths'].remove(email)
+
+        # auths = [x.strip() for x in str(emails).split(',')]
+        #
+        #     # data['auths'] = set(data['auths'])
+        # else:
+        #     data['auths'] = auths
+        #     # data['auths'] = set(data['auths'])
+
+    entity.update(data)
+    ds.put(entity)
+    return from_datastore(entity)
+
 
 def collect_project_hours(id):
     """

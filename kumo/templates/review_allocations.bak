@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="audioList">
+  <div class="row">
+    <div class="col s2">
+      <h4>Imputaciones</h4>
+    </div>
+    <div class="col s4 right">
+      {% if session.profile %}
+      <span> 
+        <a href="#" class="btn btn-success btn-sm hidden" id="buttonDelete" disabled="disabled" >
+         Borrar
+        </a>
+      </span>
+      <span> 
+        <a href="#" class="btn btn-success btn-sm hidden" id="buttonSubmit" disabled="disabled" >
+         Enviar
+        </a>
+      </span>      
+      <span> 
+        <a href="#" class="btn btn-success btn-sm" id="buttonReject" disabled="disabled">
+         Rechazar
+        </a>
+      </span>
+      <span> 
+        <a href="#" class="btn btn-success btn-sm" id="buttonApprove" disabled="disabled">
+         Aprobar
+        </a>
+      </span>      
+      {% endif %}
+    </div>
+  </div>
+    {% if dates %}
+      {% for year,months in dates.items() %}
+        {% if months|length > 1%}
+          <i class="material-icons left">date_range</i>
+          {% for month in months %}
+            <a href="{{year}}/{{month}}/mine"><span class="badge {{loop.cycle('red accent-2', 'teal lighten-2', 'blue lighten-1')}} black-text left">{{year}}/{{month}}</span></a> &nbsp;
+          {% endfor%}
+          <br>
+        {% else %}
+            <a href="../../mine">all</a>
+        {% endif %}
+      {% endfor %}
+      <br>
+    {% endif %}
+  {%if total_hours%}
+    {%for key, value in total_hours.items() %}
+      <span><b>{{value}}</b> hours in {{key}} status. </span>
+    {% endfor %}
+  {% endif %}
+    {% if allocations %}
+<table class="striped tablesorter" id="table-allocations">
+    <thead>
+    <tr>
+        <th> 
+         <input type="checkbox" id="check_all" />
+         <label for="all">Todos</label>
+        </th>
+        <th>Nombre</th>
+        <th>Proyecto</th>
+        <th>Aprobador</th>
+        <th>Fecha</th>
+        <th>Horas</th>
+        <th>Tipo</th>
+        <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for alloc in allocations|sort(attribute='datetime_start') %}
+    <tr>
+       <td>
+         <input type="checkbox" id="{{alloc.id}}" class="checkBoxClass"/>
+         <label for="{{alloc.id}}"></label>
+      </td>
+       <td>{{alloc.createdBy}}</td>
+       {% if alloc.project_name is string %}
+          <td>{{alloc.project_name}}</td>
+       {% else %}
+          <td>{{alloc.project}}</td>
+       {% endif %}
+       <td>{{alloc.approver}}</td>
+       <td>{{alloc.formated_start_date}}</td>
+       <td>{{alloc.hours}}</td>
+
+       <td>{{alloc.hours_type}}</td>
+
+       {% if alloc.status == 'created' %}
+        <td>
+          <span class="badge blue cwhite left">{{alloc.status}}</span>
+        </td>
+       {% endif %}
+
+       {% if alloc.status == 'submit'%}
+        <td>
+          <span class="badge orange cwhite left">{{alloc.status}}</span>
+        </td>
+        {% endif %}
+       
+        {% if alloc.status == 'accepted' %}
+        <td>
+          <span class="badge green cwhite left">{{alloc.status}}</span>
+        </td>
+       {% endif %}
+        {% if alloc.status == 'rejected' %}
+        <td>
+          <span class="badge red cwhite left">{{alloc.status}}</span>
+        </td>
+       {% endif %}
+
+        <td>
+        {% if alloc.status == 'created' %}
+          <a href="/a/submit/{{alloc.id}}/">submit</a>
+        {% endif %}
+        </td>
+        <td>
+          {% if alloc.status == 'created' or alloc.status == 'rejected' %}
+            <a href="/a/delete/{{alloc.id}}/">delete</a>
+          {% endif %}
+        </td>
+       <td>
+        {% if alloc.status == 'created' or alloc.status == 'rejected' %}
+         <a href="#">edit</a>
+        {% endif %}
+       </td>
+      
+       {% if alloc.approver ==  logged_user %}
+       <td>
+        {% if alloc.status == 'submit' %}
+         <a href="/a/reject/{{alloc.id}}/"><i class="material-icons" style="color:#b71c1c">cancel</i></a>
+        {% endif %}
+       </td>
+       <td>
+        {% if alloc.status == 'submit' %}
+         <a href="/a/accept/{{alloc.id}}/"><i class="material-icons" style="color:#1b5e20">check_circle</i></a>
+        {% endif %}
+       </td>
+      {% endif %}
+
+             
+             
+
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+<small class='right'><a href="check_allocations">Revisar Imputaciones</a></small>
+<br>
+    {% else %}
+      <p>No allocations</p>
+    {% endif %}
+
+{% if next_page_token %}
+<nav>
+  <ul class="pager">
+    <li><a href="?page_token={{next_page_token}}">More</a></li>
+  </ul>
+</nav>
+</div>
+{% endif %}
+{% endblock %}
+

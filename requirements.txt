@@ -9,3 +9,5 @@ PyMongo==3.3.0
 six==1.10.0
 google-api-python-client
 google-cloud-datastore==1.0.0
+Flask-WTF==0.14.2
+
