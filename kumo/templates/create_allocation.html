@@ -47,20 +47,21 @@
             </div>
 
             <div class="input-field col s3">
-                <select name="approver" id="approver" class="form-control" required>
-                    <option value="{{allocation.approver}}" disabled selected>{% if allocation.project
-                        %}{{allocation.approver}}{%else%}Elija una opción{%endif%}
-                    </option>
-                </select>
-                <label>Aprobador</label>
-            </div>
-            <div class="input-field col s3">
                 <select name="hours_type" id="hours_type" class="form-control">
                     <option value="{{allocation.hours_type}}" disabled selected>{% if allocation.project
                         %}{{allocation.hours_type}}{%else%}Elija una opción{%endif%}
                     </option>
                 </select>
                 <label>Tipo</label>
+            </div>
+
+            <div class="input-field col s4">
+                <select name="approver" id="approver" class="form-control" required>
+                    <option value="{{allocation.approver}}" disabled selected>{% if allocation.project
+                        %}{{allocation.approver}}{%else%}Elija una opción{%endif%}
+                    </option>
+                </select>
+                <label>Aprobador</label>
             </div>
         </div>
 

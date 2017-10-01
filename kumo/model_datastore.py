@@ -16,10 +16,11 @@ from flask import current_app
 from google.cloud import datastore
 
 from collections import defaultdict
+import json
 import datetime as dt
 
-
 builtin_list = list
+
 
 def is_number(s):
     try:
@@ -27,6 +28,8 @@ def is_number(s):
         return True
     except ValueError:
         return False
+
+
 
 
 def get_profile(user=None):
@@ -318,6 +321,15 @@ def update_allocation(data, kind='Allocation', id=None):
  
     return from_datastore(entity)
 
+def update_multi(data, new_status):
+    client = get_client()
+    entidades = []
+    for d in data:
+        entidad = read_allocation(int(d))
+        entidad['status'] = new_status
+        entidades.append(entidad)
+    client.put_multi(entidades)
+
 
 def delete(id, kind='Allocation'):
     ds = get_client()
@@ -416,9 +428,9 @@ def generic_projects(kind='Project', user_email=None, cursor=None):
         if query_iterator.next_page_token else None)
     return entities
 
+
 def check_projects(user_email, limit=50, kind='Project', cursor=None):
     ds = get_client()
-    print(user_email)
     query = ds.query(kind=kind,
             filters=[
             # ('approver', '>=', user_email)
@@ -426,7 +438,7 @@ def check_projects(user_email, limit=50, kind='Project', cursor=None):
     )
     if user_email:
         query.add_filter('approver','=',user_email)
-    query_iterator = query.fetch( start_cursor=cursor, limit=limit)
+    query_iterator = query.fetch( start_cursor=cursor)
     page = next(query_iterator.pages)
 
     entities = builtin_list(map(from_datastore, page))
@@ -435,10 +447,28 @@ def check_projects(user_email, limit=50, kind='Project', cursor=None):
         if query_iterator.next_page_token else None)
     return entities, next_cursor
 
+def regularizar(ee):
+    print("regularizar")
+    ds = get_client()
+    query = ds.query(kind='Allocation')
+    query.add_filter('project_name','=','Preventa -  []')
+    # query.add_filter('project_name','=','Google Group Iberia')
+
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+    entities = builtin_list(map(from_datastore, page))
+    for e in entities:
+        print(e['id'])
+        e['project_name'] = 'Preventa'
+        # e.update(data)
+        ds.put(e)
+    return entities
+
+
 def read_project(id):
     ds = get_client()
     key = ds.key('Project', int(id))
-    # set_auths(int(id))
+    # regularizar(11)
     results = ds.get(key)
     return from_datastore(results)
 
@@ -453,7 +483,6 @@ def create_project(data, id=None):
     entity = datastore.Entity(key=key)
     # if not data:
     #     data = ds.get(key)
-
     if data['approver']:
         approvers =[]
         approvers = [x.strip() for x in str(data['approver']).split(',')]
@@ -464,15 +493,19 @@ def create_project(data, id=None):
         hours_type =[]
         hours_type = [x.strip() for x in str(data['hours_type']).split(',')]
         data['hours_type'] = hours_type
-    if data['name']:
-        data['dvt_code'] = data['name']
+    # if data['name']:
+    data['dvt_code'] = data['project_id']
+
+    data['name'] = str(data['client']) + ' - ' + str(data['product']) + ' [' + str(data['project_id']) + ']'
 
     entity.update(data)
     ds.put(entity)
     return from_datastore(entity)
 
 
-def update_project(data, id, users, submit_hours, accept_hours):
+
+
+def update_project(data, id, users, submit_hours, accept_hours, hours_per_user=None):
     ds = get_client()
     if id:
         key = ds.key('Project', int(id))
@@ -489,9 +522,11 @@ def update_project(data, id, users, submit_hours, accept_hours):
     if accept_hours:
         data['accept_hours'] = int(accept_hours)
     data['consumed_hours'] = int(submit_hours) + int(accept_hours)
+    data['hours_per_user'] = json.dumps(hours_per_user)
     entity.update(data)
     ds.put(entity)
     return from_datastore(entity)
+
 
 
 def add_auths(id,emails):
@@ -560,18 +595,28 @@ def collect_project_hours(id):
 
     submit_hours = 0
     accept_hours = 0
+    temp = 0
     emails = []
+    hours_per_user = {}
     for e in entity:
+
         if not e['user_email'] in emails:
             emails.append(e['user_email'])
 
         if e['status'] == 'submit':
             submit_hours = submit_hours + int(e['hours'])
+            temp = int(e['hours'])
         if e['status'] == 'accepted':
             accept_hours = accept_hours + int(e['hours'])
+            temp = int(e['hours'])
+
+
+        if e['user_email'] in hours_per_user:
+            hours_per_user[e['user_email']] = int(hours_per_user[e['user_email']]) + temp
+        else:
+            hours_per_user[e['user_email']] = temp
 
     data = update_project(data=None, id=id, users = emails,
-        submit_hours=submit_hours, accept_hours= accept_hours)
-    print('O0'*80)
-    print(emails)
+        submit_hours=submit_hours, accept_hours= accept_hours, hours_per_user= hours_per_user)
+
     return data, submit_hours, accept_hours

@@ -116,7 +116,7 @@
       if(wh>8) {
         console.log("APPEND");
         $('#workdays').remove();
-        $('#hours').closest( "div" ).append("<span class='badget light-blue accent-3' id='workdays'>" + wh/8 + " jornadas aprox</span>");
+        $('#hours').closest( "div" ).append("<span class='badget light-blue accent-3' id='workdays'>" + " horas aprox</span>");
       }
       
       // for(var i=0;i < wd.length;i++){
@@ -253,6 +253,8 @@
         // Bulk deletion 
         $('#buttonDelete').on('click', function() {
           $('.checkBoxClass').each(function(){
+            // TODO: Check if array is empty
+            ids = []
             rowCount++;
             if($(this).prop( "checked" )){
               var selected_id = $(this).attr('id');
@@ -278,6 +280,7 @@
 
           $('.checkBoxClass').each(function(){
             rowCount++;
+            ids = [];
             if($(this).prop( "checked" )){
               var selected_id = $(this).attr('id');
               ids.push(selected_id);
@@ -303,6 +306,7 @@
 
           $('.checkBoxClass').each(function(){
             rowCount++;
+            ids = [];
             if($(this).prop( "checked" )){
               var selected_id = $(this).attr('id');
               ids.push(selected_id);
@@ -328,6 +332,7 @@
 
           $('.checkBoxClass').each(function(){
             rowCount++;
+            ids = [];
             if($(this).prop( "checked" )){
               var selected_id = $(this).attr('id');
               ids.push(selected_id);

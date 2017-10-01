@@ -6,11 +6,11 @@
 <div class="audioList">
   <div class="row">
     <div class="col s2">
-      <h4>Projects</h4>
+      <h4>Proyectos</h4>
     </div>
     <div class="col s2 right">
       {% if session.profile %}
-      <a href="#" class="btn btn-success btn-sm">
+      <a href="/a/create_project" class="btn btn-success btn-sm">
       Nuevo
       </a>
       {% endif %}
@@ -21,11 +21,11 @@
     <thead>
     <tr>
 
-        <th>Name</th>
-        <th>Head</th>
-        <th>Country</th>
-        <th>Approver</th>
-        <th>Hours</th>
+        <th>Nombre</th>
+        <!--<th>Aprobadores</th>-->
+        <th>Horas Consumida</th>
+        <th>Jornadas Vendidas</th>
+        <th>%</th>
         <th>Status</th>
     </tr>
   </thead>
@@ -33,14 +33,29 @@
     {% for pj in projects %}
     <tr>
        <td><a href="/a/view_project/{{pj.id}}/">{{pj.name}}</a></td>
-       <td>{{pj.head}}</td>
-       <td>{{pj.country}}</td>
+       <!--<td>-->
+         <!--{% for app in pj.approver %}-->
+          <!--{{ app }} <br>-->
+        <!--{% endfor %}-->
+       <!--</td>-->
+      <td>
+          {% if pj.consumed_hours %}
+          <a href="./update_project/{{pj.id}}/" title="click for update">{{pj.consumed_hours}} h</a>
+          <small>{{pj.consumed_hours|int / 8}} J</small>
+          {% else %}
+            <a href="./update_project/{{pj.id}}/?ret=back" title="click for update">check</a>
+          {% endif %}
+      </td>
        <td>
-         {% for app in pj.approver %}
-          {{ app }} <br>
-        {% endfor %}
+           {% if pj.work_days %}
+               {{ pj.work_days| int}} J<small>{{ (pj.work_days| int) * 8 }} h </small>
+           {% else %} - {% endif %}
        </td>
-      <td><a href="./update_project/{{pj.id}}/" title="click for update">{{pj.consumed_hours}}</a></td>
+       <td>
+           {% if pj.work_days and pj.consumed_hours %}
+           {{ (pj.consumed_hours/((pj.work_days| int) * 8))|round(2,'floor') * 100 }} %
+           {% else %} - {% endif %}
+       </td>
       <td><a href="#" title="click for update">on</a></td>
     </tr>
     {% endfor %}
@@ -53,13 +68,19 @@
       <p>No projects</p>
     {% endif %}
 
-{% if next_page_token %}
-<nav>
-  <ul class="pager">
-    <li><a href="?page_token={{next_page_token}}">More</a></li>
-  </ul>
-</nav>
-</div>
+{% if type_project == None %}
+    <nav>
+      <ul class="pager">
+        <li><a href="/a/all_projects?tp=servicios">Servicios</a></li>
+      </ul>
+    </nav>
+    {% else %}
+    <nav>
+      <ul class="pager">
+        <li><a href="/a/all_projects">Proyectos</a></li>
+      </ul>
+    </nav>
 {% endif %}
+</div>
 {% endblock %}
 

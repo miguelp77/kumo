@@ -20,11 +20,11 @@
     </div>
 
     <div class="row">
-        <h5>{{project.name}} - {{project.country}}</h5>
+        <h5>{{project.name}}</h5>
 
         <div class="col s3">
             <ul>
-                <li><b>Approvers:</b>
+                <li><b>Aprobadores:</b>
                     <ul>
                         {% for app in project.approver %}
                         <li>{{app}}</li>
@@ -33,20 +33,22 @@
                 </li>
             </ul>
         </div>
-        {% if project.estimated_hours %}
+        {% if project.work_days %}
         <div class="col s3">
             <ul>
-                <li><b>Progreso: </b>{{ (project.consumed_hours/project.estimated_hours) * 100 }} %</li>
-                <li><b>Consumido: </b>{{project.consumed_hours}}</li>
-                <li><b>Total: </b>{{project.estimated_hours}}</li>
+                <li><b>Progreso: </b>{{ ((project.consumed_hours/project.estimated_hours) * 100)| round(2, 'ceil') }} %</li>
+                <li><b>Consumido: </b>{{project.consumed_hours}} horas</li>
+                <li><b>Total: </b>{{project.estimated_hours}} horas</li>
             </ul>
         </div>
-        <div class="col s3">
+        <div class="col s4">
+            {% if project.hours_per_user%}
             <ul>
-                <li><b>Progreso: </b>{{ (project.consumed_hours/project.estimated_hours) * 100 }} %</li>
-                <li><b>Consumido: </b>{{project.consumed_hours}}</li>
-                <li><b>Total: </b>{{project.estimated_hours}}</li>
+                {% for k,v in hours_per_user.items() %}
+                    <li>{{k}} -- {{v}} horas</li>
+                {% endfor %}
             </ul>
+            {% endif %}
         </div>
         {% endif %}
     </div>
@@ -56,7 +58,7 @@
                 <li><h4>Han imputado</h4></li>
                 {% for user in project.users%}
                 <li class="collection-item green lighten-4">
-                    <a href="/a/allocations/{{user}}"><span class="black-text">{{user}}</span></a>
+                    <a href="/a/allocations/{{user}}?project={{project.name}}"><span class="black-text">{{user}}</span></a>
                 </li>
                 {% endfor %}
             </ul>
@@ -69,7 +71,6 @@
                     <a href="/a/allocations/{{user}}">
                         <span class="black-text">{{user}}</span>
                     </a>
-
                     <a href="/a/_remove_auth/{{project.id}}/{{user}}" class="right">-</a>
                 </li>
                 {% endfor %}
@@ -81,7 +82,7 @@
                             <input type="submit">
                         </form>
                     </span>
-                    </li>
+                </li>
             </ul>
         </div>
     </div>

@@ -1,89 +1,95 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Kumo by DCS</title>
     <meta charset="utf-8">
     <link rel="shortcut icon" type="image/ico" href="/static/images/favicon.ico"/>
 
     <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
-     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" media="screen" title="no title"> 
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"
+          media="screen" title="no title">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- <link href="http://fonts.googleapis.com/icon?family=Material+Icons|Orbitron|Russo+One" rel="stylesheet"> -->
- <!-- Compiled and minified CSS -->
+    <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
 
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type=text/javascript>
       $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-    </script>
-  </head>
 
-  <body>
-      <nav>
-        <div class="container">
-          <div class="burger">
+    </script>
+</head>
+
+<body>
+<nav>
+    <div class="container">
+        <div class="burger">
             <div class="burger01"></div>
             <div class="burger01"></div>
             <div class="burger01"></div>
-          </div>
+        </div>
 
         <div class="nav-wrapper">
-          <a href="/" class="brand-logo russo">Kumo</a>
-          <ul id="nav-mobile" class="right hide-on-med-and-down">
-            {# <li><a class="tab" href="/a">Main</a></li> #}
-            {% if session.profile %}
-              <!-- {# <li><a class="tab" href="/a/mine">Mis imputaciones</a></li> #} -->
-              <li><a class="tab" href="/a/mine">Mis imputaciones</a></li>
-              <!-- <li><b><a class="tab" href="/books/add_audio">Add Audio</a></b></li>
-              <li><a class="tab" href="/books/audios">Audios</a></li>
-              <li><a class="tab" href="/books/dashboard">Dashboard</a></li> -->
-            {% endif %}
-            {% if session.role =="admin" or session.role =="manager" or session.role =="su" %}
-              <li><a class="tab" href="/a/check_allocations">Revisar</a></li>
-              <!--<li><a class="tab" href="/a/user/list">Users</a></li>-->
-              <li><a class="tab" href="/a/my_projects">Proyectos</a></li>
-            {% endif %}
-            <li>
-              {% if session.profile %}
-                {% if session.profile.image %}
-                  <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
+            <a href="/" class="brand-logo russo">Kumo</a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+
+                {% if session.profile %}
+                    <li><a class="tab" href="/a/mine">Mis imputaciones</a></li>
                 {% endif %}
-              {% endif %}
-            </li>
-            <li>
-              {% if session.profile %}
-                <a class="tab" href="/logout">
-                  {{session.profile.displayName}}
-                </a>
-              {% else %}
-                <a class="tab" href="/oauth2authorize">Login</a>
-              {% endif %}
-            </li>
-          </ul>
+
+                {% if session.role =="admin" or session.role =="su" %}
+                    <li><a class="tab" href="/a/check_allocations">Revision</a></li>
+                    <li><a class="tab" href="/a/my_projects">Mis Proyectos</a></li>
+                    <li><a class="tab" href="/a/all_projects">Todos Proyectos</a></li>
+                {% endif %}
+                {% if session.role =="manager" or session.role =="su" %}
+                    <li><a class="tab" href="/a/check_allocations">Revision</a></li>
+                    <li><a class="tab" href="/a/my_projects">Mis Proyectos</a></li>
+                {% endif %}
+
+
+                    <li>
+                        {% if session.profile %}
+                            {% if session.profile.image %}
+                                <img class="circle responsive-img img_profile" src="{{session.profile.image.url}}" width="24">
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                    <li>
+                        {% if session.profile %}
+                            <a class="tab" href="/logout">
+                                {{session.profile.displayName}}
+                            </a>
+                        {% else %}
+                            <a class="tab" href="/oauth2authorize">Login</a>
+                        {% endif %}
+                    </li>
+            </ul>
         </div>
-      </div>
-      </nav>
-
-    <div class="container">
-      <div class="row">
-        {% block content %}{% endblock %}
-      </div>
     </div>
- 
+</nav>
 
-    <!-- Compiled and minified JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
-    <script type="text/javascript" src="/static/js/jquery.tablesorter.min.js"></script> 
+<div class="container">
+    <div class="row">
+        {% block content %}{% endblock %}
+    </div>
+</div>
 
-    <script src="/static/js/init.js"></script>
 
-    <script>
+<!-- Compiled and minified JavaScript -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.tablesorter.min.js"></script>
+
+<script src="/static/js/init.js"></script>
+
+<script>
       $(document).ready(function(){
         $('ul.tabs').tabs('select_tab', 'tab_id');
       });
-    </script>
-  </body>
+
+</script>
+</body>
 </html>

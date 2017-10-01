@@ -8,6 +8,8 @@ from flask import Blueprint, current_app, redirect, render_template, request, \
 from datetime import datetime, date, timedelta
 from werkzeug.utils import secure_filename
 import urllib.request
+import json
+
 from collections import defaultdict
 from functools import wraps
 
@@ -67,7 +69,7 @@ def user_test_admin(req_roles = 'None'):
         def decorated_view(*args, **kwargs):
             email=session['profile']['emails'][0]['value']
             auth_role = get_model().get_profile(email)
-            if str(req_roles) == str(auth_role) or 'su' == str(auth_role):
+            if str(req_roles) == str(auth_role) or 'su' == str(auth_role) or 'admin' == str(auth_role):
                 return func(*args, **kwargs)
             else:
                 return render_template('not_access.html')
@@ -247,15 +249,17 @@ def list_allocations():
     if csv:
         datos = []   
         for a in allocations:
+            datos.append(linea)
             linea = str(a['year']) + ',' + \
                 str(a['month']) + ',' + \
-                str(a['formated_start_date']) + ',' + \
                 str(a['createdBy']) + ',' + \
+                str(a['formated_start_date']) + ',' + \
                 str(a['hours']) + ',' + \
-                str(a['project_name']) + ',' + \
+                str(a['hours_type']) + ',' + \
                 str(a['status']) + ',' + \
-                str(a['approver']) + '\n'
-            datos.append(linea)
+                str(a['project_name']) + ',' + \
+                str(a['approver']) + \
+                str(a['comment']) + '\n'
 
         return Response(list(datos),
             mimetype="text/csv",
@@ -392,23 +396,37 @@ def my_projects():
         next_page_token=next_page_token)
 
 
+
 @crud.route("/all_projects")
 @oauth2.required
 @user_test_admin(req_roles='su')
 def all_projects():
     token = request.args.get('page_token', None)
+    type_project = request.args.get('tp', None)
+
     if token:
         token = token.encode('utf-8')
 
     projects, next_page_token = get_model().check_projects(
         user_email=None,
         kind='Project',cursor=token)
-    print(projects)
+
+    noService = []
+    if type_project is None:
+        for p in projects:
+            if 'work_days' in p and type_project is None:
+                noService.append(p)
+    else:
+        for p in projects:
+            if 'work_days' not in p and type_project is not None:
+                noService.append(p)
+
     # books, next_page_token = get_model().list(kind='Book',cursor=token)
     return render_template(
         "list_projects.html",
         # books=books,
-        projects=projects,
+        projects=noService,
+        type_project=type_project,
         next_page_token=next_page_token)
 
 
@@ -416,21 +434,41 @@ def all_projects():
 @oauth2.required
 @user_test_admin(req_roles='manager')
 def view_project(id):
-    # print(get_model().give_me_name(5664248772427776	,'Project'))
     project = get_model().read_project(id)
+    if 'work_days' in project:
+        project['estimated_hours'] = int(project['work_days'])*8
+    if 'hours_per_user' in project:
+        hours_per_user = json.loads(project['hours_per_user'])
+    else:
+        hours_per_user = {}
+
     return render_template(
         "view_project.html",
-        project=project)
+        project=project,
+        hours_per_user=hours_per_user)
+
 
 
 @crud.route("/update_project/<id>/")
 @oauth2.required
 @user_test_admin(req_roles='manager')
 def update_project(id):
+    ret = request.args.get('ret', None)
+
     project, submit_hours, accept_hours = get_model().collect_project_hours(id)
-    return render_template(
-        "view_project.html",
-        project=project)
+    if 'work_days' in project:
+        project['estimated_hours'] = int(project['work_days'])*8
+    if 'hours_per_user' in project:
+        hours_per_user = json.loads(project['hours_per_user'])
+
+    if ret == "back":
+        return redirect(url_for('.all_projects'))
+
+    else:
+        return render_template(
+            "view_project.html",
+            project=project,
+            hours_per_user=hours_per_user)
 
 
 @crud.route("/create_project/", methods=['GET', 'POST'])
@@ -730,7 +768,7 @@ def add_allocation():
             data['createdBy'] = session['profile']['displayName']
             data['createdById'] = session['profile']['id']
 
-        if int(data['hours']) > 8:
+        if int(data['hours']) > 8 and data['formated_start_date'] != data['formated_end_date']:
             # listamos el numero de jornadas
             dates = work_days(data['datetime_start'],data['datetime_end']+ timedelta(days=1))
             for workday in dates:
@@ -738,6 +776,15 @@ def add_allocation():
                 data['formated_end_date'] = date_to_string(workday,reverse=True)
                 data['datetime_start'] = workday
                 data['hours'] = 8
+                allocation = get_model().create(data, kind='Allocation')
+        elif int(data['hours']) > 8 and data['formated_start_date'] == data['formated_end_date']:
+            # listamos el numero de jornadas
+            dates = work_days(data['datetime_start'],data['datetime_end']+ timedelta(days=1))
+            for workday in dates:
+                data['formated_start_date'] = date_to_string(workday,reverse=True)
+                data['formated_end_date'] = date_to_string(workday,reverse=True)
+                data['datetime_start'] = workday
+                # data['hours'] = 8
                 allocation = get_model().create(data, kind='Allocation')
         else:
             allocation = get_model().create(data, kind='Allocation')
@@ -821,8 +868,7 @@ def edit(id):
 def submited(id):
     allocation = get_model().read_allocation(id)
     allocation['status'] = 'submit'
-    allocation = get_model().update_allocation(data=allocation, kind='Allocation', id=id)
-    # return render_template("list.html", allocation=allocation)
+    get_model().update_allocation(data=allocation, kind='Allocation', id=id)
     return redirect(url_for('.list_mine'))
 
 
@@ -893,8 +939,11 @@ def delete_selection():
 def submit_selection():
     if request.method == 'GET':
         data = eval(request.args.get('ids'))
-        for id in data:
-            submited(id)
+        print(data)
+        get_model().update_multi(data=data, new_status='submited')
+        #
+        # for id in data:
+        #     submited(id)
     return jsonify('submit')
 
 
@@ -903,8 +952,10 @@ def submit_selection():
 def reject_selection():
     if request.method == 'GET':
         data = eval(request.args.get('ids'))
-        for id in data:
-            rejected(id)
+        get_model().update_multi(data=data, new_status='rejected')
+
+        # for id in data:
+        #     rejected(id)
     return jsonify('reject')
 
 
@@ -913,8 +964,10 @@ def reject_selection():
 def approve_selection():
     if request.method == 'GET':
         data = eval(request.args.get('ids'))
-        for id in data:
-            accepted(id)
+        get_model().update_multi(data=data, new_status='approved')
+
+        # for id in data:
+        #     accepted(id)
     return jsonify('approve')
 
 
@@ -947,17 +1000,6 @@ def _remove_auth(id, email):
     return render_template(
         "view_project.html",
         project=project)
-# @crud.route('/_cleandb')
-# @oauth2.required
-# def cleandb():
-#     if request.method == 'GET':
-#         # newdata = ['Normal']
-#         newdata = 'Normal'
-#         field = 'hours_type'
-#         res = get_model().set_value(kind='Allocation', field=field, newdata=newdata)
-
-#     return jsonify('clean')
-
 
 
 
