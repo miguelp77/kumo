@@ -214,14 +214,29 @@ def list_user():
 
 def _get_hours(allocations):
     total_hours = {}
+    total_months = []
+    total_projects = []
     for allocs in allocations:
+        project = allocs['project_name']
+        m = allocs['month']
+        y = allocs['year']
+        mes = str(m) + "/" + str(y)
         s = allocs['status']
         if s in total_hours:
             total_hours[s] = int(total_hours[s]) + int(allocs['hours'])
         else:
             total_hours[s] = int(allocs['hours'])
+        if mes not in total_months:
+            total_months.append(mes)
 
-    return total_hours
+        if project not in total_projects:
+            total_projects.append(project)
+
+    total_projects.sort()
+    total_months.sort(reverse=True)
+
+    return total_hours, total_months, total_projects
+
 
 # Imputaciones
 @crud.route("/allocations")
@@ -244,8 +259,7 @@ def list_allocations():
     allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token, email=email,
          day=day, month=month, year=year, project=project, hours=hours, status=status)
 
-    total_hours = _get_hours(allocations)
-
+    total_hours, total_months, total_projects = _get_hours(allocations)
     if csv:
         datos = []
         # cabecera = 'Año','Mes','Usuario','Fecha','Horas','Tipo de horas','Estado','Proyecto','Aprobador','Comentario'
@@ -269,10 +283,13 @@ def list_allocations():
             headers={"Content-disposition": "attachment; filename=" + csv +".csv"}
             )
 
+
     return render_template(
         "list_all.html",
+        total_months=total_months,
+        total_projects=total_projects,
         allocations=allocations,
-        day = day,
+        day=day,
         month = month,
         year=year,
         project=project,

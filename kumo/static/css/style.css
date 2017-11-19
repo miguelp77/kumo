@@ -783,3 +783,12 @@ th.headerSortUp::after {
 }
 
 th.shortWidth{max-width: 150px;}
+
+.opt_filter{
+    border: 1px solid #0b9a8d;
+    padding: 4px;
+    margin: 2px 2px;
+    display: inline-block;
+ }
+
+.opt_filter a{color:black;}

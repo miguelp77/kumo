@@ -58,8 +58,24 @@
       {% endif %}
     </div>
   </div>
+    <div class="row">
+        {% for project in total_projects %}
+            <span class="opt_filter">
+                <a href="allocations?project={{project}}">{{project}}</a>
+            </span>
+        {% endfor %}
+    </div>
+
+    <div class="row">
+        {% for month in total_months %}
+        {% set date = month.split('/') %}
+            <span class="opt_filter">
+                <a href="allocations?month={{date[0]}}&year={{date[1]}}">{{month}}</a>
+            </span>
+        {% endfor %}
+    </div>
+
   <div class="row">
-    
     {% if month %}
       {{ chip( 'month', month ) }}
     {% endif %}
