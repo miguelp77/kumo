@@ -23,8 +23,8 @@
 
         <th>Nombre</th>
         <!--<th>Aprobadores</th>-->
-        <th>Horas Consumida</th>
-        <th>Jornadas Vendidas</th>
+        <th>Consumido</th>
+        <th>Vendido</th>
         <th>%</th>
         <th>Status</th>
     </tr>
@@ -40,15 +40,15 @@
        <!--</td>-->
       <td>
           {% if pj.consumed_hours %}
-          <a href="./update_project/{{pj.id}}/" title="click for update">{{pj.consumed_hours}} h</a>
-          <small>{{pj.consumed_hours|int / 8}} J</small>
+          {{pj.consumed_hours|int / 8}} J
+          <small><a href="./update_project/{{pj.id}}/" title="click for update">{{pj.consumed_hours}} h</a></small>
           {% else %}
             <a href="./update_project/{{pj.id}}/?ret=back" title="click for update">check</a>
           {% endif %}
       </td>
        <td>
            {% if pj.work_days %}
-               {{ pj.work_days| int}} J<small>{{ (pj.work_days| int) * 8 }} h </small>
+               {{ pj.work_days| int}} J <small>{{ (pj.work_days| int) * 8 }} h </small>
            {% else %} - {% endif %}
        </td>
        <td>

@@ -254,7 +254,7 @@
         $('#buttonDelete').on('click', function() {
           $('.checkBoxClass').each(function(){
             // TODO: Check if array is empty
-            ids = []
+
             rowCount++;
             if($(this).prop( "checked" )){
               var selected_id = $(this).attr('id');
@@ -280,7 +280,7 @@
 
           $('.checkBoxClass').each(function(){
             rowCount++;
-            ids = [];
+
             if($(this).prop( "checked" )){
               var selected_id = $(this).attr('id');
               ids.push(selected_id);
@@ -306,7 +306,7 @@
 
           $('.checkBoxClass').each(function(){
             rowCount++;
-            ids = [];
+
             if($(this).prop( "checked" )){
               var selected_id = $(this).attr('id');
               ids.push(selected_id);
@@ -332,7 +332,7 @@
 
           $('.checkBoxClass').each(function(){
             rowCount++;
-            ids = [];
+
             if($(this).prop( "checked" )){
               var selected_id = $(this).attr('id');
               ids.push(selected_id);

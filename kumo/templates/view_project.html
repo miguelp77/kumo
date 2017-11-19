@@ -36,9 +36,11 @@
         {% if project.work_days %}
         <div class="col s3">
             <ul>
-                <li><b>Progreso: </b>{{ ((project.consumed_hours/project.estimated_hours) * 100)| round(2, 'ceil') }} %</li>
-                <li><b>Consumido: </b>{{project.consumed_hours}} horas</li>
-                <li><b>Total: </b>{{project.estimated_hours}} horas</li>
+                {% if project.consumed_hours and project.estimated_hours%}
+                    <li><b>Progreso: </b>{{ ((project.consumed_hours/project.estimated_hours) * 100)| round(2, 'ceil') }} %</li>
+                    <li><b>Consumido: </b>{{project.consumed_hours}} horas</li>
+                    <li><b>Total: </b>{{project.estimated_hours}} horas</li>
+                {% endif %}
             </ul>
         </div>
         <div class="col s4">

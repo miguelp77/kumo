@@ -109,7 +109,17 @@
     <span><b>{{value}}</b> hours in {{key}} status. </span>
     {% endfor %}
     {% endif %}
+
     {% if allocations %}
+    {% if display %}
+        {% if display|length < 7 %}
+            {% for d in display %}
+                <a href="?display={{d}}">{{d}}</a>
+            {% endfor %}
+        {% else %}
+            <a href=""?display={{display}}"">{{display}}</a>
+        {% endif %}
+    {% endif %}
     <table class="striped tablesorter" id="table-allocations">
         <thead>
         <tr>
@@ -128,7 +138,7 @@
         </thead>
         <tbody>
 
-        {% for alloc in allocations|sort(attribute='createdBy')|sort(attribute='datetime_start') %}
+        {% for alloc in allocations|sort(attribute='createdBy')|sort(attribute='datetime_start') if alloc.status in display%}
         <tr>
             <td>
                 <input type="checkbox" id="{{alloc.id}}" class="checkBoxClass"/>
@@ -140,12 +150,11 @@
             <td>
                 <small>{{alloc.createdBy}}{{ params(alloc.user_email,'user_email='+alloc.user_email|e) }}</small>
             </td>
-
-            {% if alloc.project_name is string %}
+        {% if alloc.project_name is string %}
             <td>{{ params(alloc.project_name,'project='+alloc.project_name|e) }}</td>
-            {% else %}
+        {% else %}
             <td>{{alloc.project}}</td>
-            {% endif %}
+        {% endif %}
             <td>{{alloc.approver}}</td>
             <td>{{ params(alloc.formated_start_date,'month='+alloc.month|e) }}</td>
             <td>{{alloc.hours}}</td>
@@ -153,23 +162,23 @@
                 %} - {% endif %}
             </td>
 
-            {% if alloc.status == 'created' %}
+        {% if alloc.status == 'created' %}
             <td>
                 <span class="badge blue cwhite left">{{alloc.status}}</span>
             </td>
-            {% endif %}
+        {% endif %}
 
-            {% if alloc.status == 'submit'%}
+        {% if alloc.status == 'submit' or alloc.status == 'submited' %}
             <td>
                 <span class="badge orange cwhite left">{{alloc.status}}</span>
             </td>
-            {% endif %}
+        {% endif %}
 
-            {% if alloc.status == 'accepted' %}
+        {% if alloc.status == 'accepted' %}
             <td>
                 <span class="badge green cwhite left">{{alloc.status}}</span>
             </td>
-            {% endif %}
+        {% endif %}
             {% if alloc.status == 'rejected' %}
             <td>
                 <span class="badge red cwhite left">{{alloc.status}}</span>
@@ -177,12 +186,12 @@
             {% endif %}
             {% if alloc.approver ==  logged_user %}
             <td>
-                {% if alloc.status == 'submit' %}
+                {% if alloc.status == 'submit' or alloc.status == 'submited' or alloc.status == 'submitted' %}
                 <a href="/a/reject/{{alloc.id}}/"><i class="material-icons" style="color:#b71c1c">cancel</i></a>
                 {% endif %}
             </td>
             <td>
-                {% if alloc.status == 'submit' %}
+                {% if alloc.status == 'submit' or alloc.status == 'submited' or alloc.status == 'submitted' %}
                 <a href="/a/accept/{{alloc.id}}/"><i class="material-icons" style="color:#1b5e20">check_circle</i></a>
                 {% endif %}
             </td>

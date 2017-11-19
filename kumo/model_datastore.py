@@ -72,7 +72,7 @@ def from_datastore(entity):
     return entity
 
 
-def list_all(limit=1000,  email=None,  day=None, month=None, year=None, project=None, hours=None,
+def list_all(limit=10000,  email=None,  day=None, month=None, year=None, project=None, hours=None,
      status=None, kind='Allocation',cursor=None):
     """
     List all allocations. email is optional
@@ -85,27 +85,29 @@ def list_all(limit=1000,  email=None,  day=None, month=None, year=None, project=
         query.add_filter('formated_start_date', '=', str(day))
     if month:
         query.add_filter('month', '=', int(month))
-    if  year:
+    if year:
         query.add_filter('year', '=', int(year))
-    if  project:
+    if project:
         query.add_filter('project_name', '=', str(project))
-    if  hours:
+    if hours:
         query.add_filter('hours_type', '=', str(hours))
-    if  status:
+    if status:
         query.add_filter('status', '=', str(status))
 
-    query_iterator = query.fetch( start_cursor=cursor)
-    page = next(query_iterator.pages)
-
-    entities = builtin_list(map(from_datastore, page))
-    next_cursor = (
-        query_iterator.next_page_token.decode('utf-8')
-        if query_iterator.next_page_token else None)
+    query_iterator = query.fetch()
+    entities = list(query_iterator)
+    # page = next(query_iterator.pages)
+    #
+    # entities = builtin_list(map(from_datastore, page))
+    # next_cursor = (
+    #     query_iterator.next_page_token.decode('utf-8')
+    #     if query_iterator.next_page_token else None)
+    next_cursor = None
     return entities, next_cursor
 
 
 def list_by_user(user_id, day=None, month=None, year=None, project=None, hours=None,
-     status=None, kind='Allocation', limit=50, cursor=None):
+     status=None, kind='Allocation', limit=500, cursor=None):
     """
     List by users and params from GET
     """
@@ -180,29 +182,30 @@ def list_by_month(user_id,  kind='Allocation',limit=50, cursor=None,year='2017',
     return entities, next_cursor, dates
 
 
-def assigned_to_me(user_email, kind='Allocation', limit=1000,  email=None,  day=None, month=None, year=None, project=None, hours=None,
+def assigned_to_me(user_email, kind='Allocation', limit=None,  email=None,  day=None, month=None, year=None, project=None, hours=None,
      status=None, cursor=None):
     ds = get_client()
 
     query = ds.query(kind='Allocation')
 
     if email:
-        query.add_filter('user_email', '=', str(email))
+        print('email -->' + email + "<")
+        query.add_filter('user_email', '=', email)
     if day:
         query.add_filter('formated_start_date', '=', str(day))
     if month:
         query.add_filter('month', '=', int(month))
-    if  year:
+    if year:
         query.add_filter('year', '=', int(year))
-    if  project:
+    if project:
         query.add_filter('project_name', '=', str(project))
-    if  hours:
+    if hours:
         query.add_filter('hours_type', '=', str(hours))
-    if  status:
+    if status:
         query.add_filter('status', '=', str(status))
 
     query.add_filter('approver','=',str(user_email))
-    query.add_filter('status','=','submit')
+    # query.add_filter('status','=','submit')
 
     query_iterator = query.fetch()
     page = next(query_iterator.pages)
@@ -271,39 +274,21 @@ def update(data, kind='Allocation', id=None):
     return from_datastore(entity)
 
 
-
-# def update(data, kind='Allocation', id=None):
-#     ds = get_client()
-#     if id:
-#         key = ds.key(kind, int(id))
-#     else:
-#         key = ds.key('AllocList', 'default','Allocation')
-    
-#     entity = datastore.Entity(
-#         key=key,
-#         exclude_from_indexes=['entidades','english'])
-#         # exclude_from_indexes=['description','entidades'])
-
-#     entity.update(data)
-#     ds.put(entity)
-    
-#     # task = datastore.Entity(
-#     #     ds.key('TaskList', 'default', 'Task'))
-#     # task.update({
-#     #     'category': 'Personal',
-#     #     'description': 'Learn Cloud Datastore',
-#     # })
-#     # ds.put(task)
-
-#     # # [START ancestor_query]
-#     # ancestor = ds.key('TaskList', 'default')
-#     # query = ds.query(kind='Task', ancestor=ancestor)
-#     # print(query.fetch())
-#     # print('*'*100)
-#     return from_datastore(entity)
-
-
 create = update
+
+
+
+def create_allocations(data):
+    ds = get_client()
+    entidades = []
+    for d in data:
+        key = ds.key('Allocation')
+        entity = datastore.Entity(key=key)
+        entity.update(d)
+        entidades.append(entity)
+    ds.put_multi(entidades)
+
+    return from_datastore(entity)
 
 
 def update_allocation(data, kind='Allocation', id=None):
@@ -322,6 +307,12 @@ def update_allocation(data, kind='Allocation', id=None):
     return from_datastore(entity)
 
 def update_multi(data, new_status):
+    '''
+    Update status of allocations
+    :param data: Allocations data
+    :param new_status: New status for all these allocations
+    :return: None
+    '''
     client = get_client()
     entidades = []
     for d in data:
@@ -447,11 +438,12 @@ def check_projects(user_email, limit=50, kind='Project', cursor=None):
         if query_iterator.next_page_token else None)
     return entities, next_cursor
 
+
 def regularizar(ee):
-    print("regularizar")
+    print("regularizar" + str(ee))
     ds = get_client()
     query = ds.query(kind='Allocation')
-    query.add_filter('project_name','=','Preventa -  []')
+    query.add_filter('status','=','approved')
     # query.add_filter('project_name','=','Google Group Iberia')
 
     query_iterator = query.fetch()
@@ -459,16 +451,17 @@ def regularizar(ee):
     entities = builtin_list(map(from_datastore, page))
     for e in entities:
         print(e['id'])
-        e['project_name'] = 'Preventa'
+        e['status'] = 'accepted'
         # e.update(data)
         ds.put(e)
     return entities
 
 
+
 def read_project(id):
     ds = get_client()
     key = ds.key('Project', int(id))
-    # regularizar(11)
+#    regularizar(11)
     results = ds.get(key)
     return from_datastore(results)
 
@@ -618,5 +611,41 @@ def collect_project_hours(id):
 
     data = update_project(data=None, id=id, users = emails,
         submit_hours=submit_hours, accept_hours= accept_hours, hours_per_user= hours_per_user)
-
+    get_vacances_from_project(id)
     return data, submit_hours, accept_hours
+
+
+def get_vacances_from_project(id):
+    """
+    Collect the dates for timeline
+
+    :param id: Project ID in allocations
+    :return: start and end date
+    """
+    ds = get_client()
+    query = ds.query(kind='Allocation',
+    filters=[
+            ('project', '=', id)
+        ])
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+    entity = builtin_list(map(from_datastore, page))
+
+
+    emails = {}
+    for e in entity:
+        if not e['user_email'] in emails:
+            emails[e['user_email']] = [e['start_date']]
+        else:
+            emails[e['user_email']].append(e['start_date'])
+    submit_hours = 0
+    accept_hours = 0
+    temp = 0
+    hours_per_user = {}
+    for user, val in emails.items():
+        dates = set(val)
+        emails[user] = sorted(dates, key=lambda d: tuple(map(int, d.split('-'))))
+
+    print(emails)
+    return emails
+

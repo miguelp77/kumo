@@ -68,21 +68,21 @@
         <div class="row">
             <div class="col s1">
                 <div class="form-group">
-                    <label for="title">Desde</label>
+                    <label for="start_date">Desde</label>
                     <input type="text" id="start_date" name="start_date" value="{{allocation.formated_start_date}}"
                            class="form-control datepicker"/>
                 </div>
             </div>
             <div class="col s1">
                 <div class="form-group">
-                    <label for="title">Hasta</label>
+                    <label for="end_date">Hasta</label>
                     <input type="text" id="end_date" name="end_date" value="{{allocation.formated_start_date}}"
                            class="form-control datepicker"/>
                 </div>
             </div>
             <div class="col s1">
                 <div class="form-group">
-                    <label for="title">Horas</label>
+                    <label for="hours">Horas</label>
                     <input type="text" id="hours" name="hours" value="{{allocation.hours}}" class="form-control"/>
                 </div>
             </div>
@@ -93,7 +93,29 @@
                               rows="1">{{allocation.comment}}</textarea>
                 </div>
             </div>
+            <!-- Hora inicio - Hora Fin-->
 
+            <div class="col s1">
+                <div class="form-group">
+                    <label for="hour_start">Horas</label>
+                    {% if action == 'Editar'%}
+                        <input type="time" id="hour_start" name="hour_start" value="{{allocation.hour_start}}" step="900" class="form-control"/>
+                    {% else %}
+                        <input type="time" id="hour_start" name="hour_start" value="09:00" step="900" class="form-control"/>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col s1">
+                <div class="form-group">
+                    <label for="hour_end">Horas</label>
+                    {% if action == 'Editar'%}
+                        <input type="time" id="hour_end" name="hour_end" value="{{allocation.hour_end}}" step="900" class="form-control"/>
+                    {% else %}
+                        <input type="time" id="hour_end" name="hour_end"  value="18:00" step="900" class="form-control"/>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
         <div class="row">

@@ -1,5 +1,5 @@
 Flask==0.11.1
-google-cloud
+google-cloud==0.27
 gunicorn==19.6.0
 oauth2client==3.0.0
 Flask-SQLAlchemy==2.1
@@ -9,5 +9,4 @@ PyMongo==3.3.0
 six==1.10.0
 google-api-python-client
 google-cloud-datastore==1.0.0
-Flask-WTF==0.14.2
 

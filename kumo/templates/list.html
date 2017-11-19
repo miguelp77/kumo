@@ -121,7 +121,7 @@
     {% for alloc in allocations|sort(attribute='datetime_start')|rejectattr('archived') %}
     <tr>
        <td>
-         {% if not alloc.status == 'accepted' and not alloc.status == 'submit' %}
+         {% if not alloc.status == 'accepted' and not alloc.status == 'submit' and not alloc.status == 'submited' %}
          <input type="checkbox" id="{{alloc.id}}" class="checkBoxClass"/>
          <label for="{{alloc.id}}"></label>
          {% if alloc.comment %}
@@ -139,22 +139,22 @@
        <td>{{ params(alloc.formated_start_date,'month='+alloc.month|e) }}</td>
        <td>{{alloc.hours}}</td>
        <td>{% if alloc.hours_type|length > 1 %}{{ params(alloc.hours_type,'hours='+alloc.hours_type|e) }} {% else %} - {% endif %}</td>
-
        {% if alloc.status == 'created' %}
         <td>
           <span class="badge blue cwhite left">{{alloc.status}}</span>
         </td>
        {% endif %}
 
-       {% if alloc.status == 'submit'%}
+       {% if alloc.status == 'submit' or alloc.status == 'submited' or alloc.status == 'submitted'%}
         <td>
           <span class="badge orange cwhite left">{{alloc.status}}</span>
         </td>
         {% endif %}
-       
-        {% if alloc.status == 'accepted' %}
+
+        {% if alloc.status == 'accepted' or alloc.status == 'approved' %}
         <td>
             <span class="badge green cwhite left">{{alloc.status}}</span>
+
         </td>
         <td>
             <a href="/a/archive/{{alloc.id}}">archive</a>
