@@ -206,5 +206,13 @@
 
 </div>
 {% endif %}
+<script>
+    var url = window.location.href;
+    if(url.includes("?")){
+    //
+    } else {
+        window.location.href = url + "?month=" + {{current_month}};
+    }
+</script>
 {% endblock %}
 

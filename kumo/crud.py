@@ -6,6 +6,7 @@ from functools import update_wrapper
 from flask import Blueprint, current_app, redirect, render_template, request, \
     session, url_for, jsonify, Response
 from datetime import datetime, date, timedelta
+import datetime as dt
 from werkzeug.utils import secure_filename
 import urllib.request
 import json
@@ -270,6 +271,8 @@ def list_allocations():
                 str(a['month']) + ',' + \
                 str(a['createdBy']) + ',' + \
                 str(a['formated_start_date']) + ',' + \
+                str(a['hour_start']) + ',' + \
+                str(a['hour_end']) + ',' + \
                 str(a['hours']) + ',' + \
                 str(a['hours_type']) + ',' + \
                 str(a['status']) + ',' + \
@@ -282,11 +285,14 @@ def list_allocations():
             mimetype="text/csv",
             headers={"Content-disposition": "attachment; filename=" + csv +".csv"}
             )
+    now = dt.datetime.now()
+    current_month = now.month
 
 
     return render_template(
         "list_all.html",
         total_months=total_months,
+        current_month=current_month,
         total_projects=total_projects,
         allocations=allocations,
         day=day,
@@ -383,7 +389,7 @@ def user_allocations(email):
         hour = allocation['hours']
         start_dates[str(start_date.timestamp()*1000)].append(int(hour))
 
-    total_hours = _get_hours(allocations)
+    total_hours, total_months, total_projects = _get_hours(allocations)
 
 
     return render_template(
@@ -403,6 +409,7 @@ def my_projects():
     List the projects for logged user
     :return:
     """
+
     token = request.args.get('page_token', None)
     if token:
         token = token.encode('utf-8')
@@ -436,10 +443,12 @@ def all_projects():
     if type_project is None:
         for p in projects:
             if 'work_days' in p and type_project is None:
+
                 noService.append(p)
     else:
         for p in projects:
             if 'work_days' not in p and type_project is not None:
+                print("No Work Days " + p['dvt_code'])
                 noService.append(p)
 
     # books, next_page_token = get_model().list(kind='Book',cursor=token)
@@ -449,6 +458,7 @@ def all_projects():
         projects=noService,
         type_project=type_project,
         next_page_token=next_page_token)
+
 
 
 @crud.route("/view_project/<id>/")
@@ -861,7 +871,7 @@ def add_allocation():
     generics = get_model().generic_projects()
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
-
+        # print(data)
         data['formated_start_date'] = format_date(data['start_date'])
         data['formated_end_date'] = format_date(data['end_date'])
 

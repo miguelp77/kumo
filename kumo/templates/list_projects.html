@@ -30,7 +30,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for pj in projects %}
+    {% for pj in projects|sort(attribute='name') %}
     <tr>
        <td><a href="/a/view_project/{{pj.id}}/">{{pj.name}}</a></td>
        <!--<td>-->
