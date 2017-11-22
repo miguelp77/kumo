@@ -208,7 +208,7 @@
 {% endif %}
 <script>
     var url = window.location.href;
-    if(url.includes("?")){
+    if(url.includes("?") || url.includes("month=all")){
     //
     } else {
         window.location.href = url + "?month=" + {{current_month}};

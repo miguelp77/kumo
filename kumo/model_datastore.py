@@ -438,6 +438,17 @@ def check_projects(user_email, limit=50, kind='Project', cursor=None):
         if query_iterator.next_page_token else None)
     return entities, next_cursor
 
+def list_projects_full(kind='Project'):
+    ds = get_client()
+    query = ds.query(kind=kind)
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+
+    entities = builtin_list(map(from_datastore, page))
+
+    return entities
+
+
 
 def regularizar(ee):
     print("regularizar" + str(ee))

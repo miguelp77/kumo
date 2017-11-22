@@ -238,7 +238,6 @@ def _get_hours(allocations):
 
     return total_hours, total_months, total_projects
 
-
 # Imputaciones
 @crud.route("/allocations")
 @oauth2.required
@@ -254,7 +253,8 @@ def list_allocations():
     email = request.args.get('user_email', None)
     csv = request.args.get('csv', None)
 
-
+    if month == "all":
+        month = None
     if token:
         token = token.encode('utf-8')
     allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token, email=email,
@@ -266,6 +266,10 @@ def list_allocations():
         # cabecera = 'Año','Mes','Usuario','Fecha','Horas','Tipo de horas','Estado','Proyecto','Aprobador','Comentario'
         # datos.append(cabecera)
         for a in allocations:
+            if 'hour_start' not in a:
+                a['hour_start'] = "-"
+            if 'hour_end' not in a:
+                a['hour_end'] = "-"
 
             linea = str(a['year']) + ',' + \
                 str(a['month']) + ',' + \
@@ -448,7 +452,7 @@ def all_projects():
     else:
         for p in projects:
             if 'work_days' not in p and type_project is not None:
-                print("No Work Days " + p['dvt_code'])
+                # print("No Work Days " + p['dvt_code'])
                 noService.append(p)
 
     # books, next_page_token = get_model().list(kind='Book',cursor=token)
@@ -460,6 +464,36 @@ def all_projects():
         next_page_token=next_page_token)
 
 
+
+@crud.route("/list_all_projects")
+@oauth2.required
+@user_test_admin(req_roles='manager')
+def list_all_projects():
+    projects = get_model().list_projects_full(kind='Project')
+    return render_template(
+        "list_all_projects.html",
+        projects=projects)
+
+
+#download_all_projects
+@crud.route("/download_all_projects")
+@oauth2.required
+@user_test_admin(req_roles='manager')
+def download_all_projects():
+    projects = get_model().list_projects_full(kind='Project')
+    csv = 'all_projects'
+    datos = []
+    for p in projects:
+        linea = str(p['name']) + ',' + \
+            str(p['dvt_code']) + ',' + \
+            str(";".join(p['hours_type'])) + ',' + \
+            str(";".join(p['approver'])) + '\n'
+        datos.append(linea)
+
+    return Response(list(datos),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=" + csv +".csv"}
+        )
 
 @crud.route("/view_project/<id>/")
 @oauth2.required

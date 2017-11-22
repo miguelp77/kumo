@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="audioList">
+  <div class="row">
+    <div class="col s2">
+      <h4>Proyectos</h4>
+    </div>
+    <div class="col s2 right">
+      {% if session.profile %}
+      <a href="/a/download_all_projects" class="btn btn-success btn-sm">
+      CSV
+      </a>
+      {% endif %}
+    </div>
+  </div>
+    {% if projects %}
+<table class="striped">
+    <thead>
+    <tr>
+
+        <th>Nombre</th>
+        <!--<th>Aprobadores</th>-->
+        <th>Consumido</th>
+        <th>Vendido</th>
+        <th>%</th>
+        <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pj in projects|sort(attribute='name') %}
+    <tr>
+       <td><a href="/a/view_project/{{pj.id}}/">{{pj.name}}</a></td>
+       <!--<td>-->
+         <!--{% for app in pj.approver %}-->
+          <!--{{ app }} <br>-->
+        <!--{% endfor %}-->
+       <!--</td>-->
+      <td>
+          {% if pj.consumed_hours %}
+          {{pj.consumed_hours|int / 8}} J
+          <small><a href="./update_project/{{pj.id}}/" title="click for update">{{pj.consumed_hours}} h</a></small>
+          {% else %}
+            <a href="./update_project/{{pj.id}}/?ret=back" title="click for update">check</a>
+          {% endif %}
+      </td>
+       <td>
+           {% if pj.work_days %}
+               {{ pj.work_days| int}} J <small>{{ (pj.work_days| int) * 8 }} h </small>
+           {% else %} - {% endif %}
+       </td>
+       <td>
+           {% if pj.work_days and pj.consumed_hours %}
+           {{ (pj.consumed_hours/((pj.work_days| int) * 8))|round(2,'floor') * 100 }} %
+           {% else %} - {% endif %}
+       </td>
+      <td><a href="#" title="click for update">on</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+<small class='right'><a href="check_allocations">Revisar Imputaciones</a></small>
+<br>
+    {% else %}
+      <p>No projects</p>
+    {% endif %}
+
+{% if type_project == None %}
+    <nav>
+      <ul class="pager">
+        <li><a href="/a/all_projects?tp=servicios">Servicios</a></li>
+      </ul>
+    </nav>
+    {% else %}
+    <nav>
+      <ul class="pager">
+        <li><a href="/a/all_projects">Proyectos</a></li>
+      </ul>
+    </nav>
+{% endif %}
+</div>
+{% endblock %}
+
