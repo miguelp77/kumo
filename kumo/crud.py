@@ -759,7 +759,7 @@ def review_allocations():
         day=day, month=month, year=year,
         project=project, hours=hours, status=status)
 
-    total_hours = _get_hours(allocations)
+    total_hours, total_months, total_projects = _get_hours(allocations)
     logged_user = session['profile']['emails'][0]['value']
 
     if display is None:
