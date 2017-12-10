@@ -15,7 +15,7 @@
 {% for user in users %}
 <p>
 <div class="user {{ 'banned' if user.banned else 'no-banned' }}">
-  {{user.email}}   <div class="chip"> {{user.profile}} </div>{{user.lastAccess}}
+  {{user.email}}   <div class="chip"> {{user.profile}} </div>  <div class="chip"> {{user.country}} </div>  {{user.lastAccess}}
   <div class="opciones right">
     {% if session.role =="admin" or session.role =="manager" or session.role == "su" %}
       <a href="../user/{{user.id}}/edit_user" class="btn btn-primary btn-sm">

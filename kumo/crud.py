@@ -213,6 +213,19 @@ def list_user():
         next_page_token=next_page_token)
 
 
+@crud.route('/user/update')
+@oauth2.required
+@user_test_admin(req_roles='su')
+def user_update():
+    """
+    :return: Update user's country
+    """
+    users = get_model().set_bulk_country("es")
+    return render_template(
+        "list_user.html", users=users, next_page_token=None
+    )
+
+
 def _get_hours(allocations):
     total_hours = {}
     total_months = []
@@ -270,6 +283,8 @@ def list_allocations():
                 a['hour_start'] = "-"
             if 'hour_end' not in a:
                 a['hour_end'] = "-"
+            if 'hours_type' not in a:
+                a['hours_type'] = "-"
 
             linea = str(a['year']) + ',' + \
                 str(a['month']) + ',' + \
@@ -821,7 +836,7 @@ def review_allocations_as_other(as_email):
         status=status)
 
 
-    total_hours = _get_hours(allocations)
+    total_hours, total_months, total_projects = _get_hours(allocations)
 
     if display is None:
         display = ['submit',

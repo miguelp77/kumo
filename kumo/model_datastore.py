@@ -360,7 +360,7 @@ def read_user(id):
     # print(from_datastore(results))
     return from_datastore(results)
 
-def list_user(limit=50,  kind='User',cursor=None):
+def list_user(limit=200,  kind='User',cursor=None):
     ds = get_client()
 
     query = ds.query(kind='User', order=['email'])
@@ -660,3 +660,60 @@ def get_vacances_from_project(id):
     print(emails)
     return emails
 
+
+def set_country(id, cty):
+    ds = get_client()
+    key = ds.key('User', int(id))
+
+    entity = datastore.Entity(key=key)
+    data = ds.get(key)
+
+    data['country'] = cty
+    entity.update(data)
+
+    ds.put(entity)
+    return from_datastore(entity)
+
+
+def set_bulk_country(cty):
+    ds = get_client()
+
+    query = ds.query(kind='User', order=['email'])
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+
+    entities = builtin_list(map(from_datastore, page))
+    for entity in entities:
+        if 'country' in entity:
+            print(entity['email'] + " " + entity['country'] + " - " + cty)
+            if entity['country'] == 'tbd':
+                set_country(entity['id'], cty)
+        else:
+            set_country(entity['id'], cty)
+            print(entity['email'] + " - " + cty)
+
+
+    return entities
+
+
+# def add_auths(id,emails):
+#     ds = get_client()
+#     if id:
+#         key = ds.key('Project', int(id))
+#     else:
+#         key = ds.key('Project')
+#     entity = datastore.Entity(key=key)
+#     data = ds.get(key)
+#
+#     if emails:
+#         auths = [x.strip() for x in str(emails).split(',')]
+#         if 'auths' in data:
+#             data['auths'].extend(auths)
+#             # data['auths'] = set(data['auths'])
+#         else:
+#             data['auths'] = auths
+#             # data['auths'] = set(data['auths'])
+#
+#     entity.update(data)
+#     ds.put(entity)
+#     return from_datastore(entity)
