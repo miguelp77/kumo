@@ -53,7 +53,7 @@
        </td>
        <td>
            {% if pj.work_days and pj.consumed_hours %}
-           {{ (pj.consumed_hours/((pj.work_days| int) * 8))|round(2,'floor') * 100 }} %
+           {{ (100*(pj.consumed_hours |int)/((pj.work_days| int) * 8))|round(2,'floor')}} %
            {% else %} - {% endif %}
        </td>
       <td><a href="#" title="click for update">on</a></td>

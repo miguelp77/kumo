@@ -6,13 +6,13 @@
 <div class="audioList">
     <div class="row">
         <div class="col s2">
-            <h4>Project</h4>
+            <h4>Project {{project.name}}</h4>
         </div>
 
         {% if project %}
         <div class="col s2 right">
             {% if session.profile %}
-            <a href="/a/update_project/{{project.id}}/" class="btn btn-success btn-sm">
+            <a href="/a/update_project/{{project.id}}/?ret=view" class="btn btn-success btn-sm">
                 Actualizar
             </a>
             {% endif %}
@@ -20,11 +20,10 @@
     </div>
 
     <div class="row">
-        <h5>{{project.name}}</h5>
 
         <div class="col s3">
             <ul>
-                <li><b>Aprobadores:</b>
+                <li><b>Son Aprobadores:</b>
                     <ul>
                         {% for app in project.approver %}
                         <li>{{app}}</li>
@@ -58,11 +57,19 @@
         <div class="col s5">
             <ul class="collection with-header">
                 <li><h4>Han imputado</h4></li>
-                {% for user in project.users%}
-                <li class="collection-item green lighten-4">
-                    <a href="/a/allocations/{{user}}?project={{project.name}}"><span class="black-text">{{user}}</span></a>
-                </li>
-                {% endfor %}
+                {% if show_all != None %}
+                    {% for user in project['approver'] %}
+                        <li class="collection-item green lighten-4">
+                            <a href="/a/allocations/{{user}}?project={{project.name}}"><span class="black-text">{{user}}</span></a>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    {% for user in aprobadores[session.profile.emails[0].value] %}
+                        <li class="collection-item green lighten-4">
+                            <a href="/a/allocations/{{user}}?project={{project.name}}"><span class="black-text">{{user}}</span></a>
+                        </li>
+                    {% endfor %}
+                {% endif %}
             </ul>
         </div>
         <div class="col s5">
@@ -88,7 +95,10 @@
             </ul>
         </div>
     </div>
-
+    <div>{# aprobadores['miguel.garcia@devoteam.com'] #}</div>
+    <div>
+    {#aprobadores#}
+    </div>
     {% else %}
     <p>No projects</p>
     {% endif %}

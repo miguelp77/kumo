@@ -19,14 +19,14 @@
         <div class="row">
             <div class="col s3">
                 <div class="form-group">
-                    <label for="title">Nombre</label>
+                    <label for="name">Nombre</label>
                     <input type="text" name="name" id="name" disabled value="{{session.profile.displayName}}"
                            class="form-control"/>
                 </div>
             </div>
             <div class="col s3">
                 <div class="form-group">
-                    <label for="title">Email</label>
+                    <label for="email">Email</label>
                     <input type="text" name="email" id="email" disabled value="{{session.profile.emails.0.value}}"
                            class="form-control"/>
                 </div>
@@ -37,10 +37,10 @@
                 <select name="project" id="project" class="form-control" required>
                     <option value="{{allocation.project}}" disabled selected>{% if allocation.project%}{{allocation.project_name}}{%else%}Elija una opción{%endif%}</option>
                     {% for generic in generics %}
-                    <option value="{{generic.id}}" data-id="{{generic.approver}}" data-type="{{generic.hours_type}}">{{generic.name}}</option>
+                      <option value="{{generic.id}}" data-id="{{generic.approver}}" data-type="{{generic.hours_type}}">{{generic.name}}</option>
                     {% endfor %}
                     {% for pjs in projects %}
-                    <option value="{{pjs.id}}" data-id="{{pjs.approver}}" data-type="{{pjs.hours_type}}">{{pjs.name}}</option>
+                      <option value="{{pjs.id}}" data-id="{{pjs.approver}}" data-type="{{pjs.hours_type}}">{{pjs.name}}</option>
                     {% endfor %}
                 </select>
                 <label>Proyecto</label>
@@ -130,6 +130,7 @@
 
         <input type="text" value="{{session.profile.id}}" id="user_id" name="user_id" hidden/>
         <input type="text" value="{{session.profile.emails[0].value}}" id="user_email" name="user_email" hidden/>
+        <input type="text" value="{{user_country}}" id="country" name="country" hidden/>
         <input type="text" value="created" id="status" name="status" hidden/>
 
         <div class="row">

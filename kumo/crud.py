@@ -79,7 +79,7 @@ def user_test_admin(req_roles = 'None'):
 # FIN DECORADOR
 
 
-# Calculo de horas
+# FESTIVOS
 HOLIDAYS = {
     'h1': '2017-01-06',
     'h2': '2017-03-20',
@@ -94,13 +94,51 @@ HOLIDAYS = {
     'h11': '2017-11-09',
     'h12': '2017-12-06',
     'h13': '2017-12-08',
-    'h14': '2017-12-25'}
+    'h14': '2017-12-25',
+    'h15': '2018-01-01',
+    'h16': '2018-01-06',
+    'h21': '2017-03-29',
+    'h17': '2017-03-30',
+    'h18': '2017-05-01',
+    'h19': '2017-05-02',
+    'h20': '2017-05-15',
+    'h22': '2017-08-15',
+    'h23': '2017-10-12',
+    'h24': '2017-11-01',
+    'h25': '2017-11-09',
+    'h26': '2017-12-06',
+    'h27': '2017-12-08',
+    'h28': '2017-12-25'
 
+}
 
-def is_holiday(date):
+HOLIDAYS_MX = {
+    'h01': '2017-12-25',
+    'h02': '2017-12-12',
+    'h1': '2018-01-01',
+    'h2': '2018-02-05',
+    'h3': '2018-03-19',
+    'h4': '2018-03-29',
+    'h5': '2018-03-30',
+    'h6': '2018-05-01',
+    'h7': '2018-05-10',
+    'h8': '2018-09-16',
+    'h9': '2018-11-02',
+    'h10': '2018-11-19',
+    'h11': '2018-12-12',
+    'h12': '2018-12-25'
+}
+
+def is_holiday(date, cty='es'):
     formated = date_to_string(date)
-    print(str(formated) in HOLIDAYS.values())
-    return str(formated) in HOLIDAYS.values()
+    if cty == 'mx':
+        print(str(formated) in HOLIDAYS_MX.values())
+        return str(formated) in HOLIDAYS_MX.values()
+    # TODO: Hay que contemplar la opcion PT y FR
+    # No tengo info 12/12
+    else:
+        print(str(formated) in HOLIDAYS.values())
+        return str(formated) in HOLIDAYS.values()
 
 
 def daterange(start_date, end_date):
@@ -108,9 +146,9 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 
-def work_days(start_date, end_date_inc):
+def work_days(start_date, end_date_inc, cty='es'):
     """
-    Split date range. Exception for Weekends
+    Split date range. Exception for Weekends and holidays
     """
     dates = []
     if start_date.weekday() >= 5:
@@ -120,7 +158,7 @@ def work_days(start_date, end_date_inc):
         return dates    
     for single_date in daterange(start_date, end_date_inc):
         weekno = single_date.weekday()
-        if weekno < 5 and not is_holiday(single_date):
+        if weekno < 5 and not is_holiday(single_date,cty):
             dates.append(single_date)
     return dates
 
@@ -129,7 +167,7 @@ def work_hours(start_date,end_date_inc):
     for single_date in daterange(start_date, end_date_inc):
         # print(single_date.strftime("%d-%m-%Y"))
         weekno = single_date.weekday()
-        if weekno<5 and not is_holiday(single_date):
+        if weekno<5 and not is_holiday(single_date,cty):
             hours = hours + 8
     return hours
 
@@ -479,7 +517,6 @@ def all_projects():
         next_page_token=next_page_token)
 
 
-
 @crud.route("/list_all_projects")
 @oauth2.required
 @user_test_admin(req_roles='manager')
@@ -510,12 +547,20 @@ def download_all_projects():
         headers={"Content-disposition": "attachment; filename=" + csv +".csv"}
         )
 
+
 @crud.route("/view_project/<id>/")
 @oauth2.required
 @user_test_admin(req_roles='manager')
 def view_project(id):
+    all = request.args.get('all', None)
+
     project = get_model().read_project(id)
     if project is not None:
+        if 'aprobadores' in project:
+            aprobadores = json.loads(project['aprobadores'])
+        else:
+            get_aprobadores = get_model().collect_approvers(id)
+            aprobadores = get_aprobadores
 
         if 'work_days' in project:
         # if project['work_days']:
@@ -526,11 +571,18 @@ def view_project(id):
             hours_per_user = {}
     else:
         return render_template("not_access.html")
-    
+
+    # if all == 'all':
+    #     aprobadores = project['approver']
+
+    print('*'*80)
+    print(aprobadores)
     return render_template(
         "view_project.html",
+        show_all=all,
         project=project,
-        hours_per_user=hours_per_user)
+        hours_per_user=hours_per_user,
+        aprobadores=aprobadores)
 
 
 @crud.route("/update_project/<id>/")
@@ -539,7 +591,7 @@ def view_project(id):
 def update_project(id):
     ret = request.args.get('ret', None)
 
-    project, submit_hours, accept_hours = get_model().collect_project_hours(id)
+    project, submit_hours, accept_hours, aprobadores = get_model().collect_project_hours_plus(id)
     if 'work_days' in project:
         project['estimated_hours'] = int(project['work_days'])*8
     if 'hours_per_user' in project:
@@ -547,33 +599,94 @@ def update_project(id):
 
     if ret == "back":
         return redirect(url_for('.all_projects'))
-
+    if ret == "view":
+        return redirect(url_for('.view_project',id=id))
     else:
+        print(aprobadores)
         return render_template(
             "view_project.html",
             project=project,
-            hours_per_user=hours_per_user)
+            hours_per_user=hours_per_user,
+            aprobadores=aprobadores)
 
 
-
-@crud.route("/timeline_project/<id>/")
-def timeline_project(id):
-    vacances =  get_model().get_vacances_from_project(id)
+@crud.route("/vacaciones_mx")
+def vacaciones_mx():
+    cty = request.args.get('cty', 'mx')
+    id = '5196459188158464'
+    # cty='mx'
+    # get_model().set_bulk_country_allocs(cty)
+    vacances =  get_model().get_vacances_from_project(id, cty)
+    # get_model().set_bulk_country('mx')
+    # print(vacances)
     # [  'George Washington', new Date(1789, 3, 1, 0, 0), new Date(1789, 3, 1, 23, 59) ]
     data = []
+    number_of_holidays = {}
+
     for user,days in vacances.items():
         for day in days:
             d = day.split('-')
             month = str(int(d[1]) - 1)
-            fecha = d[2] +"/"+d[1]+"/"+d[0]
-            new_value = "[  \"{0}\",  \"\"  ,  \"{4}\", new Date({1}, {2}, {3}, 0, 0), new Date({1}, {2}, {3}, 23, 59) ],".format(user,d[0],month,d[2],fecha)
+            # fecha = d[2] +"/"+d[1]+"/"+d[0]
+            fecha = d[0] +"/"+d[1]+"/"+d[2]
+            if user in number_of_holidays:
+                n = number_of_holidays[user]
+                number_of_holidays[user] = n +1
+            else:
+                number_of_holidays[user] = 1
+            # number_of_holidays[user]
+            new_value = "[  \"{0}\",  \"\"  ,  \"{4}\", new Date({1}, {2}, {3}, 0, 0), new Date({1}, {2}, {3}, 23, 59) ],".format(user,d[2],month,d[0],fecha)
 
             data.append(new_value)
 
     return render_template("timeline_project.html",
                            project=vacances,
-                           data=data)
+                           data=data,
+                           number_of_holidays=number_of_holidays)
 
+
+
+@crud.route("/timeline_project/<id>/")
+def timeline_project(id):
+    cty = request.args.get('cty', 'es')
+    m = request.args.get('month',None)
+
+    # get_model().set_bulk_country_allocs(cty)
+    vacances =  get_model().get_vacances_from_project(id,cty)
+    # [  'George Washington', new Date(1789, 3, 1, 0, 0), new Date(1789, 3, 1, 23, 59) ]
+    data = []
+    number_of_holidays = {}
+    for user,days in vacances.items():
+        for day in days:
+            d = day.split('-')
+            month = str(int(d[1]) - 1)
+            fecha = d[0] +"/"+d[1]+"/"+d[2]
+
+
+            if m and month == m:
+                if user in number_of_holidays:
+                    n = number_of_holidays[user]
+                    number_of_holidays[user] = n +1
+                else:
+                    number_of_holidays[user] = 1
+
+                new_value = "[  \"{0}\",  \"\"  ,  \"{4}\", new Date({1}, {2}, {3}, 0, 0), new Date({1}, {2}, {3}, 23, 59) ],".format(user,d[2],month,d[0],fecha)
+                data.append(new_value)
+            if m is None:
+                if user in number_of_holidays:
+                    n = number_of_holidays[user]
+                    number_of_holidays[user] = n +1
+                else:
+                    number_of_holidays[user] = 1
+
+                new_value = "[  \"{0}\",  \"\"  ,  \"{4}\", new Date({1}, {2}, {3}, 0, 0), new Date({1}, {2}, {3}, 23, 59) ],".format(user,d[2],month,d[0],fecha)
+                data.append(new_value)
+
+
+    return render_template("timeline_project.html",
+                           project=vacances,
+                           data=data,
+                           number_of_holidays=number_of_holidays)
 
 
 @crud.route("/create_project/", methods=['GET', 'POST'])
@@ -916,11 +1029,13 @@ def add():
 @oauth2.required
 def add_allocation():
     user_email = session['profile']['emails'][0]['value']
-    projects, next_page_token2 = get_model().list_projects(50,'Project', user_email, None)
+    projects, next_page_token2 = get_model().list_projects(100,'Project', user_email, None)
     generics = get_model().generic_projects()
+    user_country = get_model().get_country(user_email)
+
     if request.method == 'POST':
         data = request.form.to_dict(flat=True)
-        # print(data)
+        # Format the data to ES format
         data['formated_start_date'] = format_date(data['start_date'])
         data['formated_end_date'] = format_date(data['end_date'])
 
@@ -932,9 +1047,19 @@ def add_allocation():
             data['createdBy'] = session['profile']['displayName']
             data['createdById'] = session['profile']['id']
 
+        if 'country' not in data:
+            # Default value for cty (country) is 'es'
+            print("="*80)
+            country = 'es'
+            print("No tengo country y por defecto es igual a " + country )
+            data['country'] = country
+        else:
+            print("Tengo country y es igual a " + data['country'] )
+            country = data['country']
+
         if int(data['hours']) > 8 and data['formated_start_date'] != data['formated_end_date']:
             # listamos el numero de jornadas
-            dates = work_days(data['datetime_start'],data['datetime_end'] + timedelta(days=1))
+            dates = work_days(data['datetime_start'],data['datetime_end'] + timedelta(days=1), country)
             entidades = []
             for workday in dates:
                 data['formated_start_date'] = date_to_string(workday,reverse=True)
@@ -951,7 +1076,7 @@ def add_allocation():
 
         elif int(data['hours']) > 8 and data['formated_start_date'] == data['formated_end_date']:
             # listamos el numero de jornadas
-            dates = work_days(data['datetime_start'],data['datetime_end'] + timedelta(days=1))
+            dates = work_days(data['datetime_start'],data['datetime_end'] + timedelta(days=1), country)
             for workday in dates:
                 data['formated_start_date'] = date_to_string(workday,reverse=True)
                 data['formated_end_date'] = date_to_string(workday,reverse=True)
@@ -965,7 +1090,10 @@ def add_allocation():
         return redirect(url_for('.list_mine'))
 
     return render_template("create_allocation.html", action="Crear",
-                           projects=projects, generics=generics, allocation={})
+                           projects=projects,
+                           generics=generics,
+                           user_country= user_country,
+                           allocation={})
 
 
 
@@ -991,6 +1119,9 @@ def edit_allocation(id):
             data['hour_start'] = "09:00"
         if 'hour_end' not in data:
             data['hour_end'] = "18:00"
+        if 'cty' not in data:
+            data['cty'] = 'es'
+
 
 
         data['formated_start_date'] = format_date(data['start_date'])
@@ -1006,7 +1137,7 @@ def edit_allocation(id):
 
         if int(data['hours']) > 8:
             # listamos el numero de jornadas
-            dates = work_days(data['datetime_start'],data['datetime_end']+ timedelta(days=1))
+            dates = work_days(data['datetime_start'],data['datetime_end']+ timedelta(days=1), data['cty'])
             for workday in dates:
                 data['formated_start_date'] = date_to_string(workday,reverse=True)
                 data['formated_end_date'] = date_to_string(workday,reverse=True)

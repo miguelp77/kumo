@@ -5,7 +5,7 @@
 runtime: python
 # vm: true
 env: flex
-entrypoint: gunicorn -b :$PORT main:app -t 60
+entrypoint: gunicorn -b :$PORT main:app -t 90
 # entrypoint: gunicorn -b :$PORT main:app -t 60
 
 runtime_config:
@@ -24,7 +24,7 @@ runtime_config:
     # cloud_sql_instances: "your-cloudsql-connection-name"
 automatic_scaling:
   min_num_instances: 1
-  max_num_instances: 4
+  max_num_instances: 3
 #  cool_down_period_sec: 120 # default value
 #  cpu_utilization:
 #    target_utilization: 0.5

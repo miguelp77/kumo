@@ -234,7 +234,7 @@ def is_auth_user(user):
         data['user'] = user
         data['profile'] = 'user'
         data['comment'] = 'Created in first login'
-        data['country'] = 'tbd'
+        data['country'] = 'mx'
         data['email'] = user
         key = ds.key('User')
         entity = datastore.Entity(key=key)

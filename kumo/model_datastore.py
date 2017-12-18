@@ -22,6 +22,7 @@ import datetime as dt
 builtin_list = list
 
 
+
 def is_number(s):
     try:
         float(s)
@@ -30,7 +31,15 @@ def is_number(s):
         return False
 
 
-
+def get_country(user_email=None):
+    if user_email is None:
+        user_email = get_profile()
+    ds = get_client()
+    query = ds.query(kind='User')
+    query.add_filter('email','=',user_email)
+    results = iter(query.fetch(1))
+    result = results.__next__()
+    return result['country']
 
 def get_profile(user=None):
     if not user:
@@ -509,7 +518,7 @@ def create_project(data, id=None):
 
 
 
-def update_project(data, id, users, submit_hours, accept_hours, hours_per_user=None):
+def update_project(data, id, users, submit_hours, accept_hours, hours_per_user=None, aprobadores=None):
     ds = get_client()
     if id:
         key = ds.key('Project', int(id))
@@ -521,6 +530,8 @@ def update_project(data, id, users, submit_hours, accept_hours, hours_per_user=N
         data = ds.get(key)
     if users:
         data['users'] = users
+    if aprobadores:
+        data['aprobadores'] = json.dumps(aprobadores)
     if submit_hours:
         data['submit_hours'] = int(submit_hours)
     if accept_hours:
@@ -528,6 +539,7 @@ def update_project(data, id, users, submit_hours, accept_hours, hours_per_user=N
     data['consumed_hours'] = int(submit_hours) + int(accept_hours)
     data['hours_per_user'] = json.dumps(hours_per_user)
     entity.update(data)
+    print(data)
     ds.put(entity)
     return from_datastore(entity)
 
@@ -622,16 +634,46 @@ def collect_project_hours(id):
 
     data = update_project(data=None, id=id, users = emails,
         submit_hours=submit_hours, accept_hours= accept_hours, hours_per_user= hours_per_user)
-    get_vacances_from_project(id)
+    # get_vacances_from_project(id)
     return data, submit_hours, accept_hours
 
 
-def get_vacances_from_project(id):
+def collect_approvers(project_id):
+    ds = get_client()
+    query = ds.query(kind='Allocation',
+    filters=[
+            ('project', '=', project_id)
+        ])
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+    entity = builtin_list(map(from_datastore, page))
+
+    emails = []
+    aprobadores = {}
+    for e in entity:
+        email_aux = []
+        if not e['user_email'] in emails:
+            emails.append(e['user_email'])
+
+            if e['approver'] in aprobadores:
+
+                email_aux = aprobadores[e['approver']]
+                email_aux.append(e['user_email'])
+                aprobadores[e['approver']] = email_aux
+            else:
+                email_aux.append(e['user_email'])
+                aprobadores[e['approver']] = email_aux
+
+    return aprobadores
+
+
+
+def collect_project_hours_plus(id):
     """
-    Collect the dates for timeline
+    Collect all the information of one Project
 
     :param id: Project ID in allocations
-    :return: start and end date
+    :return: submit_hours and accept_hours
     """
     ds = get_client()
     query = ds.query(kind='Allocation',
@@ -642,17 +684,84 @@ def get_vacances_from_project(id):
     page = next(query_iterator.pages)
     entity = builtin_list(map(from_datastore, page))
 
+    submit_hours = 0
+    accept_hours = 0
+    temp = 0
+    emails = []
+    hours_per_user = {}
+    aprobadores = {}
+
+    for e in entity:
+        email_aux = []
+        if not e['user_email'] in emails:
+            emails.append(e['user_email'])
+
+            if e['approver'] in aprobadores:
+
+                email_aux = aprobadores[e['approver']]
+                email_aux.append(e['user_email'])
+                aprobadores[e['approver']] = email_aux
+            else:
+                email_aux.append(e['user_email'])
+                aprobadores[e['approver']] = email_aux
+
+
+        if e['status'] == 'submit':
+            submit_hours = submit_hours + int(e['hours'])
+            temp = int(e['hours'])
+        if e['status'] == 'accepted':
+            accept_hours = accept_hours + int(e['hours'])
+            temp = int(e['hours'])
+
+
+        if e['user_email'] in hours_per_user:
+            hours_per_user[e['user_email']] = int(hours_per_user[e['user_email']]) + temp
+        else:
+            hours_per_user[e['user_email']] = temp
+
+    data = update_project(data=None, id=id, users = emails,
+        submit_hours=submit_hours, accept_hours= accept_hours, hours_per_user= hours_per_user,aprobadores=aprobadores)
+    # get_vacances_from_project(id)
+    return data, submit_hours, accept_hours, aprobadores
+
+def get_vacances_from_project(id, cty):
+    """
+    Collect the dates for timeline
+
+    :param id: Project ID in allocations
+    :return: start and end date
+    """
+    ds = get_client()
+    query = ds.query(kind='Allocation',
+    filters=[
+            ('project', '=', id),
+        ])
+    # query.add_filter('country','=',cty)
+    query.add_filter('country','=',cty)
+    # query.add_filter('month','>=','10')
+
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+    entity = builtin_list(map(from_datastore, page))
+    print('VACACIONES')
+    print(entity)
+    print(cty)
 
     emails = {}
     for e in entity:
         if not e['user_email'] in emails:
-            emails[e['user_email']] = [e['start_date']]
+            # emails[e['user_email']] = [e['start_date']]
+            emails[e['user_email']] = [e['formated_end_date']]
         else:
-            emails[e['user_email']].append(e['start_date'])
+            # emails[e['user_email']].append(e['start_date'])
+            emails[e['user_email']].append(e['formated_end_date'])
     submit_hours = 0
     accept_hours = 0
     temp = 0
     hours_per_user = {}
+    print('*'*80)
+    print(emails)
+    print('*'*80)
     for user, val in emails.items():
         dates = set(val)
         emails[user] = sorted(dates, key=lambda d: tuple(map(int, d.split('-'))))
@@ -692,10 +801,45 @@ def set_bulk_country(cty):
             set_country(entity['id'], cty)
             print(entity['email'] + " - " + cty)
 
-
     return entities
 
 
+def set_country_allocs(id, cty):
+    ds = get_client()
+    key = ds.key('Allocation', int(id))
+
+    entity = datastore.Entity(key=key)
+    data = ds.get(key)
+
+    data['country'] = cty
+    entity.update(data)
+
+    ds.put(entity)
+    return from_datastore(entity)
+
+
+
+def set_bulk_country_allocs(cty='es'):
+    ds = get_client()
+    cty = 'es'
+    query = ds.query(kind='Allocation')
+    query.add_filter('cty','=',cty)
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+
+    entities = builtin_list(map(from_datastore, page))
+    for entity in entities:
+        if 'country' in entity:
+            if entity['country'] == cty:
+                # set_country_allocs(entity['id'], cty)
+                pass
+            else:
+                set_country_allocs(entity['id'], cty)
+
+        else:
+            set_country_allocs(entity['id'], cty)
+
+    return entities
 # def add_auths(id,emails):
 #     ds = get_client()
 #     if id:

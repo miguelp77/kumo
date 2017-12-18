@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+    <!--<meta charset="UTF-8">-->
+    <!--<title></title>-->
+<!--</head>-->
+<!--<body>-->
+{% extends "base.html" %}
+
+{% block content %}
+
+<style media="screen">
+    /*body{background-image: url("/static/images/google_DC.jpg");}*/
+    canvas{ display: block; vertical-align: bottom; } /* ---- particles.js container ---- */
+    #particles-js{ display:none; position:absolute; width: 100%; height: 100%;
+    background-color: #b61924; background-image: url("");
+    background-repeat: no-repeat; background-size: cover; background-position: 50% 50%; }
+</style>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
@@ -12,7 +23,7 @@
   google.charts.load("current", {packages:["timeline"]});
   google.charts.setOnLoadCallback(drawChart);
   function drawChart() {
-    var container = document.getElementById('example2.2');
+    var container = document.getElementById('contenido');
     var chart = new google.visualization.Timeline(container);
     var dataTable = new google.visualization.DataTable();
 
@@ -24,15 +35,11 @@
 
     dataTable.addRows([
         {{data|replace('["','',1)|replace('", "','')|replace("', '","") |replace('"]','',1)|replace("['[","[",1)|replace(") ],']",") ]",1)|safe}}
-/*
-      [  'George Washington', new Date(1789, 3, 1, 0, 0), new Date(1789, 3, 1, 23, 59) ],
-      [  'John Adams',        new Date(1789, 2, 4, 0, 0),  new Date(1789, 2, 4, 23, 59) ],
-      [  'John Adams',        new Date(1789, 2, 5, 0, 0),  new Date(1789, 2, 5, 23, 59) ],
-      [  'Thomas Jefferson',  new Date(1789, 5, 4, 0, 0),  new Date(1789, 5, 4, 23, 59) ]
-*/
+
       ]);
 
     var options = {
+      tooltip: {isHtml: true},
       timeline: { showRowLabels: true },
       avoidOverlappingGridLines: true
 
@@ -42,7 +49,18 @@
   }
 </script>
 
-<div id="example2.2" style="height:800px;"></div>
+<div id="contenido" style="height:800px;"></div>
+<div id="totales">
+    <div class="row">
 
-</body>
-</html>
+    {% for user,holiday in number_of_holidays.items() %}
+        <div class="col s3 lb">{{user}}</div>
+        <div class="col s1 lb">{{holiday}}</div>
+    {% endfor %}
+    </div>
+</div>
+<!--</body>-->
+<!--</html>-->
+
+
+    {% endblock %}

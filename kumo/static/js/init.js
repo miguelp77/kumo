@@ -139,17 +139,20 @@
 
   // Validation form
   $('#form').on('change', function(){
-         if($('#project').val() != null && $('#approver').val() != null ){
-           if($('#start_date').siblings('input').val() != "" && $('#end_date').siblings('input').val() != "" ){       
-               console.log($('#start_date'));
-               $('#submit').removeAttr('disabled');  
-           } else {
-             $('#submit').attr('disabled','disabled');
-           }
-         } else {
-           $('#submit').attr('disabled','disabled');
-         }
-       });
+    var project = $('#project')[0][0].text;
+    var approver = $('#approver')[0][0].text;
+    console.log("--------" + approver);
+    if(project != null && approver != null ){
+      if($('#start_date').siblings('input').val() != "" && $('#end_date').siblings('input').val() != "" ){
+        console.log($('#start_date'));
+        $('#submit').removeAttr('disabled');
+      } else {
+        $('#submit').attr('disabled','disabled');
+      }
+    } else {
+      $('#submit').attr('disabled','disabled');
+    }
+  });
 
   $('#check_all[type="checkbox"]+label').on('click', function(){
     if(!$("#check_all").prop('checked')){
