@@ -1176,7 +1176,9 @@ def edit(id):
 @oauth2.required
 def submited(id):
     allocation = get_model().read_allocation(id)
-    allocation['status'] = 'submited'
+    allocation['status'] = 'submitted'
+    print('*'*80)
+    print("HERE I AM!!!!!")
     get_model().update_allocation(data=allocation, kind='Allocation', id=id)
     return redirect(url_for('.list_mine'))
 
