@@ -104,14 +104,22 @@ def list_all(limit=10000,  email=None,  day=None, month=None, year=None, project
         query.add_filter('status', '=', str(status))
 
     query_iterator = query.fetch()
-    entities = list(query_iterator)
+    # entities = list(query_iterator)
     # page = next(query_iterator.pages)
     #
     # entities = builtin_list(map(from_datastore, page))
     # next_cursor = (
     #     query_iterator.next_page_token.decode('utf-8')
     #     if query_iterator.next_page_token else None)
-    next_cursor = None
+
+
+    entities = builtin_list(map(from_datastore, query_iterator))
+    next_cursor=None
+
+    print('>'*80)
+    print(len(entities))
+    print("Entidades")
+
     return entities, next_cursor
 
 
@@ -191,8 +199,8 @@ def list_by_month(user_id,  kind='Allocation',limit=50, cursor=None,year='2017',
     return entities, next_cursor, dates
 
 
-def assigned_to_me(user_email, kind='Allocation', limit=None,  email=None,  day=None, month=None, year=None, project=None, hours=None,
-     status=None, cursor=None):
+def assigned_to_me(user_email,token=None, kind='Allocation', limit=None,  email=None,  day=None, month=None, year=None, project=None, hours=None,
+     status=None,display=None, cursor=None):
     ds = get_client()
 
     query = ds.query(kind='Allocation')
@@ -212,17 +220,30 @@ def assigned_to_me(user_email, kind='Allocation', limit=None,  email=None,  day=
         query.add_filter('hours_type', '=', str(hours))
     if status:
         query.add_filter('status', '=', str(status))
+    if display:
+        query.add_filter('status', '=', str(display))
 
     query.add_filter('approver','=',str(user_email))
     # query.add_filter('status','=','submit')
 
     query_iterator = query.fetch()
-    page = next(query_iterator.pages)
+    # query_iterator = query.fetch(start_cursor=token)
+    # query_iterator = query.fetch(offset=0, limit=1000)
 
-    entities = builtin_list(map(from_datastore, page))
-    next_cursor = (
-        query_iterator.next_page_token.decode('utf-8')
-        if query_iterator.next_page_token else None)
+    # page = next(query_iterator.pages)
+    #
+    # entities = builtin_list(map(from_datastore, page))
+    #
+    # next_cursor = (
+    #     query_iterator.next_page_token.decode('utf-8')
+    #     if query_iterator.next_page_token else None)
+
+    entities = builtin_list(map(from_datastore, query_iterator))
+    next_cursor=None
+
+    print('*'*80)
+    print(len(entities))
+    print("ENTIDADES")
     return entities, next_cursor
 
 
@@ -821,7 +842,7 @@ def set_country_allocs(id, cty):
 
 def set_bulk_country_allocs(cty='es'):
     ds = get_client()
-    cty = 'es'
+    # cty = 'es'
     query = ds.query(kind='Allocation')
     query.add_filter('cty','=',cty)
     query_iterator = query.fetch()
@@ -861,3 +882,47 @@ def set_bulk_country_allocs(cty='es'):
 #     entity.update(data)
 #     ds.put(entity)
 #     return from_datastore(entity)
+
+def normalize_allocations():
+    ds = get_client()
+    query = ds.query(kind='Allocation')
+    query.add_filter('cty', '=', 'tbd')
+    query.add_filter('status', '=', 'submited')
+    query.add_filter('month', '=', 12)
+
+    query_iterator = query.fetch()
+    page = next(query_iterator.pages)
+
+    entities = builtin_list(map(from_datastore, page))
+    for entity in entities:
+        if 'country' in entity:
+            if entity['country'] == 'tbd':
+                # set_country_allocs(entity['id'], cty)
+                pass
+            else:
+                # set_country_allocs(entity['id'], 'mx')
+                # delete_property(entity['id'],'cty')
+                pass
+
+        else:
+            # set_country_allocs(entity['id'], 'mx')
+            print('***** Country actualizado')
+            print('u: ' + entity['user_email'])
+
+
+    return entities
+
+def delete_property(id,property):
+    ds = get_client()
+    key = ds.key('Allocation', int(id))
+    entity = datastore.Entity(key=key)
+
+    data = ds.get(key)
+    if property in data:
+        del data[property]
+        print(property + ' has been delete from ' + str(id))
+
+    entity.update(data)
+    ds.put(entity)
+    return from_datastore(entity)
+

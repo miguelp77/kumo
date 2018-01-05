@@ -10,6 +10,7 @@ import datetime as dt
 from werkzeug.utils import secure_filename
 import urllib.request
 import json
+import re
 
 from collections import defaultdict
 from functools import wraps
@@ -172,6 +173,28 @@ def work_hours(start_date,end_date_inc):
     return hours
 
 
+def check_browser():
+    browser = request.user_agent.browser
+    version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
+    platform = request.user_agent.platform
+    uas = request.user_agent.string
+    if browser and version:
+        if (browser == 'msie' and version < 9) \
+        or (browser == 'firefox' and version < 4) \
+        or (platform == 'android' and browser == 'safari' and version < 534) \
+        or (platform == 'iphone' and browser == 'safari' and version < 7000) \
+        or ((platform == 'macos' or platform == 'windows') and browser == 'safari' and not re.search('Mobile', uas) and version < 534) \
+        or (re.search('iPad', uas) and browser == 'safari' and version < 7000) \
+        or (platform == 'windows' and re.search('Windows Phone OS', uas)) \
+        or (browser == 'opera') \
+        or (re.search('BlackBerry', uas)):
+            details = {"browser": browser, "version": version, "platform": platform, "agent": uas}
+            return False, details
+        else:
+            details = {"browser": browser, "version": version, "platform": platform, "agent": uas}
+            return True, details
+
+
 # Routing
 @crud.route("/")
 def showHome():
@@ -179,12 +202,18 @@ def showHome():
     if token:
         token = token.encode('utf-8')
 
-    allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token)
+    # allocations, next_page_token = get_model().list_all(kind='Allocation',cursor=token)
+    browser_ok, details = check_browser()
+    if browser_ok:
+        return render_template(
+            "home.html"
+        # allocations=allocations,
+       # next_page_token=next_page_token
+            )
+    else:
+        return render_template("not_access.html", details=details)
 
-    return render_template(
-        "home.html",
-        allocations=allocations,
-        next_page_token=next_page_token)
+
 
 
 @crud.route("/user", methods=['GET', 'POST'])
@@ -346,6 +375,7 @@ def list_allocations():
     current_month = now.month
 
 
+
     return render_template(
         "list_all.html",
         total_months=total_months,
@@ -448,6 +478,10 @@ def user_allocations(email):
 
     total_hours, total_months, total_projects = _get_hours(allocations)
 
+
+    print("-"*80)
+    print(len(allocations))
+    print("allocationsssss")
 
     return render_template(
         "list_by_user.html",
@@ -895,6 +929,9 @@ def review_allocations():
                    'submited',
                    'accepted']
 
+    print("*"*80)
+    print(len(allocations))
+    print("allocations")
     return render_template(
         "review_allocations.html",
         allocations=allocations,
@@ -946,7 +983,8 @@ def review_allocations_as_other(as_email):
         year=year,
         project=project,
         hours=hours,
-        status=status)
+        status=status,
+        display=display, token=token)
 
 
     total_hours, total_months, total_projects = _get_hours(allocations)
@@ -1050,7 +1088,7 @@ def add_allocation():
         if 'country' not in data:
             # Default value for cty (country) is 'es'
             print("="*80)
-            country = 'es'
+            country = 'tbd'
             print("No tengo country y por defecto es igual a " + country )
             data['country'] = country
         else:
@@ -1335,7 +1373,6 @@ def _remove_auth(id, email):
         hours_per_user=hours_per_user)
 
 
-
 @crud.route('/roadmap')
 def roadmap():
     next_release = [
@@ -1351,3 +1388,8 @@ def roadmap():
         }
         ]
     return jsonify(next_release)
+
+@crud.route('/regulariza')
+def regulariza():
+    regs = get_model().normalize_allocations()
+    return jsonify(regs)

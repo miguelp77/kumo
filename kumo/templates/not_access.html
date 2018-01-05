@@ -5,6 +5,12 @@
     <div class="valign-wrapper center-align">
         <h1 class="red-text lighten-4">No tiene acceso a está página.</h1>
     </div>
+    {% if details %}
+      <h4>Navegador no soportado. Por favor, capture esta pantalla.</h4>
+      {% for k,detail in details.items() %}
+        <h5>{{k}}: {{detail}}</h5>
+      {% endfor %}
+    {% endif %}
     <a href="/" class="right">Inicio</a>
 </div>
 <div class="col s6">
